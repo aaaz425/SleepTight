@@ -19,6 +19,11 @@ export class UserService {
         return user;
     }
 
+    async findByEmail(email: string): Promise<User | null> {
+        const user = await this.userRepository.findOneBy({ email });
+        return user;
+    }
+
     async updateName(id: number, name: string): Promise<User> {
         const user = await this.findById(id);
         user.name = name;
