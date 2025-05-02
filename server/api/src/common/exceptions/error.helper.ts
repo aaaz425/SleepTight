@@ -10,3 +10,14 @@ export function throwBadRequest(message: string, code: string) {
         HttpStatus.BAD_REQUEST,
     );
 }
+
+export function throwUnauthorizedException(message: string, code: string) {
+    throw new HttpException(
+        {
+            status: HttpStatus.UNAUTHORIZED,
+            error: message,
+            code: code
+        },
+        HttpStatus.UNAUTHORIZED
+    );
+}

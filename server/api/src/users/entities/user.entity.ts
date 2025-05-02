@@ -14,14 +14,14 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   email: string;
 
-  @Column({ type: 'time', default: '07:00', nullable: true })
-  wake_time: string | null;
+  @Column({ type: 'time', default: '07:00', nullable: false })
+  wake_time: string;
 
-  @Column({ type: 'time', default: '23:00', nullable: true })
-  sleep_time: string | null;
+  @Column({ type: 'time', default: '23:00', nullable: false })
+  sleep_time: string;
 
-  @Column({ type: 'interval', default: '8 hours', nullable: true })
-  min_sleep_duration: string | null;
+  @Column({ type: 'interval', default: '8 hours', nullable: false })
+  min_sleep_duration: string
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

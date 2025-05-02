@@ -7,6 +7,9 @@ import { User } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 import { kakaoUser } from "./interfaces/kakao.user.interface";
 import { throwBadRequest } from "src/common/exceptions/error.helper";
+import { ResponseLoginDto } from "./dto/response-login.dto";
+import { ResponseJoinDto } from "./dto/response-join.dto";
+import { ResponseOauthLoginDto } from "./dto/response-oauth-login.dto";
 
 @Injectable()
 export class AuthService {
@@ -25,7 +28,6 @@ export class AuthService {
                 }
             })
         )
-        console.log(kakaoResponse);
         //카카오로 부터 받는 정보는 최소한(id, email, name)으로 생각하고 구현했습니다.
         const data = kakaoResponse.data;
         const kakaoUser: kakaoUser = {
@@ -49,34 +51,43 @@ export class AuthService {
         if(!user) {
             //유저가 없으면 생성합니다.
             const kakaoId: string = kakaoUser.id.toString();
-            this.createUser(kakaoUser);
-        } else if(user.status === 'Incomplete Registration') {
-            //유저가 있지만 가입이 완료되지 않았으면 에러를 던집니다.
-            throwBadRequest('가입이 완료되지 않았습니다.', 'INCOMPLETE_REGISTRATION');
+            const dto :Promise<ResponseOauthLoginDto> = this.createUserTemporary(kakaoUser);
+            return dto;
         } else {
-            //유저가 있으면 로그인
-            this.login(user)
+            //유저가 있으면 리턴
+            const payload = {
+                sub: user.id,
+                email: user.email,
+                status: user.status
+            };
+            const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+            user.refresh_token = refreshToken;
+            await this.userRepository.save(user);
+            const dto :ResponseOauthLoginDto = ResponseOauthLoginDto.fromEntity(user, accessToken, refreshToken)
+            return dto;
         }
     }
 
-    //TODO: 로그인 후 JWT 토큰을 발급하고 유저 정보를 반환합니다.
-    private async login(user: User) {
-        const payload = { email: user.email, sub: user.id };
-        const accessToken = this.jwtService.sign(payload, {
-            secret: process.env.JWT_SECRET,
-            expiresIn: '1h',
-        });
-        return {
-            access_token: accessToken,
-            user: user,
+    private async createUserTemporary(kakaoUser: kakaoUser): Promise<ResponseOauthLoginDto>  {
+        const tempUser = new User();
+        tempUser.serial_number = kakaoUser.id;
+        tempUser.provider = kakaoUser.provider;
+        tempUser.email = kakaoUser.email;
+        tempUser.status = 'Incomplete Registration';
+        const newUser :User = await this.userRepository.save(tempUser);
+        //JWT 토큰 발급
+        const payload = { 
+            sub: newUser.id,
+            email: newUser.email,
+            status: newUser.status
         };
-    }
-    private async createUser(kakaoUser: kakaoUser): Promise<User>  {
-        const newUser = new User();
-        newUser.serial_number = kakaoUser.id;
-        newUser.provider = kakaoUser.provider;
-        newUser.email = kakaoUser.email;
-        newUser.status = 'Incomplete Registration';
-        return await this.userRepository.save(newUser)
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+        const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+        
+        newUser.refresh_token = refreshToken;
+        await this.userRepository.save(newUser);
+        const dto :ResponseOauthLoginDto = ResponseOauthLoginDto.fromEntity(newUser, accessToken, refreshToken)
+        return dto;
     }
 }

@@ -6,19 +6,30 @@ import { HttpModule } from "@nestjs/axios";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "src/users/entities/user.entity";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { JwtStrategy } from "./jwt.strategy";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User]),
-        UserModule,
+        ConfigModule,
+        // UserModule,
         HttpModule,
-        JwtModule,
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+              secret: configService.get<string>('JWT_SECRET'),
+              signOptions: { expiresIn: '1h' },
+            })
+        })
     ],
     controllers: [
         AuthController
     ],
     providers: [
-        AuthService
+        AuthService,
+        JwtStrategy
     ],
 })
 
