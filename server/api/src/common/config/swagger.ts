@@ -11,13 +11,14 @@ export function setupSwagger(app: INestApplication): void {
     .setTitle('Sleep Tight API Docs')
     .setDescription('Sleep Tight API description')
     .setVersion('1.0.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'Authorization',
-      in: 'header',
-    }) // ✅ JWT 인증 사용 시 주석 해제 (Controller에 @ApiBearerAuth() 추가해 사용)
+    // .addBearerAuth({
+    //   type: 'http',
+    //   scheme: 'bearer',
+    //   bearerFormat: 'JWT',
+    //   name: 'Authorization',
+    //   in: 'header',
+    // }) // ✅ JWT 인증 사용 시 주석 해제 (Controller에 @ApiBearerAuth() 추가해 사용)
+    .addServer('/api')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
