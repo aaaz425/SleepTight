@@ -30,6 +30,7 @@ export class UserController {
     return this.userService.updateName(userId, firstName, lastName);
   }
 
+  // 사용자 생년월일 변경
   @UseGuards(JwtAuthGuard)
   @Patch('birthDate')
   async updateBirthDate(
@@ -39,5 +40,16 @@ export class UserController {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateBirthdate(userId, birthDate);
   }
+
+    // 사용자 성별 변경
+    @UseGuards(JwtAuthGuard)
+    @Patch('gender')
+    async updateGender(
+      @Request() req,
+      @Body('gender') gender :string,
+    ): Promise<ResponseUserInfoDto> {
+      const userId = req.user.userId // JWT에서 userId를 가져옴
+      return this.userService.updateGender(userId, gender);
+    }
 
 }
