@@ -1,30 +1,25 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:app/main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:app/features/user/presentation/screens/user_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('User name changes on button press', (WidgetTester tester) async {
+    // 위젯을 ProviderScope로 감싸서 테스트 환경 구성
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: UserScreen())),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // 초기 상태: "Guest"라는 텍스트가 보여야 함
+    expect(find.text('Hello, Guest'), findsOneWidget);
+    expect(find.text('Hello, 홍길동'), findsNothing);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // 버튼을 눌러 상태 변경
+    await tester.tap(find.text('이름 변경'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 이름이 '홍길동'으로 변경되었는지 확인
+    expect(find.text('Hello, Guest'), findsNothing);
+    expect(find.text('Hello, 홍길동'), findsOneWidget);
   });
 }
