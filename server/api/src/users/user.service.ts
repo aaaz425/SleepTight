@@ -11,6 +11,11 @@ export class UserService {
         private readonly userRepository: Repository<User>,
     ) {}
 
+    async create(user: User): Promise<User> {
+        const newUser = this.userRepository.create(user);
+        return this.userRepository.save(newUser);
+    }
+    
     async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
@@ -19,9 +24,14 @@ export class UserService {
         return user;
     }
 
+    async findByEmail(email: string): Promise<User | null> {
+        const user = await this.userRepository.findOneBy({ email });
+        return user;
+    }
+
     async updateName(id: number, name: string): Promise<User> {
         const user = await this.findById(id);
-        user.name = name;
+        user.first_name = name;
         return this.userRepository.save(user);
     }
 }
