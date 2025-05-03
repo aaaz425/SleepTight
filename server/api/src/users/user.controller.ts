@@ -1,8 +1,9 @@
 // src/user/user.controller.ts
-import { Controller, Get, Post, Body, Param, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, UseGuards, Request, HttpCode } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import {UserService} from './user.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ResponseUserInfoDto } from './dto/response-userInfo.dto';
 
 
 @Controller('user')
@@ -17,10 +18,10 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("/test")
-  async findUser(@Param('id') id: number): Promise<User>{
-    console.log("findUser======================", id);
-    return this.userService.findById(id);
+  @Get()
+  async getUserInfo(@Request() req): Promise<ResponseUserInfoDto>{
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.getUserInfo(userId);
   }
 
 }
