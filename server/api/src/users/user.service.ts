@@ -29,10 +29,18 @@ export class UserService {
         return user;
     }
 
-    async updateName(id: number, name: string): Promise<User> {
+    async updateName(id: number, firstName: string, lastName :string): Promise<ResponseUserInfoDto> {
         const user = await this.findById(id);
-        user.first_name= name;
-        return this.userRepository.save(user);
+        user.first_name = firstName;
+        user.last_name = lastName;
+        await this.userRepository.update(
+            user.id, {
+                first_name: firstName,
+                last_name: lastName 
+            }
+        );
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
+        return responseUserInfoDto;
     }
 
     private async findById(id: number): Promise<User> {

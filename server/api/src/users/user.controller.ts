@@ -11,10 +11,15 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   // 사용자 이름 변경
-  //TODO: Header에 있는 Token으로 user_id 가져오기
-  @Patch('name/:id')
-  async updateName(@Param('id') id: number, @Body() name: string): Promise<User> {
-    return this.userService.updateName(id, name);
+  @UseGuards(JwtAuthGuard)
+  @Patch('name')
+  async updateName(
+    @Request() req,
+    @Body('firstName') firstName :string,
+    @Body('lastName') lastName :string,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateName(userId, firstName, lastName);
   }
 
   @UseGuards(JwtAuthGuard)

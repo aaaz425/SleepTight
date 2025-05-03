@@ -19,7 +19,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
         // 사용자 Status 체크
         //TODO: 탈퇴회원, 휴면회원 관리
-        if (user.status === 'INCOMPLETE_REGISTRATION') {
+        if (user.status === 'Incomplete Registration') {
             throwBadRequest('회원가입이 완료되지 않았습니다.', 'INCOMPLETE_REGISTRATION');
         }
         return user;
