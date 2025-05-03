@@ -21,3 +21,14 @@ export function throwUnauthorizedException(message: string, code: string) {
         HttpStatus.UNAUTHORIZED
     );
 }
+
+export function throwNotFoundException(message: string, code: string) :never{
+    throw new HttpException(
+        {
+            status: HttpStatus.NOT_FOUND,
+            error: message,
+            code: code
+        },
+        HttpStatus.NOT_FOUND
+    );
+}
