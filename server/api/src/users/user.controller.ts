@@ -10,6 +10,14 @@ import { ResponseUserInfoDto } from './dto/response-userInfo.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // 사용자 정보 조회
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getUserInfo(@Request() req): Promise<ResponseUserInfoDto>{
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.getUserInfo(userId);
+  }
+
   // 사용자 이름 변경
   @UseGuards(JwtAuthGuard)
   @Patch('name')
@@ -23,10 +31,13 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  async getUserInfo(@Request() req): Promise<ResponseUserInfoDto>{
+  @Patch('birthDate')
+  async updateBirthDate(
+    @Request() req,
+    @Body('birthDate') birthDate :Date,
+  ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
-    return this.userService.getUserInfo(userId);
+    return this.userService.updateBirthdate(userId, birthDate);
   }
 
 }

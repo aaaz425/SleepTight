@@ -13,22 +13,14 @@ export class UserService {
         private readonly userRepository: Repository<User>,
     ) {}
 
-    async create(user: User): Promise<User> {
-        const newUser = this.userRepository.create(user);
-        return this.userRepository.save(newUser);
-    }
-    
+    // 사용자 정보 조회
     async getUserInfo(id: number): Promise<ResponseUserInfoDto> {
         const user = await this.findById(id);
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
         return responseUserInfoDto;
     }
 
-    async findByEmail(email: string): Promise<User | null> {
-        const user = await this.userRepository.findOneBy({ email });
-        return user;
-    }
-
+    // 사용자 이름 변경
     async updateName(id: number, firstName: string, lastName :string): Promise<ResponseUserInfoDto> {
         const user = await this.findById(id);
         user.first_name = firstName;
@@ -43,6 +35,20 @@ export class UserService {
         return responseUserInfoDto;
     }
 
+    // 사용자 생년월일 변경
+    async updateBirthdate(id: number, birthDate :Date): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.birth_date = birthDate
+        await this.userRepository.update(
+            user.id, {
+                birth_date: birthDate 
+            }
+        );
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
+        return responseUserInfoDto;
+    }
+
+    // userId로 사용자 조회
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
