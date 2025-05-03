@@ -48,6 +48,19 @@ export class UserService {
         return responseUserInfoDto;
     }
 
+    // 사용자 성별 변경
+    async updateGender(id: number, gender :string): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.gender = gender
+        await this.userRepository.update(
+            user.id, {
+                gender : gender 
+            }
+        );
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
+        return responseUserInfoDto;
+    }
+
     // userId로 사용자 조회
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
