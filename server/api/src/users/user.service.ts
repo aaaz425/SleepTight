@@ -101,6 +101,17 @@ export class UserService {
         return responseUserInfoDto;
     }
 
+    // 사용자 목표 수면 시간 변경
+    async updateMinSleepDuration(id: number, minSleepDuration: string): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.min_sleep_duration = minSleepDuration
+        await this.userRepository.update(
+            user.id, { min_sleep_duration : minSleepDuration }
+        );
+        const updatedUser = await this.findById(id);
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(updatedUser);
+        return responseUserInfoDto;
+    }
     // userId로 사용자 조회
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
