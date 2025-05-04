@@ -52,4 +52,15 @@ export class UserController {
       return this.userService.updateGender(userId, gender);
     }
 
+    // 사용자 국적 변경
+    @UseGuards(JwtAuthGuard)
+    @Patch('country')
+    async updateCountry(
+      @Request() req,
+      @Body('country') country :string,
+    ): Promise<ResponseUserInfoDto> {
+      const userId = req.user.userId // JWT에서 userId를 가져옴
+      return this.userService.updateCountry(userId, country);
+    }    
+
 }

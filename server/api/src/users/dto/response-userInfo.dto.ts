@@ -13,6 +13,8 @@ export class ResponseUserInfoDto {
     weight: number
     height: number
     gender: string
+    birthDate: Date
+    country: string
     lengthUnit: string
     weightUnit: string
     status: string
@@ -31,6 +33,8 @@ export class ResponseUserInfoDto {
         dto.weight = user.weight??0;
         dto.height = user.height??0;
         dto.gender = user.gender??'';
+        dto.birthDate = user.birth_date??new Date();
+        dto.country = user.nationality??'';
         dto.lengthUnit = user.length_unit??'' 
         dto.weightUnit = user.weight_unit??''
         dto.status = user.status??'';
