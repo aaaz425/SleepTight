@@ -95,4 +95,26 @@ export class UserController {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateMinSleepDuration(userId, minSleepDuration);
   }
+  
+  // 사용자 취침 시간 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('sleep-time')
+  async updateSleepTime(
+    @Request() req,
+    @Body('sleep_time') sleepTime: string,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateSleepTime(userId, sleepTime);
+  }
+
+  // 사용자 기상 시간 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('wake-time')
+  async updateWakeTime(
+    @Request() req,
+    @Body('wake_time') wakeTime: string,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateWakeTime(userId, wakeTime);
+  }
 }

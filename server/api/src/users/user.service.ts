@@ -112,6 +112,30 @@ export class UserService {
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(updatedUser);
         return responseUserInfoDto;
     }
+
+    // 사용자 취침 시간 변경
+    async updateSleepTime(id: number, sleepTime: string): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.sleep_time = sleepTime
+        await this.userRepository.update(
+            user.id, { sleep_time : sleepTime }
+        );
+        const updatedUser = await this.findById(id);
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(updatedUser);
+        return responseUserInfoDto;
+    }
+    
+    // 사용자 기상 시간 변경
+    async updateWakeTime(id: number, wakeTime: string): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.wake_time = wakeTime
+        await this.userRepository.update(
+            user.id, { wake_time : wakeTime }
+        );
+        const updatedUser = await this.findById(id);
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(updatedUser);
+        return responseUserInfoDto;
+    }
     // userId로 사용자 조회
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
