@@ -22,7 +22,6 @@ pipeline {
   stages {
     stage('Checkout & Prepare') {
       steps {
-        script { set -e }
         // 소스 코드 체크아웃
         git branch: "${GIT_BRANCH}",
             credentialsId: 'gitlab-access-token-credential',

@@ -22,7 +22,6 @@ pipeline {
   stages {
     stage('Checkout & Prepare') {
       steps {
-        script { set -e }
         git branch: "${GIT_BRANCH}",
             credentialsId: 'gitlab-access-token-credential',
             url: "${GIT_URL}"
