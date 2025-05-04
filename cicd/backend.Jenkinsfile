@@ -39,20 +39,22 @@ pipeline {
 
     stage('Docker Login') {
       steps {
-        script { set -e }
         withCredentials([usernamePassword(
           credentialsId: "${DOCKER_HUB_CRED}",
           usernameVariable: 'DOCKERHUB_USR',
           passwordVariable: 'DOCKERHUB_PSW'
         )]) {
-          sh 'echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
+          sh '''
+            #!/bin/bash -e
+            echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin \
+              || { echo "[ERROR] Docker login failed"; exit 1; }
+          '''
         }
       }
     }
 
     stage('Build & Push Backend') {
       steps {
-        script { set -e }
         sh '''
           # 1) Nest.js 빌드
           cd server/api
@@ -73,7 +75,6 @@ pipeline {
 
     stage('Deploy Backend') {
       steps {
-        script { set -e }
         sh '''
           # 배포 디렉토리 준비
           mkdir -p "$REMOTE_APP_DIR"
