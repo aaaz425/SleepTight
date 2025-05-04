@@ -14,6 +14,11 @@ pipeline {
     GIT_BRANCH        = 'dev/be'
     GIT_URL           = 'https://lab.ssafy.com/s12-final/S12P31S303.git'
 
+    // EC2 SSH 설정
+    DEPLOY_USER       = 'ubuntu'
+    DEPLOY_HOST       = '43.202.63.167'
+    SSH_CREDENTIAL_ID = 'ec2-ssh-key'
+
     // EC2 배포 디렉토리 및 Compose 경로
     REMOTE_APP_DIR    = '/home/ubuntu/sleep-tight-app'
     COMPOSE_FILE_PATH = 'cicd/docker-compose.yml'
@@ -73,22 +78,26 @@ pipeline {
 
     stage('Deploy Backend') {
       steps {
-        sh '''
-          set -e
-          
-          # 배포 디렉토리 준비
-          mkdir -p "$REMOTE_APP_DIR"
+        sshagent (credentials: [SSH_CREDENTIAL_ID]) {
+          sh """
+            # 1) 배포 디렉토리 생성 (ubuntu 권한으로)
+            ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST \\
+              "mkdir -p \$REMOTE_APP_DIR"
 
-          # .env, docker-compose.yml, 배포 스크립트 복사
-          cp ./.env "$REMOTE_APP_DIR"/.env
-          cp "$COMPOSE_FILE_PATH" "$REMOTE_APP_DIR"/docker-compose.yml
-          cp cicd/deploy_backend.sh "$REMOTE_APP_DIR"/deploy_backend.sh
-          chmod +x "$REMOTE_APP_DIR"/deploy_backend.sh
+            # 2) 파일 복사 (.env, docker-compose.yml, 스크립트)
+            scp -o StrictHostKeyChecking=no ./.env \\
+                \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/.env
+            scp -o StrictHostKeyChecking=no \$COMPOSE_FILE \\
+                \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/docker-compose.yml
+            scp -o StrictHostKeyChecking=no cicd/deploy_backend.sh \\
+                \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/deploy_backend.sh
 
-          # 로컬에서 배포 스크립트 실행
-          cd "$REMOTE_APP_DIR"
-          bash ./deploy_backend.sh
-        '''
+            # 3) 권한 부여 및 실행
+            ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST \\
+              "chmod +x \$REMOTE_APP_DIR/deploy_backend.sh && \\
+               cd \$REMOTE_APP_DIR && ./deploy_backend.sh"
+          """
+        }
       }
     }
   }
