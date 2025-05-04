@@ -37,7 +37,6 @@ pipeline {
 
     stage('Docker Login') {
       steps {
-        script { set -e }
         withCredentials([usernamePassword(
           credentialsId: "${DOCKER_HUB_CRED}",
           usernameVariable: 'DOCKERHUB_USR',
@@ -50,7 +49,6 @@ pipeline {
 
     stage('Build & Push AI') {
       steps {
-        script { set -e }
         sh '''
           # 1) AI 서비스 빌드(필요 시 의존성 설치)
           cd server/ai
@@ -70,7 +68,6 @@ pipeline {
 
     stage('Deploy AI') {
       steps {
-        script { set -e }
         sh '''
           mkdir -p "$REMOTE_APP_DIR"
           cp ./.env "$REMOTE_APP_DIR"/.env
