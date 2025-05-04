@@ -45,9 +45,8 @@ pipeline {
           passwordVariable: 'DOCKERHUB_PSW'
         )]) {
           sh '''
-            #!/bin/bash -e
-            echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin \
-              || { echo "[ERROR] Docker login failed"; exit 1; }
+            set -e
+            echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
           '''
         }
       }
@@ -55,18 +54,17 @@ pipeline {
 
     stage('Build & Push Backend') {
       steps {
+        // Docker 멀티스테이지로 빌드+태그+푸시
         sh '''
-          # 1) Nest.js 빌드
+          set -e
           cd server/api
-          npm install --production=false
-          npm run build
 
-          # 2) Docker 이미지 태깅 및 푸시
           IMAGE_TAG=${DOCKER_REGISTRY}/${BACKEND_IMAGE}:${BUILD_NUMBER}
           LATEST_TAG=${DOCKER_REGISTRY}/${BACKEND_IMAGE}:latest
 
           docker build -t "$IMAGE_TAG" .
           docker tag "$IMAGE_TAG" "$LATEST_TAG"
+
           docker push "$IMAGE_TAG"
           docker push "$LATEST_TAG"
         '''
@@ -76,6 +74,8 @@ pipeline {
     stage('Deploy Backend') {
       steps {
         sh '''
+          set -e
+          
           # 배포 디렉토리 준비
           mkdir -p "$REMOTE_APP_DIR"
 
