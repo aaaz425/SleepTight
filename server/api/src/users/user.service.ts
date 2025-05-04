@@ -87,7 +87,20 @@ export class UserService {
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
         return responseUserInfoDto;
     }
-    
+
+    // 사용자 몸무게 변경
+    async updateWeight(id: number, weight: number): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.weight = weight
+        await this.userRepository.update(
+            user.id, {
+            weight: weight
+        }
+        );
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
+        return responseUserInfoDto;
+    }
+
     // userId로 사용자 조회
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
