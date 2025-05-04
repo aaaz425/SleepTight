@@ -61,6 +61,7 @@ export class UserService {
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
         return responseUserInfoDto;
     }
+
     // 사용자 국적 변경
     async updateCountry(id: number, country: string): Promise<ResponseUserInfoDto> {
         const user = await this.findById(id);
@@ -73,6 +74,20 @@ export class UserService {
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
         return responseUserInfoDto;
     }
+
+    // 사용자 키 변경
+    async updateHeight(id: number, height: number): Promise<ResponseUserInfoDto> {
+        const user = await this.findById(id);
+        user.height = height
+        await this.userRepository.update(
+            user.id, {
+            height: height
+        }
+        );
+        const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
+        return responseUserInfoDto;
+    }
+    
     // userId로 사용자 조회
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });

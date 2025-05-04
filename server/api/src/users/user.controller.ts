@@ -1,19 +1,19 @@
 // src/user/user.controller.ts
 import { Controller, Get, Post, Body, Param, Patch, UseGuards, Request, HttpCode } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import {UserService} from './user.service';
+import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ResponseUserInfoDto } from './dto/response-userInfo.dto';
 
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   // 사용자 정보 조회
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getUserInfo(@Request() req): Promise<ResponseUserInfoDto>{
+  async getUserInfo(@Request() req): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.getUserInfo(userId);
   }
@@ -23,8 +23,8 @@ export class UserController {
   @Patch('name')
   async updateName(
     @Request() req,
-    @Body('firstName') firstName :string,
-    @Body('lastName') lastName :string,
+    @Body('firstName') firstName: string,
+    @Body('lastName') lastName: string,
   ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateName(userId, firstName, lastName);
@@ -35,32 +35,42 @@ export class UserController {
   @Patch('birthDate')
   async updateBirthDate(
     @Request() req,
-    @Body('birthDate') birthDate :Date,
+    @Body('birthDate') birthDate: Date,
   ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateBirthdate(userId, birthDate);
   }
 
-    // 사용자 성별 변경
-    @UseGuards(JwtAuthGuard)
-    @Patch('gender')
-    async updateGender(
-      @Request() req,
-      @Body('gender') gender :string,
-    ): Promise<ResponseUserInfoDto> {
-      const userId = req.user.userId // JWT에서 userId를 가져옴
-      return this.userService.updateGender(userId, gender);
-    }
+  // 사용자 성별 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('gender')
+  async updateGender(
+    @Request() req,
+    @Body('gender') gender: string,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateGender(userId, gender);
+  }
 
-    // 사용자 국적 변경
-    @UseGuards(JwtAuthGuard)
-    @Patch('country')
-    async updateCountry(
-      @Request() req,
-      @Body('country') country :string,
-    ): Promise<ResponseUserInfoDto> {
-      const userId = req.user.userId // JWT에서 userId를 가져옴
-      return this.userService.updateCountry(userId, country);
-    }    
+  // 사용자 국적 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('country')
+  async updateCountry(
+    @Request() req,
+    @Body('country') country: string,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateCountry(userId, country);
+  }
 
+  // 사용자 키 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('height')
+  async updateHeight(
+    @Request() req,
+    @Body('height') height: number,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateHeight(userId, height);
+  }
 }
