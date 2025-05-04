@@ -73,6 +73,7 @@ export class UserController {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateHeight(userId, height);
   }
+
   // 사용자 몸무게 변경
   @UseGuards(JwtAuthGuard)
   @Patch('weight')
@@ -82,5 +83,16 @@ export class UserController {
   ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateWeight(userId, weight);
+  }
+
+  // 사용자 목표 수면 시간 변경
+  @UseGuards(JwtAuthGuard)
+  @Patch('min-sleep-duration')
+  async updateMinSleepDuration(
+    @Request() req,
+    @Body('min_sleep_duration') minSleepDuration: string,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    return this.userService.updateMinSleepDuration(userId, minSleepDuration);
   }
 }
