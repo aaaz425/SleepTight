@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        google()       // ✅ Kotlin 플러그인이 존재하는 저장소
+        mavenCentral() // ✅ 백업 저장소
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+    }
+}
 allprojects {
     repositories {
         google()
