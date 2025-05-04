@@ -44,7 +44,11 @@ pipeline {
           usernameVariable: 'DOCKERHUB_USR',
           passwordVariable: 'DOCKERHUB_PSW'
         )]) {
-          sh 'echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin'
+          sh '''
+            #!/bin/bash -e
+            echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin \
+              || { echo "[ERROR] Docker login failed"; exit 1; }
+          '''
         }
       }
     }
