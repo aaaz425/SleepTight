@@ -10,8 +10,13 @@ NGINX_CONF="/etc/nginx/conf.d/service-url.inc"
 HEALTH_ENDPOINT="/api/utils/status"
 MAX_RETRIES=20
 RETRY_INTERVAL=5
+LOG_DIR="/home/ubuntu/deploy-logs"
 
 echo "=== 백엔드 Blue/Green 배포 시작 ==="
+
+# 0) 로그 디렉터리 준비
+echo "로그 디렉터리 확인: $LOG_DIR"
+sudo mkdir -p $LOG_DIR && sudo chown ubuntu:ubuntu $LOG_DIR
 
 # 현재 Nginx가 바라보는 포트 확인 (초기값: 8080)
 CURRENT_PORT=$(grep -oP '127\.0\.0\.1:\K[0-9]+' $NGINX_CONF || echo "8080")
@@ -55,9 +60,16 @@ set -e
 
 if [ $OK -ne 1 ]; then
   echo "❌ 헬스체크 실패, 롤백"
+
+  TIMESTAMP=$(date +%Y%m%d%H%M%S)
+  LOG_FILE="$LOG_DIR/${NEXT_SERVICE}_$TIMESTAMP.log"
+  echo "로그를 $LOG_FILE 에 저장합니다."
+  docker-compose -f $COMPOSE_FILE logs $NEXT_SERVICE > $LOG_FILE || true
+
   # Nginx 원복
   echo "set \$service_url http://127.0.0.1:${PREV_PORT};" | sudo tee $NGINX_CONF >/dev/null
   sudo nginx -s reload
+
   # 새 컨테이너 삭제
   docker-compose -f $COMPOSE_FILE stop $NEXT_SERVICE
   docker-compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE

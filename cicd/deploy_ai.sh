@@ -13,7 +13,7 @@ RETRY_INTERVAL=5
 
 echo "=== AI 서비스 배포 시작 ==="
 
-# 1) 최신 이미지 풀
+# 1) 이미지 풀
 docker-compose -f $COMPOSE_FILE pull $AI_SERVICE
 
 # 2) 기존 컨테이너 정리
@@ -23,7 +23,7 @@ docker-compose -f $COMPOSE_FILE rm -f $AI_SERVICE 2>/dev/null || true
 # 3) 새 컨테이너 실행
 docker-compose -f $COMPOSE_FILE up -d --no-deps $AI_SERVICE
 
-# 4) 헬스체크 (B 방식 적용)
+# 4) 헬스체크
 echo "헬스체크: $HEALTH_URL"
 set +e
 OK=0
