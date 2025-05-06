@@ -78,7 +78,7 @@ pipeline {
 
     stage('Deploy Backend') {
       steps {
-        sshagent (credentials: [SSH_CREDENTIAL_ID]) {
+        sshagent(credentials: [SSH_CREDENTIAL_ID]) {
           sh """
             # 1) 배포 디렉토리 생성 (ubuntu 권한으로)
             ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST \\
