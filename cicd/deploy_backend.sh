@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# (Optional) Ensure docker-compose is on PATH
+export PATH=$PATH:/usr/local/bin
+
 APP_DIR="/home/ubuntu/sleep-tight-app"
 COMPOSE_FILE="${APP_DIR}/docker-compose.yml"
 NGINX_CONF="/etc/nginx/conf.d/service-url.inc"
@@ -25,7 +28,7 @@ echo "배포 대상: $NEXT_SERVICE (포트: $NEXT_PORT)"
 # 1) 최신 이미지 풀
 docker-compose -f $COMPOSE_FILE pull $NEXT_SERVICE
 
-# 2) 이전 (같은 컬러) 컨테이너 정리
+# 2) 이전(같은 컬러) 컨테이너 정리
 docker-compose -f $COMPOSE_FILE stop $NEXT_SERVICE 2>/dev/null || true
 docker-compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE 2>/dev/null || true
 
@@ -34,25 +37,32 @@ docker-compose -f $COMPOSE_FILE up -d --no-deps $NEXT_SERVICE
 
 # 4) 헬스체크
 echo "헬스체크: http://127.0.0.1:${NEXT_PORT}${HEALTH_ENDPOINT}"
+# 헬스체크 블록에서는 오류 중단 방지
+set +e
+OK=0
 for i in $(seq 1 $MAX_RETRIES); do
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$NEXT_PORT$HEALTH_ENDPOINT)
   if [ "$HTTP_CODE" == "200" ]; then
     echo "✅ 새 컨테이너 준비 완료"
+    OK=1
     break
   fi
-  echo "⏳ ($i/$MAX_RETRIES) 준비 중..."
+  echo "⏳ ($i/$MAX_RETRIES) 준비 중... (HTTP $HTTP_CODE)"
   sleep $RETRY_INTERVAL
-  if [ $i -eq $MAX_RETRIES ]; then
-    echo "❌ 헬스체크 실패, 롤백"
-    # Nginx 원복
-    echo "set \$service_url http://127.0.0.1:${PREV_PORT};" | sudo tee $NGINX_CONF >/dev/null
-    sudo nginx -s reload
-    # 새 컨테이너 삭제
-    docker-compose -f $COMPOSE_FILE stop $NEXT_SERVICE
-    docker-compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE
-    exit 1
-  fi
 done
+# 오류 중단 모드로 복귀
+set -e
+
+if [ $OK -ne 1 ]; then
+  echo "❌ 헬스체크 실패, 롤백"
+  # Nginx 원복
+  echo "set \$service_url http://127.0.0.1:${PREV_PORT};" | sudo tee $NGINX_CONF >/dev/null
+  sudo nginx -s reload
+  # 새 컨테이너 삭제
+  docker-compose -f $COMPOSE_FILE stop $NEXT_SERVICE
+  docker-compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE
+  exit 1
+fi
 
 # 5) Nginx 트래픽 전환
 echo "set \$service_url http://127.0.0.1:${NEXT_PORT};" | sudo tee $NGINX_CONF >/dev/null
