@@ -14,17 +14,21 @@ export class MusicService {
 
   async getMusicInfo(musicId :number, userId :number): Promise<ResponseMusicDto> {
     const music = await this.musicRepository.findOneBy({ id: musicId });
-    console.log("userId", userId);
     if (!music) {
       throwNotFoundException('음악 정보를 찾을 수 없습니다.','MUSIC_NOT_FOUND');
     }
     const responseMusicDto = ResponseMusicDto.fromEntity(music, userId);
-    console.log("isLike?? : ", music.userList?.includes(userId));
     return responseMusicDto;
   }
 
-  async findAll(): Promise<Music[]> {
-    return this.musicRepository.find();
+  async getAllMusic(category :string, userId :number): Promise<ResponseMusicDto[]> {
+    let musicList :Music[];
+    if (!category || category === undefined || category === null) { // 카테고리가 없는 경우
+        musicList = await this.musicRepository.find();
+    } else { // 카테고리가 있으면 해당 카테고리의 음악만 가져옴
+        musicList = await this.musicRepository.findBy({ category });
+    }
+    return musicList.map((music) => ResponseMusicDto.fromEntity(music, userId));
   }
 
   async findOne(id: number): Promise<Music> {
