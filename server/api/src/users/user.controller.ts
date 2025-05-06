@@ -3,7 +3,9 @@ import { Controller, Get, Post, Body, Param, Patch, UseGuards, Request, HttpCode
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ResponseUserInfoDto } from './dto/response-userInfo.dto';
+import { ResponseUserInfoDto } from './dto/response-user-info.dto';
+import { request } from 'http';
+import { RequestRegisterUserInfoDto } from './dto/request-register-user-info.dto';
 
 
 @Controller('user')
@@ -116,5 +118,17 @@ export class UserController {
   ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
     return this.userService.updateWakeTime(userId, wakeTime);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async registerUserInfo(
+    @Request() req,
+    @Body() RequestRegisterUserInfoDto: RequestRegisterUserInfoDto,
+  ): Promise<ResponseUserInfoDto> {
+    const userId = req.user.userId // JWT에서 userId를 가져옴
+    console.log('userId', userId);
+    console.log('RequestRegisterUserInfoDto', RequestRegisterUserInfoDto);
+    return this.userService.registerUserInfo(userId, RequestRegisterUserInfoDto);
   }
 }
