@@ -12,15 +12,14 @@ import { JwtStrategy } from "./jwt.strategy";
 @Module({
     imports: [
         TypeOrmModule.forFeature([User]),
-        ConfigModule,
-        // UserModule,
         HttpModule,
+        ConfigModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
               secret: configService.get<string>('JWT_SECRET'),
-              signOptions: { expiresIn: '1h' },
+              signOptions: { expiresIn: configService.get<string>("ACCESS_TOKEN_EXPIRES_IN") }, //기본 설정 만료기간
             })
         })
     ],

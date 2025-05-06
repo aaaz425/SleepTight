@@ -7,8 +7,6 @@ import { User } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 import { kakaoUser } from "./interfaces/kakao.user.interface";
 import { throwBadRequest, throwUnauthorizedException } from "src/common/exceptions/error.helper";
-import { ResponseLoginDto } from "./dto/response-login.dto";
-import { ResponseJoinDto } from "./dto/response-join.dto";
 import { ResponseOauthLoginDto } from "./dto/response-oauth-login.dto";
 import { ConfigService } from "@nestjs/config";
 
