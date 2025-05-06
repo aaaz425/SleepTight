@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Request, UseGuards } from "@nestjs/common";
 import { MusicService } from "./music.service";
 import { ResponseMusicDto } from "./dto/response-music.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -11,8 +11,8 @@ export class MusicController {
 
     @UseGuards(JwtAuthGuard)
     @Get(":musicId")
-    async getMusicInfo(@Req() req, @Param("musicId") musicId :number) :Promise<ResponseMusicDto>{
-        const userId :number =  req.user.id??-1;
+    async getMusicInfo(@Request() req, @Param("musicId") musicId :number) :Promise<ResponseMusicDto>{
+        const userId :number =  req.user.userId;
         const ResponseMusicDto :ResponseMusicDto = await this.musicService.getMusicInfo(musicId, userId);
         return ResponseMusicDto;
     }
