@@ -5,9 +5,6 @@ part 'home_mode_provider.g.dart';
 enum HomeState {
   noAlarm, // 알람 설정 유도 화면
   waiting, // 알람 설정 및 수면 대기 화면
-  sleeping, // 수면 모드 화면
-  ringing, // 알람 화면
-  wakeUp, // 기상 화면
 }
 
 @riverpod

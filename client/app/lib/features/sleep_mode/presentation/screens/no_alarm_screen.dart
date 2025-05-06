@@ -21,7 +21,7 @@ class NoAlarmScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: const [
             Text(
-              '알람을 설정해보세요',
+              '알람 시간을 설정해보세요',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
             SizedBox(width: 4),
