@@ -6,16 +6,16 @@ import {
   Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadSoundRequestDto } from './dto/upload-sound.request.dto';
-import { UploadSoundResponseDto } from './dto/upload-sound.response.dto';
-import { SoundService } from './sound.service';
+import { UploadSleepSoundRequestDto } from './dto/upload-sleep-sound.request.dto';
+import { UploadSleepSoundResponseDto } from './dto/upload-sleep-sound.response.dto';
+import { SleepSoundService } from './sleep-sound.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 
 @ApiTags('Sleep')
 @Controller('sleep/sound')
-export class SoundController {
-  constructor(private readonly soundService: SoundService) {}
+export class SleepSoundController {
+  constructor(private readonly sleepSoundService: SleepSoundService) {}
 
   @Post()
   @ApiConsumes('multipart/form-data')
@@ -26,10 +26,10 @@ export class SoundController {
       },
     }),
   )
-  async uploadSound(
+  async uploadSleepSound(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: UploadSoundRequestDto,
-  ): Promise<UploadSoundResponseDto> {
-    return this.soundService.handleUpload(file, body);
+    @Body() body: UploadSleepSoundRequestDto,
+  ): Promise<UploadSleepSoundResponseDto> {
+    return this.sleepSoundService.handleUpload(file, body);
   }
 }

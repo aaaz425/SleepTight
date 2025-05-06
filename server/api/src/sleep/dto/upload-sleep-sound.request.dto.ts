@@ -2,7 +2,7 @@ import { IsNumber, IsISO8601, IsUUID, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UploadSoundRequestDto {
+export class UploadSleepSoundRequestDto {
   @ApiProperty({ type: 'string', format: 'binary' })
   @IsOptional() // 이건 실제로는 안 씀. Swagger UI용
   file?: any;
