@@ -86,7 +86,7 @@ pipeline {
             # 2) 파일 복사 (.env, docker-compose.yml, 스크립트)
             scp -o StrictHostKeyChecking=no ./.env \\
                 \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/.env
-            scp -o StrictHostKeyChecking=no \$COMPOSE_FILE \\
+            scp -o StrictHostKeyChecking=no \$COMPOSE_FILE_PATH \\
                 \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/docker-compose.yml
             scp -o StrictHostKeyChecking=no cicd/deploy_ai.sh \\
                 \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/deploy_ai.sh
