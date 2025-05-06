@@ -13,7 +13,7 @@ import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 
 @ApiTags('Sleep')
-@Controller('api/sleep/sound')
+@Controller('sleep/sound')
 export class SoundController {
   constructor(private readonly soundService: SoundService) {}
 
