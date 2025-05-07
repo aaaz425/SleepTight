@@ -93,9 +93,9 @@ flutter:
   #         weight: 700
   #
   fonts:
+    # Memo: 기본 폰트
     - family: Pretendard
       fonts:
-        # Memo: 기본 폰트
         - asset: assets/fonts/Pretendard-Regular.ttf
         - asset: assets/fonts/Pretendard-Medium.ttf
         - asset: assets/fonts/Pretendard-SemiBold.ttf
@@ -106,8 +106,10 @@ flutter:
         - asset: assets/fonts/Pretendard-Black.ttf
         - asset: assets/fonts/Pretendard-ExtraLight.ttf
 
-        # Memo: 슬롯에 사용할 폰트
-        - asset: assets/fonts/Seven Segment.ttf
+    # Memo: 슬롯에 사용할 폰트
+    - family: Seven_Segment
+      fonts:
+        - asset: assets/fonts/Seven-Segment.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 

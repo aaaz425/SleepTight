@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../provider/home_mode_provider.dart';
-
-import 'no_alarm_screen.dart';
 import 'waiting_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -11,14 +8,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(homeModeProvider);
-
-    switch (homeState) {
-      case HomeState.noAlarm:
-        return const NoAlarmScreen();
-
-      case HomeState.waiting:
-        return const WaitingScreen();
-    }
+    return const WaitingScreen();
   }
 }

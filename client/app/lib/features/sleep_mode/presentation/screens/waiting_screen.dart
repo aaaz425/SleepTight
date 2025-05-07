@@ -1,3 +1,5 @@
+import 'package:app/core/config/theme/color.dart';
+import 'package:app/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/time_slot_picker.dart';
@@ -7,6 +9,7 @@ class WaitingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Todo: 알람 조회 및 설정 로직 추가
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -32,7 +35,38 @@ class WaitingScreen extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
+
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: AlarmToggleRow(),
+          ),
+        ),
+
+        const SizedBox(height: 60),
+
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 156),
+          child: SizedBox(
+            height: 48,
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              onPressed: () {
+                // Todo: 수면 시작
+              },
+              child: const Text('수면 시작', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+        ),
       ],
     );
   }

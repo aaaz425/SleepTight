@@ -1,3 +1,4 @@
+import 'package:app/core/config/theme/color.dart';
 import 'package:flutter/material.dart';
 
 class TimeSlotPicker extends StatefulWidget {
@@ -8,16 +9,14 @@ class TimeSlotPicker extends StatefulWidget {
 }
 
 class _TimeSlotPickerState extends State<TimeSlotPicker> {
-  String _amPm = '오전'; // 오전/오후
-  int _hour = 7; // 시간 (기본값 오전 7시)
-  int _minute = 0; // 분
+  String _amPm = '오전';
+  int _hour = 7;
+  int _minute = 0;
 
-  // 슬롯의 항목들 (1 ~ 12시, 00 ~ 59분, AM/PM)
   final List<String> _amPmOptions = ['오전', '오후'];
   final List<int> _hours = List.generate(12, (index) => index + 1);
   final List<int> _minutes = List.generate(60, (index) => index);
 
-  // FixedExtentScrollController를 사용하도록 변경
   final FixedExtentScrollController _hourController =
       FixedExtentScrollController();
   final FixedExtentScrollController _minuteController =
@@ -26,17 +25,18 @@ class _TimeSlotPickerState extends State<TimeSlotPicker> {
       FixedExtentScrollController();
 
   String get formattedTime {
-    return '$_hour:${_minute.toString().padLeft(2, '0')} $_amPm';
+    final hourStr = _hour.toString().padLeft(2, '0');
+    final minuteStr = _minute.toString().padLeft(2, '0');
+    return '$_amPm $hourStr:$minuteStr';
   }
 
   @override
   void initState() {
     super.initState();
-    // 기본값인 오전 7시로 설정
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _hourController.jumpToItem(_hour - 1); // 초기화 시 7시가 가운데로 오게
-      _minuteController.jumpToItem(_minute); // 분 설정
-      _amPmController.jumpToItem(_amPm == '오전' ? 0 : 1); // 오전/오후 설정
+      _hourController.jumpToItem(_hour - 1);
+      _minuteController.jumpToItem(_minute);
+      _amPmController.jumpToItem(_amPm == '오전' ? 0 : 1);
     });
   }
 
@@ -50,37 +50,32 @@ class _TimeSlotPickerState extends State<TimeSlotPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
       children: [
-        // 시간 슬롯
+        Positioned.fill(
+          child: Align(
+            alignment: Alignment.center,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 320,
+                minHeight: 60,
+                maxHeight: 60,
+              ),
+              child: SizedBox.expand(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(58, 110, 255, 0.16),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TimeSlot(
-              options: _hours,
-              controller: _hourController,
-              onChanged: (value) {
-                setState(() {
-                  _hour = value;
-                });
-              },
-              highlightIndex: _hour - 1,
-            ),
-            const SizedBox(width: 10),
-            const Text(":", style: TextStyle(fontSize: 32)),
-            const SizedBox(width: 10),
-            TimeSlot(
-              options: _minutes,
-              controller: _minuteController,
-              onChanged: (value) {
-                setState(() {
-                  _minute = value;
-                });
-              },
-              highlightIndex: _minute,
-            ),
-            const SizedBox(width: 10),
             TimeSlot(
               options: _amPmOptions,
               controller: _amPmController,
@@ -90,13 +85,41 @@ class _TimeSlotPickerState extends State<TimeSlotPicker> {
                 });
               },
               highlightIndex: _amPm == '오전' ? 0 : 1,
+              fontSize: 24,
+            ),
+            TimeSlot(
+              options: _hours,
+              controller: _hourController,
+              onChanged: (value) {
+                setState(() {
+                  _hour = value;
+                });
+              },
+              highlightIndex: _hour - 1,
+              textFormatter: (val) => val.toString().padLeft(2, '0'),
+            ),
+            const SizedBox(width: 4),
+            const Text(
+              ":",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: AppColors.white,
+              ),
+            ),
+            const SizedBox(width: 4),
+            TimeSlot(
+              options: _minutes,
+              controller: _minuteController,
+              onChanged: (value) {
+                setState(() {
+                  _minute = value;
+                });
+              },
+              highlightIndex: _minute,
+              textFormatter: (val) => val.toString().padLeft(2, '0'),
             ),
           ],
-        ),
-        const SizedBox(height: 20),
-        Text(
-          '선택된 시간: $formattedTime',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -106,8 +129,10 @@ class _TimeSlotPickerState extends State<TimeSlotPicker> {
 class TimeSlot<T> extends StatelessWidget {
   final List<T> options;
   final ValueChanged<T> onChanged;
-  final int highlightIndex; // 강조할 항목의 인덱스
+  final int highlightIndex;
   final FixedExtentScrollController controller;
+  final String Function(T)? textFormatter;
+  final double? fontSize;
 
   const TimeSlot({
     Key? key,
@@ -115,49 +140,61 @@ class TimeSlot<T> extends StatelessWidget {
     required this.onChanged,
     required this.highlightIndex,
     required this.controller,
+    this.textFormatter,
+    this.fontSize,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 80,
-      height: 200,
-      child: ListWheelScrollView.useDelegate(
-        controller: controller,
-        itemExtent: 40, // 항목 크기
-        perspective: 0.005, // 회전 효과 강도
-        diameterRatio: 1.5, // 깊이 효과
-        physics:
-            const FixedExtentScrollPhysics(), // FixedExtentScrollPhysics 사용
-        childDelegate: ListWheelChildBuilderDelegate(
-          builder: (context, index) {
-            final isSelected = index == highlightIndex;
-            return GestureDetector(
-              onTap: () => onChanged(options[index]),
-              child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.blue.withOpacity(0.5) : null,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      options[index].toString(),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected ? Colors.white : null,
-                      ),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          width: 80,
+          height: 240,
+          child: ListWheelScrollView.useDelegate(
+            controller: controller,
+            itemExtent: 60,
+            perspective: 0.002,
+            diameterRatio: 1.2,
+            physics: const FixedExtentScrollPhysics(),
+            onSelectedItemChanged: (index) {
+              onChanged(options[index]);
+            },
+            childDelegate: ListWheelChildBuilderDelegate(
+              childCount: options.length,
+              builder: (context, index) {
+                if (index < 0 || index >= options.length) return null;
+
+                final isSelected = index == highlightIndex;
+                final displayText =
+                    textFormatter?.call(options[index]) ??
+                    options[index].toString();
+
+                final distance = (index - highlightIndex).abs();
+                final scale = (1.0 - distance * 0.1).clamp(0.8, 1.0);
+                final fade = (1.0 - distance * 0.25).clamp(0.2, 1.0);
+
+                return Center(
+                  child: Text(
+                    displayText,
+                    style: TextStyle(
+                      fontFamily: 'Seven_Segment',
+                      fontSize: fontSize ?? (52 * scale),
+
+                      color:
+                          isSelected
+                              ? AppColors.white
+                              : Color(0xFF87A8FF).withOpacity(fade),
+                      height: 1.0,
                     ),
                   ),
-                ),
-              ),
-            );
-          },
-          childCount: options.length,
+                );
+              },
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
