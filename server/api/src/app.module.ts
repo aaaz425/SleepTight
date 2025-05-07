@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './users/user.module';
 import { SleepSoundModule } from './sleep/sleep-sound.module';
+import { AuthModule } from './auth/auth.module';
+import { Music } from './music/music.entity';
+import { MusicModule } from './music/music.module';
 
 @Module({
   imports: [
@@ -26,6 +29,8 @@ import { SleepSoundModule } from './sleep/sleep-sound.module';
     }),
     UserModule,
     SleepSoundModule,
+    AuthModule,
+    MusicModule,
   ],
   controllers: [],
   providers: [],

@@ -1,46 +1,70 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
-@Entity('users') // 테이블 이름 명시
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  provider: string;
+  provider: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  serial_number: string;
+  serial_number: string | null;
 
-  @Column({type: 'varchar', length: 50, nullable: false })
-  name: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255 })
   email: string;
 
-  @Column({ type: 'time', default: () => "'07:00'" })
+  @Column({ type: 'time', default: '07:00', nullable: false })
   wake_time: string;
 
-  @Column({ type: 'time', default: () => "'23:00'" })
+  @Column({ type: 'time', default: '23:00', nullable: false })
   sleep_time: string;
 
-  @Column({ type: 'interval', default: () => "'8 hours'" })
-  min_sleep_duration: string; // PostgreSQL INTERVAL은 string 타입으로 매핑
+  @Column({ type: 'interval', default: '8 hours', nullable: false })
+  min_sleep_duration: string
 
-  @Column({ type: 'timestamp', nullable: false })
+  @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @CreateDateColumn({ type: 'timestamp' })
   visited_at: Date;
 
   @Column({ type: 'smallint', nullable: true })
-  weight: number;
+  weight: number | null;
 
   @Column({ type: 'smallint', nullable: true })
-  height: number;
+  height: number | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  refresh_token: string;
+  refresh_token: string | null;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
-  status: string;
+  status: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  withdrawal_at: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  dormant_at: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  birth_date: Date | null;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  last_name: string | null;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  first_name: string | null;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  gender: string | null;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  nationality: string | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  length_unit: string | null; // 예: 'cm', 'ft'
+  
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  weight_unit: string | null; // 예: 'kg', 'lb'
 }
