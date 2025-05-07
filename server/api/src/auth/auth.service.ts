@@ -10,6 +10,7 @@ import { throwBadRequest, throwUnauthorizedException } from "src/common/exceptio
 import { ResponseOauthLoginDto } from "./dto/response-oauth-login.dto";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/users/user.service";
+import { UserStatus } from "src/users/user-status.enum";
 
 @Injectable()
 export class AuthService {
@@ -44,8 +45,7 @@ export class AuthService {
             name: data.kakao_account.name
         }
 
-        //HACK: 이메일 제공 동의를 안하면 이메일이 안넘어 옴.
-        //일단 배제하고 구현.
+        //HACK: 이메일 제공 동의를 안하면 이메일이 안넘어 옴(필수로 받아야함).
         const email: string = kakaoUser.email;
         if (!email) {
             throw new Error('이메일이 제공되지 않았습니다. 카카오 계정에서 이메일 제공을 허용해주세요.');
@@ -55,7 +55,7 @@ export class AuthService {
         const user = await this.userRepository.findOneBy(
             { email: email }
         );
-        if (!user) {
+        if(!user) {
             //유저가 없으면 생성합니다.
             const kakaoId: string = kakaoUser.id.toString();
             const dto: Promise<ResponseOauthLoginDto> = this.userService.createUserTemporary(kakaoUser);
