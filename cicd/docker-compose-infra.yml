@@ -42,7 +42,7 @@ services:
 
 networks:
   app-network:
-    driver: bridge
+    external: true
 
 volumes:
   postgres_data:
