@@ -120,15 +120,24 @@ export class UserController {
     return this.userService.updateWakeTime(userId, wakeTime);
   }
 
+  //초기 사용자 정보 등록
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('/register')
   async registerUserInfo(
     @Request() req,
     @Body() RequestRegisterUserInfoDto: RequestRegisterUserInfoDto,
   ): Promise<ResponseUserInfoDto> {
-    const userId = req.user.userId // JWT에서 userId를 가져옴
+    const userId = req.user.userId; // JWT에서 userId를 가져옴
     console.log('userId', userId);
     console.log('RequestRegisterUserInfoDto', RequestRegisterUserInfoDto);
     return this.userService.registerUserInfo(userId, RequestRegisterUserInfoDto);
+  }
+
+  //로그아웃
+  @UseGuards(JwtAuthGuard)
+  @Get('logout')
+  async logout(@Request() req) {
+    const userId :number = req.user.userId;
+    this.userService.logout(userId);
   }
 }

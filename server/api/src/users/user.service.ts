@@ -177,4 +177,11 @@ export class UserService {
         }
         return user;
     }
+
+    //사용자 로그아웃
+    async logout(userId :number) {
+        const user = await this.findById(userId);
+        //refresh_Token ''으로 수정
+        this.userRepository.update(userId, {refresh_token : ''});
+    }
 }
