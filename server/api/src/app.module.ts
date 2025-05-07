@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './users/user.module';
 import { SleepSoundModule } from './sleep/sleep-sound.module';
-import { RabbitMQMessagingModule } from './common/rabbitmq/rabbitmq-messaging.module';
 
 @Module({
   imports: [
@@ -27,7 +26,6 @@ import { RabbitMQMessagingModule } from './common/rabbitmq/rabbitmq-messaging.mo
     }),
     UserModule,
     SleepSoundModule,
-    RabbitMQMessagingModule,
   ],
   controllers: [],
   providers: [],

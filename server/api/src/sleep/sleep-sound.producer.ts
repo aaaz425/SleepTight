@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class SleepSoundProducer {
-  constructor(private readonly amqpConnection: AmqpConnection) {}
+  constructor(
+    @Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy,
+  ) {}
 
   // RabbitMQ에 메타데이터 발행
   async publishSegmentMetadata(data: {
@@ -13,6 +15,6 @@ export class SleepSoundProducer {
     duration: number;
     codec: string;
   }) {
-    await this.amqpConnection.publish('audio.segment', '', data);
+    await this.client.emit('sleep.segment.metadata', data).toPromise();
   }
 }
