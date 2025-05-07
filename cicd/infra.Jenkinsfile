@@ -48,8 +48,8 @@ pipeline {
 
             # 2) 원격에서 docker-compose 실행
             ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \\
-              "cd $APP_DIR && docker-compose -f ${COMPOSE_FILE} pull && \\
-               docker-compose -f ${COMPOSE_FILE} up -d"
+              "cd $APP_DIR && docker compose -f ${COMPOSE_FILE} pull && \\
+               docker compose -f ${COMPOSE_FILE} up -d"
           """
         }
       }

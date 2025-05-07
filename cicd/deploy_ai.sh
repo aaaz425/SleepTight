@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Optional: Ensure docker-compose is on PATH
-export PATH=$PATH:/usr/local/bin
-
 APP_DIR="/home/ubuntu/sleep-tight-app"
 COMPOSE_FILE="${APP_DIR}/docker-compose.yml"
 AI_SERVICE="ai"
@@ -14,14 +11,14 @@ RETRY_INTERVAL=5
 echo "=== AI 서비스 배포 시작 ==="
 
 # 1) 이미지 풀
-docker-compose -f $COMPOSE_FILE pull $AI_SERVICE
+docker compose -f $COMPOSE_FILE pull $AI_SERVICE
 
 # 2) 기존 컨테이너 정리
-docker-compose -f $COMPOSE_FILE stop $AI_SERVICE 2>/dev/null || true
-docker-compose -f $COMPOSE_FILE rm -f $AI_SERVICE 2>/dev/null || true
+docker compose -f $COMPOSE_FILE stop $AI_SERVICE 2>/dev/null || true
+docker compose -f $COMPOSE_FILE rm -f $AI_SERVICE 2>/dev/null || true
 
 # 3) 새 컨테이너 실행
-docker-compose -f $COMPOSE_FILE up -d --no-deps $AI_SERVICE
+docker compose -f $COMPOSE_FILE up -d --no-deps $AI_SERVICE
 
 # 4) 헬스체크
 echo "헬스체크: $HEALTH_URL"

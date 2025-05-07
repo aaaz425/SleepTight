@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# (Optional) Ensure docker-compose is on PATH
-export PATH=$PATH:/usr/local/bin
-
 APP_DIR="/home/ubuntu/sleep-tight-app"
 COMPOSE_FILE="${APP_DIR}/docker-compose.yml"
 NGINX_CONF="/etc/nginx/conf.d/service-url.inc"
@@ -31,14 +28,14 @@ fi
 echo "배포 대상: $NEXT_SERVICE (포트: $NEXT_PORT)"
 
 # 1) 최신 이미지 풀
-docker-compose -f $COMPOSE_FILE pull $NEXT_SERVICE
+docker compose -f $COMPOSE_FILE pull $NEXT_SERVICE
 
 # 2) 이전(같은 컬러) 컨테이너 정리
-docker-compose -f $COMPOSE_FILE stop $NEXT_SERVICE 2>/dev/null || true
-docker-compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE 2>/dev/null || true
+docker compose -f $COMPOSE_FILE stop $NEXT_SERVICE 2>/dev/null || true
+docker compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE 2>/dev/null || true
 
 # 3) 새 컨테이너 실행
-docker-compose -f $COMPOSE_FILE up -d --no-deps $NEXT_SERVICE
+docker compose -f $COMPOSE_FILE up -d --no-deps $NEXT_SERVICE
 
 # 4) 헬스체크
 echo "헬스체크: http://127.0.0.1:${NEXT_PORT}${HEALTH_ENDPOINT}"
@@ -64,15 +61,15 @@ if [ $OK -ne 1 ]; then
   TIMESTAMP=$(date +%Y%m%d%H%M%S)
   LOG_FILE="$LOG_DIR/${NEXT_SERVICE}_$TIMESTAMP.log"
   echo "로그를 $LOG_FILE 에 저장합니다."
-  docker-compose -f $COMPOSE_FILE logs $NEXT_SERVICE > $LOG_FILE || true
+  docker compose -f $COMPOSE_FILE logs $NEXT_SERVICE > $LOG_FILE || true
 
   # Nginx 원복
   echo "set \$service_url http://127.0.0.1:${PREV_PORT};" | sudo tee $NGINX_CONF >/dev/null
   sudo nginx -s reload
 
   # 새 컨테이너 삭제
-  docker-compose -f $COMPOSE_FILE stop $NEXT_SERVICE
-  docker-compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE
+  docker compose -f $COMPOSE_FILE stop $NEXT_SERVICE
+  docker compose -f $COMPOSE_FILE rm -f $NEXT_SERVICE
   exit 1
 fi
 
@@ -81,8 +78,8 @@ echo "set \$service_url http://127.0.0.1:${NEXT_PORT};" | sudo tee $NGINX_CONF >
 sudo nginx -s reload
 
 # 6) 이전 컨테이너 정리
-docker-compose -f $COMPOSE_FILE stop $PREV_SERVICE 2>/dev/null || true
-docker-compose -f $COMPOSE_FILE rm -f $PREV_SERVICE 2>/dev/null || true
+docker compose -f $COMPOSE_FILE stop $PREV_SERVICE 2>/dev/null || true
+docker compose -f $COMPOSE_FILE rm -f $PREV_SERVICE 2>/dev/null || true
 
 echo "=== 백엔드 배포 완료: $NEXT_SERVICE 활성화 ==="
 exit 0
