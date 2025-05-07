@@ -1,8 +1,7 @@
+import 'package:app/core/config/theme/color.dart';
+import 'package:app/features/sleep_mode/presentation/widgets/progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/config/theme/color.dart';
-import '../widgets/progress_bar.dart';
 
 class WakeUpScreen extends StatelessWidget {
   const WakeUpScreen({super.key});
@@ -80,7 +79,7 @@ class WakeUpScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: AppColors.primaryHv,
+                        foregroundColor: AppColors.font2,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),

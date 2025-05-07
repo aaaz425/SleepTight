@@ -1,7 +1,6 @@
+import 'package:app/shared/widgets/app_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'app_bottom_navigation_bar.dart';
 
 class ShellScreen extends ConsumerWidget {
   final PreferredSizeWidget? header;

@@ -1,7 +1,6 @@
+import 'package:app/core/config/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../core/config/theme/color.dart';
 
 class RingingScreen extends StatelessWidget {
   const RingingScreen({super.key});

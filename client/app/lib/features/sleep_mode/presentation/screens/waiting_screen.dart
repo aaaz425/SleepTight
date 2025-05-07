@@ -1,8 +1,7 @@
 import 'package:app/core/config/theme/color.dart';
 import 'package:app/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
+import 'package:app/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
 import 'package:flutter/material.dart';
-
-import '../widgets/time_slot_picker.dart';
 
 class WaitingScreen extends StatelessWidget {
   const WaitingScreen({super.key});

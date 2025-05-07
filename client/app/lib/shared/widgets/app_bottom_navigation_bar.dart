@@ -1,7 +1,8 @@
+import 'package:app/core/config/theme/theme.dart';
+import 'package:app/core/state/navigation/bottom_nav_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/config/theme/theme.dart';
-import '../../core/state/navigation/bottom_nav_provider.dart';
+
 import 'package:go_router/go_router.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
