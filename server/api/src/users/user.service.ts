@@ -4,11 +4,13 @@ import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
 import { ResponseUserInfoDto } from "./dto/response-user-info.dto";
 import { throwNotFoundException } from "src/common/exceptions/error.helper";
-import { count } from "console";
 import { RequestRegisterUserInfoDto } from "./dto/request-register-user-info.dto";
 import { ResponseRegisterUserInfoDto } from "./dto/response-register-user-info.dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { UserStatus } from "./user-status.enum";
+import { kakaoUser } from "src/auth/interfaces/kakao.user.interface";
+import { ResponseOauthLoginDto } from "src/auth/dto/response-oauth-login.dto";
 
 
 @Injectable()
@@ -30,6 +32,28 @@ export class UserService {
         const user = await this.findById(id);
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
         return responseUserInfoDto;
+    }
+
+    //사용자 임시 회원가입(authService에서 콜함)
+    async createUserTemporary(kakaoUser: kakaoUser): Promise<ResponseOauthLoginDto> {
+        const tempUser = new User();
+        tempUser.serial_number = kakaoUser.id;
+        tempUser.provider = kakaoUser.provider;
+        tempUser.email = kakaoUser.email;
+        tempUser.status = UserStatus.INCOMPLETE_REGISTRATION;
+        const newUser: User = await this.userRepository.save(tempUser);
+        //JWT 토큰 발급
+        const payload = {
+            sub: newUser.id,
+            email: newUser.email,
+            status: newUser.status
+        };
+        const accessToken = this.jwtService.sign(payload, {expiresIn: this.accessTokenExpiresIn});
+        const refreshToken = this.jwtService.sign(payload, {expiresIn: this.refreshTokenExpiresIn});
+        newUser.refresh_token = refreshToken;
+        await this.userRepository.update(newUser.id, { refresh_token: refreshToken });
+        const dto: ResponseOauthLoginDto = ResponseOauthLoginDto.fromEntity(newUser, accessToken, refreshToken)
+        return dto;
     }
 
     // 사용자 이름 변경
@@ -183,5 +207,16 @@ export class UserService {
         const user = await this.findById(userId);
         //refresh_Token ''으로 수정
         this.userRepository.update(userId, {refresh_token : ''});
+    }
+
+    //사용자 탈퇴
+    async withdraw(userId :number) {
+        const user = await this.findById(userId);
+        //refresh_Token ''으로 수정
+        this.userRepository.update(userId, {
+            refresh_token : '',
+            status : UserStatus.PENDING_WITHDRAW,
+            withdrawal_at : new Date()
+        });
     }
 }

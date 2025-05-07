@@ -12,6 +12,7 @@ import { JwtStrategy } from "./jwt.strategy";
 @Module({
     imports: [
         TypeOrmModule.forFeature([User]),
+        UserModule,
         HttpModule,
         ConfigModule,
         JwtModule.registerAsync({

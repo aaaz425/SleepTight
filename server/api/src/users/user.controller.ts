@@ -140,4 +140,12 @@ export class UserController {
     const userId :number = req.user.userId;
     this.userService.logout(userId);
   }
+
+  //회원탈퇴
+  @UseGuards(JwtAuthGuard)
+  @Patch('withdraw')
+  async withdraw(@Request() req) {
+    const userId :number = req.user.userId;
+    this.userService.withdraw(userId);
+  }
 }
