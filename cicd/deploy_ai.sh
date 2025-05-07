@@ -4,7 +4,8 @@ set -e
 APP_DIR="/home/ubuntu/sleep-tight-app"
 COMPOSE_FILE="${APP_DIR}/docker-compose.yml"
 AI_SERVICE="ai"
-HEALTH_URL="http://127.0.0.1:8082/health"
+AI_PORT=8082
+HEALTH_ENDPOINT="/api/health"
 MAX_RETRIES=10
 RETRY_INTERVAL=5
 
@@ -21,11 +22,11 @@ docker compose -f $COMPOSE_FILE rm -f $AI_SERVICE 2>/dev/null || true
 docker compose -f $COMPOSE_FILE up -d --no-deps $AI_SERVICE
 
 # 4) 헬스체크
-echo "헬스체크: $HEALTH_URL"
+echo "헬스체크: http://127.0.0.1:${AI_PORT}${HEALTH_ENDPOINT}"
 set +e
 OK=0
 for i in $(seq 1 $MAX_RETRIES); do
-  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_URL)
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:$AI_PORT$HEALTH_ENDPOINT)
   if [ "$HTTP_CODE" == "200" ]; then
     echo "✅ AI 서비스 준비 완료"
     OK=1

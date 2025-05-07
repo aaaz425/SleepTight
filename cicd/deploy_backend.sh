@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
+
 APP_DIR="/home/ubuntu/sleep-tight-app"
 COMPOSE_FILE="${APP_DIR}/docker-compose.yml"
 NGINX_CONF="/etc/nginx/conf.d/service-url.inc"
-HEALTH_ENDPOINT="/api/utils/status"
+HEALTH_ENDPOINT="/api/health"
 MAX_RETRIES=20
 RETRY_INTERVAL=5
 LOG_DIR="/home/ubuntu/deploy-logs"

@@ -5,6 +5,7 @@ import { UserModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
 import { Music } from './music/music.entity';
 import { MusicModule } from './music/music.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MusicModule } from './music/music.module';
     UserModule,
     AuthModule,
     MusicModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],
