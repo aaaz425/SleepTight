@@ -12,10 +12,6 @@ services:
       - "8080:3000"              # 블루 포트
     env_file:
       - ./.env
-    depends_on:
-      - postgresql
-      - redis
-      - rabbitmq
     networks:
       - app-network
     restart: on-failure
@@ -27,10 +23,6 @@ services:
       - "8081:3000"              # 그린 포트
     env_file:
       - ./.env
-    depends_on:
-      - postgresql
-      - redis
-      - rabbitmq
     networks:
       - app-network
     restart: on-failure
