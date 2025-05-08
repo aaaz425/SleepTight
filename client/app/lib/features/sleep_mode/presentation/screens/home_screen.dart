@@ -2,6 +2,7 @@ import 'package:app/core/config/theme/color.dart';
 import 'package:app/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
 import 'package:app/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -53,7 +54,7 @@ class HomeScreen extends StatelessWidget {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
+                foregroundColor: const Color.fromARGB(255, 0, 0, 0),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
@@ -61,6 +62,7 @@ class HomeScreen extends StatelessWidget {
               ),
               onPressed: () {
                 // Todo: 수면 시작
+                context.go('/sleeping');
               },
               child: const Text('수면 시작', style: TextStyle(fontSize: 16)),
             ),

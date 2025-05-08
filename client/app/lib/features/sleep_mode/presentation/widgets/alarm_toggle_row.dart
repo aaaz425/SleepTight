@@ -8,7 +8,7 @@ class AlarmToggleRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final alarmAsync = ref.watch(alarmTimeProvider);
+    final alarmAsync = ref.watch(alarmTimeNotifierProvider);
 
     return alarmAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -104,7 +104,7 @@ class AlarmToggleRow extends ConsumerWidget {
             );
           }
 
-          await ref.read(toggleAlarmStatusProvider.future);
+          await ref.read(alarmTimeNotifierProvider.notifier).toggleAlarm();
         }
 
         return InkWell(

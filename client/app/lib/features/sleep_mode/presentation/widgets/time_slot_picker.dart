@@ -39,19 +39,19 @@ class _TimeSlotPickerState extends ConsumerState<TimeSlotPicker> {
 
   void _updateAlarm() {
     final alarm = ref
-        .read(alarmTimeProvider)
+        .read(alarmTimeNotifierProvider)
         .maybeWhen(data: (value) => value, orElse: () => null);
 
     if (alarm == null) return;
 
     final updated = alarm.copyWith(amPm: _amPm, hour: _hour, minute: _minute);
 
-    ref.read(updateAlarmTimeProvider(updated).future);
+    ref.read(alarmTimeNotifierProvider.notifier).updateTime(updated);
   }
 
   @override
   Widget build(BuildContext context) {
-    final alarmAsync = ref.watch(alarmTimeProvider);
+    final alarmAsync = ref.watch(alarmTimeNotifierProvider);
 
     return alarmAsync.when(
       loading: () => const SizedBox.shrink(),

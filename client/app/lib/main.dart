@@ -1,3 +1,5 @@
+import 'package:app/core/config/alarm_permission.dart';
+import 'package:app/core/service/alarm_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +16,11 @@ void main() async {
 
   // Todo: 로컬라이제이션 추가
   await initializeDateFormatting('ko_KR', null);
+
+  await requestExactAlarmPermission();
+  print('rerender');
+
+  await AlarmService.init();
 
   runApp(const ProviderScope(child: SleepTightApp()));
 }

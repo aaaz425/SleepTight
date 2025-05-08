@@ -1,4 +1,5 @@
 import 'package:app/features/sleep_mode/presentation/screens/home_screen.dart';
+import 'package:app/features/sleep_mode/presentation/screens/ringing_screen.dart';
 import 'package:app/features/sleep_mode/presentation/screens/sleeping_screen.dart';
 import 'package:app/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,13 @@ final appRouter = GoRouter(
       pageBuilder:
           (BuildContext context, GoRouterState state) => const NoTransitionPage(
             child: ShellScreen(hasBottomNav: false, body: SleepingScreen()),
+          ),
+    ),
+    GoRoute(
+      path: '/ringing',
+      pageBuilder:
+          (BuildContext context, GoRouterState state) => const NoTransitionPage(
+            child: ShellScreen(hasBottomNav: false, body: RingingScreen()),
           ),
     ),
 

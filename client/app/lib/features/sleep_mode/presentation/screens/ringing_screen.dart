@@ -1,5 +1,6 @@
 import 'package:app/core/config/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class RingingScreen extends StatelessWidget {
@@ -64,6 +65,7 @@ class RingingScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         // Todo: 알람 끄기
+                        context.go('/');
                       },
                       child: const Text(
                         '알람 끄기',

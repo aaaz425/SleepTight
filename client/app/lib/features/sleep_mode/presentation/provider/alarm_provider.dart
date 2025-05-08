@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:app/core/service/alarm_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,22 +51,32 @@ class AlarmTime {
 }
 
 @riverpod
-Future<AlarmTime> alarmTime(Ref ref) async {
-  final alarmTime = await AlarmTime.loadFromPreferences();
-  return alarmTime;
-}
+class AlarmTimeNotifier extends _$AlarmTimeNotifier {
+  @override
+  FutureOr<AlarmTime> build() async {
+    return await AlarmTime.loadFromPreferences();
+  }
 
-@riverpod
-FutureOr<void> toggleAlarmStatus(Ref ref) async {
-  final current = await ref.read(alarmTimeProvider.future);
-  final updated = current.copyWith(isAlarmOn: !current.isAlarmOn);
-  await updated.saveToPreferences();
+  Future<void> toggleAlarm() async {
+    final current = await future;
+    final updated = current.copyWith(isAlarmOn: !current.isAlarmOn);
+    await updated.saveToPreferences();
+    state = AsyncValue.data(updated);
 
-  ref.invalidate(alarmTimeProvider);
-}
+    if (updated.isAlarmOn) {
+      await AlarmService.schedule(updated);
+    } else {
+      await AlarmService.cancel();
+    }
+  }
 
-@riverpod
-FutureOr<void> updateAlarmTime(Ref ref, AlarmTime newTime) async {
-  await newTime.saveToPreferences();
-  ref.invalidate(alarmTimeProvider);
+  Future<void> updateTime(AlarmTime newTime) async {
+    await newTime.saveToPreferences();
+    state = AsyncValue.data(newTime);
+
+    final updated = newTime;
+    if (updated.isAlarmOn) {
+      await AlarmService.schedule(updated);
+    }
+  }
 }

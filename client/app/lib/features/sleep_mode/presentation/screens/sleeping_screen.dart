@@ -1,5 +1,6 @@
 import 'package:app/core/config/theme/color.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class SleepingScreen extends StatelessWidget {
@@ -93,6 +94,7 @@ class SleepingScreen extends StatelessWidget {
                   ),
                   onPressed: () {
                     // Todo: 수면 종료
+                    context.go('/');
                   },
                   child: const Text('수면 종료', style: TextStyle(fontSize: 16)),
                 ),
