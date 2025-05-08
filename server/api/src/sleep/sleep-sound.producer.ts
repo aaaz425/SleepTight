@@ -15,6 +15,7 @@ export class SleepSoundProducer {
     duration: number;
     codec: string;
   }) {
-    await this.client.emit('sleep.segment.metadata', data).toPromise();
+    // 라우팅 키 'segment.meta'
+    await this.client.emit('segment.meta', data).toPromise();
   }
 }

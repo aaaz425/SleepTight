@@ -51,7 +51,7 @@ export class SleepSoundService {
 
     const fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 
-    // DB에 음성 메타데이터 저장 (기본값: BREATH)
+    // DB에 음성 메타데이터 저장
     const sleepSound = this.sleepSoundFactory.create({
       reportId,
       segmentId,
@@ -68,13 +68,6 @@ export class SleepSoundService {
       duration,
       codec: 'opus',
     });
-
-    return {
-      success: true,
-      data: {
-        segmentId,
-        fileUrl,
-      },
-    };
+    return UploadSleepSoundResponseDto.from({ segmentId, fileUrl });
   }
 }

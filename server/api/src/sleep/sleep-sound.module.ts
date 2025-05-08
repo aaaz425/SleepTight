@@ -25,7 +25,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             urls: [
               `amqp://${config.get('RABBITMQ_DEFAULT_USER')}:${config.get('RABBITMQ_DEFAULT_PASS')}@${config.get('RABBITMQ_HOST')}:${config.get('RABBITMQ_PORT')}`,
             ],
-            queue: config.get('RABBITMQ_QUEUE'),
+            queue: 'sleep.metadata.queue',
             queueOptions: { durable: false },
           },
         }),

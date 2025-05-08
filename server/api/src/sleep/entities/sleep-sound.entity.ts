@@ -1,10 +1,12 @@
+import { SleepReport } from 'src/sleep-reports/entities/sleep-report.entity';
 import {
   Column,
   Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
   Index,
   PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity('sleep_sounds')
@@ -13,8 +15,11 @@ export class SleepSound {
   @Index({ unique: true })
   segmentId: string;
 
-  @Column({ name: 'sleep_report_id', type: 'int' })
-  sleepReportId: number;
+  @ManyToOne(() => SleepReport, (report) => report.sounds, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'sleep_report_id' })
+  sleepReport: SleepReport;
 
   @Column({ name: 'voice_url', type: 'varchar', length: 255 })
   voiceUrl: string;

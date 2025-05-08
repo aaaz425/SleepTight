@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UploadSleepSoundRequestDto {
   @ApiProperty({ type: 'string', format: 'binary' })
-  @IsOptional() // 이건 실제로는 안 씀. Swagger UI용
+  @IsOptional() // Swagger UI용
   file?: any;
 
   @ApiProperty({ example: 1, description: '수면 리포트 ID' })

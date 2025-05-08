@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { SleepReport } from 'src/sleep-reports/entities/sleep-report.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -21,7 +28,7 @@ export class User {
   sleep_time: string;
 
   @Column({ type: 'interval', default: '8 hours', nullable: false })
-  min_sleep_duration: string
+  min_sleep_duration: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
@@ -64,7 +71,11 @@ export class User {
 
   @Column({ type: 'varchar', length: 10, nullable: true })
   length_unit: string | null; // 예: 'cm', 'ft'
-  
+
   @Column({ type: 'varchar', length: 10, nullable: true })
   weight_unit: string | null; // 예: 'kg', 'lb'
+
+  // SleepReport와 연결
+  @OneToMany(() => SleepReport, (report) => report.user)
+  sleepReports: SleepReport[];
 }
