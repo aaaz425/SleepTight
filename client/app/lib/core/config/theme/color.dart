@@ -58,6 +58,11 @@ class AppColors {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
+  static const linearGradient3 = LinearGradient(
+    colors: [Color(0xFF1C1C1E), Color(0xFF000000), Color(0xFF1C1C1E)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 
   // 폰트 색상
   static const font1 = Color(0xDEFFFFFF);

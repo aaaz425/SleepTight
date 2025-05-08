@@ -1,4 +1,5 @@
 import 'package:app/features/sleep_mode/presentation/screens/home_screen.dart';
+import 'package:app/features/sleep_mode/presentation/screens/sleeping_screen.dart';
 import 'package:app/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +38,7 @@ final appRouter = GoRouter(
       path: '/sleeping',
       pageBuilder:
           (BuildContext context, GoRouterState state) => const NoTransitionPage(
-            child: ShellScreen(hasBottomNav: false, body: HomeScreen()),
+            child: ShellScreen(hasBottomNav: false, body: SleepingScreen()),
           ),
     ),
 

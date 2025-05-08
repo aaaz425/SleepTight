@@ -55,19 +55,22 @@ class SleepingScreen extends StatelessWidget {
 
             SizedBox(height: 14),
 
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 104,
-                bottom: 104,
-                left: 20,
-                right: 20,
-              ),
-              child: Center(
-                // Todo: 파형 그래프 수정
-                child: Image.asset(
-                  'assets/images/sound_wave.png',
-                  width: double.infinity,
-                  fit: BoxFit.fitWidth,
+            Container(
+              decoration: BoxDecoration(gradient: AppColors.linearGradient3),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 104,
+                  bottom: 104,
+                  left: 20,
+                  right: 20,
+                ),
+                child: Center(
+                  // Todo: 파형 그래프 수정
+                  child: Image.asset(
+                    'assets/images/sound_wave.png',
+                    width: double.infinity,
+                    fit: BoxFit.fitWidth,
+                  ),
                 ),
               ),
             ),
