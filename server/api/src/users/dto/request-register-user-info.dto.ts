@@ -1,5 +1,6 @@
 import { Expose } from "class-transformer";
 import { User } from "../entities/user.entity";
+import { UserStatus } from "../user-status.enum";
 
 export class RequestRegisterUserInfoDto {
     //유저 정보
@@ -28,6 +29,7 @@ export class RequestRegisterUserInfoDto {
         user.height = userInfo.height;
         user.length_unit = userInfo.lengthUnit;
         user.weight_unit = userInfo.weightUnit;
+        user.status = UserStatus.ACTIVE;
         return user;
     }
 }

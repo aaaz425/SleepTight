@@ -6,9 +6,13 @@ import { AuthModule } from './auth/auth.module';
 import { Music } from './music/music.entity';
 import { MusicModule } from './music/music.module';
 import { HealthModule } from './health/health.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
+    TaskModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

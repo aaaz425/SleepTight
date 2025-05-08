@@ -2,6 +2,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { throwBadRequest, throwUnauthorizedException } from 'src/common/exceptions/error.helper';
+import { UserStatus } from 'src/users/user-status.enum';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -19,7 +20,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
         // 사용자 Status 체크
         //TODO: 탈퇴회원, 휴면회원 관리
-        if (user.status === 'Incomplete Registration') {
+
+        const request = context.switchToHttp().getRequest();
+        const path = request.path;
+        // 특정 경로는 상태 체크 예외 적용 안함
+        const skipStatusCheckPaths = ['/api/user/register'];
+        if (user.status === UserStatus.INCOMPLETE_REGISTRATION && !skipStatusCheckPaths.includes(path)) {
             throwBadRequest('회원가입이 완료되지 않았습니다.', 'INCOMPLETE_REGISTRATION');
         }
         return user;

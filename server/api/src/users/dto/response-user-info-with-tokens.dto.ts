@@ -1,6 +1,6 @@
 import { User } from "../entities/user.entity";
 
-export class ResponseRegisterUserInfoDto {
+export class ResponseUserInfoWithTokensDto {
     //유저 정보
     accessToken: string;
     refreshToken: string;
@@ -21,8 +21,8 @@ export class ResponseRegisterUserInfoDto {
     weightUnit: string
     status: string
 
-    static fromEntity(user :User, accessToken :string, refreshToken :string): ResponseRegisterUserInfoDto {
-            const dto: ResponseRegisterUserInfoDto = new ResponseRegisterUserInfoDto();
+    static fromEntity(user :User, accessToken :string, refreshToken :string): ResponseUserInfoWithTokensDto {
+            const dto: ResponseUserInfoWithTokensDto = new ResponseUserInfoWithTokensDto();
             dto.accessToken = accessToken;
             dto.refreshToken = refreshToken;    
             dto.id = user.id;
