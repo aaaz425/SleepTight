@@ -6,11 +6,12 @@ import { firstValueFrom } from "rxjs";
 import { User } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 import { kakaoUser } from "./interfaces/kakao.user.interface";
-import { throwBadRequest, throwUnauthorizedException } from "src/common/exceptions/error.helper";
+import { throwBadRequest, throwNotFoundException, throwUnauthorizedException } from "src/common/exceptions/exception.helper";
 import { ResponseOauthLoginDto } from "./dto/response-oauth-login.dto";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/users/user.service";
 import { UserStatus } from "src/users/user-status.enum";
+import { ExceptionCode } from "src/common/exceptions/exception-code.enum";
 
 @Injectable()
 export class AuthService {
@@ -83,21 +84,21 @@ export class AuthService {
             refreshTokenPayload = this.jwtService.verify(refreshToken);
         } catch (error) {
             if (error.name === 'TokenExpiredError') {
-                throwUnauthorizedException('Refresh Token이 만료되었습니다.', 'REFRESH_TOKEN_EXPIRED');
+                throwUnauthorizedException(ExceptionCode.REFRESH_TOKEN_EXPIRED);
             } else if (error.name === 'JsonWebTokenError') {
-                throwUnauthorizedException('Refresh Token이 위조되었거나 잘못되었습니다.', 'REFRESH_TOKEN_INVALID');
+                throwUnauthorizedException(ExceptionCode.REFRESH_TOKEN_INVALID);
             }
             // 그 외 예상치 못한 검증 오류
-            throwUnauthorizedException('Refresh Token 검증에 실패했습니다.', 'REFRESH_TOKEN_VERIFY_FAILED');
+            throwUnauthorizedException(ExceptionCode.REFRESH_TOKEN_VERIFY_FAILED);
         }
 
         const user = await this.userRepository.findOneBy({ id: refreshTokenPayload.sub });
         if (!user) {
-            throwUnauthorizedException('유저를 찾을 수 없습니다.', 'USER_NOT_FOUND');
+            throwNotFoundException(ExceptionCode.USER_NOT_FOUND);
             return;
         }
         if (user.refresh_token !== refreshToken) {
-            throwUnauthorizedException('Refresh Token이 위조되었거나 잘못되었습니다.', 'REFRESH_TOKEN_INVALID');
+            throwUnauthorizedException(ExceptionCode.REFRESH_TOKEN_INVALID);
             return;
         }
         const newPayload = {

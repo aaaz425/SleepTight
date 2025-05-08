@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
 import { ResponseUserInfoDto } from "./dto/response-user-info.dto";
-import { throwNotFoundException } from "src/common/exceptions/error.helper";
+import { throwNotFoundException } from "src/common/exceptions/exception.helper";
 import { RequestRegisterUserInfoDto } from "./dto/request-register-user-info.dto";
 import { ResponseUserInfoWithTokensDto } from "./dto/response-user-info-with-tokens.dto";
 import { JwtService } from "@nestjs/jwt";
@@ -11,6 +11,7 @@ import { ConfigService } from "@nestjs/config";
 import { UserStatus } from "./user-status.enum";
 import { kakaoUser } from "src/auth/interfaces/kakao.user.interface";
 import { ResponseOauthLoginDto } from "src/auth/dto/response-oauth-login.dto";
+import { ExceptionCode } from "src/common/exceptions/exception-code.enum";
 
 
 @Injectable()
@@ -197,7 +198,7 @@ export class UserService {
     private async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
-            throwNotFoundException("유저를 찾을 수 없습니다.", "USER_NOT_FOUND");
+            throwNotFoundException(ExceptionCode.USER_NOT_FOUND);
         }
         return user;
     }
