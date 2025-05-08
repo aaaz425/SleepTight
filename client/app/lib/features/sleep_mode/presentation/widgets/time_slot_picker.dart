@@ -1,6 +1,7 @@
 import 'package:app/core/config/theme/color.dart';
 import 'package:app/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TimeSlotPicker extends ConsumerStatefulWidget {
@@ -62,7 +63,6 @@ class _TimeSlotPickerState extends ConsumerState<TimeSlotPicker> {
           _minute = alarm.minute;
           _initialized = true;
 
-          // 스크롤 초기 위치 세팅
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _amPmController.jumpToItem(_amPm == '오전' ? 0 : 1);
             _hourController.jumpToItem(_hour - 1);
@@ -72,78 +72,83 @@ class _TimeSlotPickerState extends ConsumerState<TimeSlotPicker> {
 
         return Stack(
           children: [
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.center,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 320,
-                    minHeight: 60,
-                    maxHeight: 60,
+            Container(
+              decoration: BoxDecoration(gradient: AppColors.linearGradient3),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TimeSlot(
+                    options: _amPmOptions,
+                    controller: _amPmController,
+                    onChanged: (value) {
+                      setState(() {
+                        _amPm = value;
+                      });
+                      _updateAlarm();
+                    },
+                    highlightIndex: _amPm == '오전' ? 0 : 1,
+                    fontSize: 24,
                   ),
-                  child: SizedBox.expand(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(58, 110, 255, 0.16),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(8),
+                  TimeSlot(
+                    options: _hours,
+                    controller: _hourController,
+                    onChanged: (value) {
+                      setState(() {
+                        _hour = value;
+                      });
+                      _updateAlarm();
+                    },
+                    highlightIndex: _hour - 1,
+                    textFormatter: (val) => val.toString().padLeft(2, '0'),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    ":",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  TimeSlot(
+                    options: _minutes,
+                    controller: _minuteController,
+                    onChanged: (value) {
+                      setState(() {
+                        _minute = value;
+                      });
+                      _updateAlarm();
+                    },
+                    highlightIndex: _minute,
+                    textFormatter: (val) => val.toString().padLeft(2, '0'),
+                  ),
+                ],
+              ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 320,
+                      minHeight: 60,
+                      maxHeight: 60,
+                    ),
+                    child: SizedBox.expand(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: const Color.fromRGBO(58, 110, 255, 0.16),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(8),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TimeSlot(
-                  options: _amPmOptions,
-                  controller: _amPmController,
-                  onChanged: (value) {
-                    setState(() {
-                      _amPm = value;
-                    });
-                    _updateAlarm();
-                  },
-                  highlightIndex: _amPm == '오전' ? 0 : 1,
-                  fontSize: 24,
-                ),
-                TimeSlot(
-                  options: _hours,
-                  controller: _hourController,
-                  onChanged: (value) {
-                    setState(() {
-                      _hour = value;
-                    });
-                    _updateAlarm();
-                  },
-                  highlightIndex: _hour - 1,
-                  textFormatter: (val) => val.toString().padLeft(2, '0'),
-                ),
-                const SizedBox(width: 4),
-                const Text(
-                  ":",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.white,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                TimeSlot(
-                  options: _minutes,
-                  controller: _minuteController,
-                  onChanged: (value) {
-                    setState(() {
-                      _minute = value;
-                    });
-                    _updateAlarm();
-                  },
-                  highlightIndex: _minute,
-                  textFormatter: (val) => val.toString().padLeft(2, '0'),
-                ),
-              ],
             ),
           ],
         );
@@ -161,14 +166,14 @@ class TimeSlot<T> extends StatelessWidget {
   final double? fontSize;
 
   const TimeSlot({
-    Key? key,
+    super.key,
     required this.options,
     required this.onChanged,
     required this.highlightIndex,
     required this.controller,
     this.textFormatter,
     this.fontSize,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -186,6 +191,7 @@ class TimeSlot<T> extends StatelessWidget {
             physics: const FixedExtentScrollPhysics(),
             onSelectedItemChanged: (index) {
               onChanged(options[index]);
+              HapticFeedback.heavyImpact();
             },
             childDelegate: ListWheelChildBuilderDelegate(
               childCount: options.length,
@@ -201,18 +207,29 @@ class TimeSlot<T> extends StatelessWidget {
                 final scale = (1.0 - distance * 0.1).clamp(0.8, 1.0);
                 final fade = (1.0 - distance * 0.25).clamp(0.2, 1.0);
 
-                return Center(
-                  child: Text(
-                    displayText,
-                    style: TextStyle(
-                      fontFamily: 'Seven_Segment',
-                      fontSize: fontSize ?? (52 * scale),
-
-                      color:
-                          isSelected
-                              ? AppColors.white
-                              : Color(0xFF87A8FF).withOpacity(fade),
-                      height: 1.0,
+                return GestureDetector(
+                  onTap: () {
+                    controller.animateToItem(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                    onChanged(options[index]);
+                    HapticFeedback.selectionClick();
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: Center(
+                    child: Text(
+                      displayText,
+                      style: TextStyle(
+                        fontFamily: 'Seven_Segment',
+                        fontSize: fontSize ?? (52 * scale),
+                        color:
+                            isSelected
+                                ? AppColors.white
+                                : Color(0xFF87A8FF).withOpacity(fade),
+                        height: 1.0,
+                      ),
                     ),
                   ),
                 );
