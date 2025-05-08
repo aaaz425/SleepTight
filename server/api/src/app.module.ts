@@ -5,6 +5,7 @@ import { UserModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
 import { Music } from './music/music.entity';
 import { MusicModule } from './music/music.module';
+import { HealthModule } from './health/health.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskModule } from './task/task.module';
 
@@ -33,6 +34,7 @@ import { TaskModule } from './task/task.module';
     UserModule,
     AuthModule,
     MusicModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],
