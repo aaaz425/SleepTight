@@ -1,10 +1,12 @@
-import { Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/users/entities/user.entity";
 import { UserStatus } from "src/users/user-status.enum";
 import { LessThan, Repository } from "typeorm";
 
+
+@Injectable()
 export class TaskService {
     private readonly logger = new Logger(TaskService.name);
 
@@ -13,7 +15,8 @@ export class TaskService {
         private readonly userRepository :Repository<User>
     ){}
 
-    @Cron(CronExpression.EVERY_DAY_AT_3AM) // 매일 새벽 3시
+    // @Cron("*/10 * * * * *") // 테스트용 10초마다 
+    @Cron(CronExpression.EVERY_DAY_AT_3AM)// 매일 새벽 3시
     async handleUserPseudonymization() {
         this.logger.log('🚀 사용자 가명화 작업 실행 중...');
 
@@ -37,10 +40,10 @@ export class TaskService {
         for (const user of users) {
             await this.pseudonymizeUser(user);
         }
-
         this.logger.log(`🔒 ${users.length}명의 유저를 가명처리 완료`);
     }
-    async pseudonymizeUser(user: User) {
+
+    private async pseudonymizeUser(user: User) {
         await this.userRepository.update(user.id, {
             first_name: "",
             last_name: "",
