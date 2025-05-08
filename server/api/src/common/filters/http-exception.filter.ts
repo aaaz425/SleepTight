@@ -23,8 +23,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         response.status(status).json({
             success: false,
             data: {
-                status,
-                message: error.error || '에러가 발생했습니다.',
+                status : error.status,
+                message: error.message || '에러가 발생했습니다.',
                 code: error.code || 'UNKNOWN_ERROR',
             },
         });

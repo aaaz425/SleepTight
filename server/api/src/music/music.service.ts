@@ -3,7 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Music } from "./music.entity";
 import { ResponseMusicDto } from "./dto/response-music.dto";
-import { throwNotFoundException } from "src/common/exceptions/error.helper";
+import { throwNotFoundException } from "src/common/exceptions/exception.helper";
+import { ExceptionCode } from "src/common/exceptions/exception-code.enum";
 
 @Injectable()
 export class MusicService {
@@ -15,7 +16,7 @@ export class MusicService {
   async getMusicInfo(musicId :number, userId :number): Promise<ResponseMusicDto> {
     const music = await this.musicRepository.findOneBy({ id: musicId });
     if (!music) {
-      throwNotFoundException('음악 정보를 찾을 수 없습니다.','MUSIC_NOT_FOUND');
+      throwNotFoundException(ExceptionCode.MUSIC_NOT_FOUND);
     }
     const responseMusicDto = ResponseMusicDto.fromEntity(music, userId);
     return responseMusicDto;
