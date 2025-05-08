@@ -38,7 +38,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - "127.0.0.1:5672:5672"    # AMQP
+      - "0.0.0.0:5672:5672"    # 외부에서 접근 허용 AMQP
       - "127.0.0.1:15672:15672"  # Management UI
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
