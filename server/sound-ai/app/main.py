@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 from threading import Thread
 from contextlib import asynccontextmanager
-from .consumer import start_consumer
+from consumer import start_consumer
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

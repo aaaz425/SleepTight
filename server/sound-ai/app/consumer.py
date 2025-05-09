@@ -4,7 +4,7 @@ import logging
 import pika
 from datetime import datetime
 
-from .config import (
+from config import (
     RABBITMQ_URL,
     QUEUE_NAME,
     ROUTING_KEY,
@@ -12,8 +12,8 @@ from .config import (
     RESULT_EXCHANGE,
     RESULT_ROUTING_KEY,
 )
-from .utils.s3_client import download_from_s3
-from .utils.inference import detect_events
+from utils.s3_client import download_from_s3
+from utils.inference import detect_events
 
 logging.basicConfig(level=logging.INFO)
 _conn    = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))

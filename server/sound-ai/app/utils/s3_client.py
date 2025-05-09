@@ -1,7 +1,7 @@
 # app/utils/s3_client.py
 import os
 import boto3
-from ..config import S3_BUCKET_NAME
+from config import S3_BUCKET_NAME
 
 s3 = boto3.client("s3")
 

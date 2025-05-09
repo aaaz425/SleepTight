@@ -3,11 +3,23 @@ import torch
 import numpy as np
 from pathlib import Path
 import tempfile
+import logging
 
-from .audio import opus_to_wav, load_wav
+from utils.audio import opus_to_wav, load_wav
+import tensorflow as tf
 from tensorflow_hub import KerasLayer
 from torch import nn
-from ..config import SR, WINDOW_LENGTH, HOP_LENGTH, THRESHOLD, MODEL_PATH
+from config import SR, WINDOW_LENGTH, HOP_LENGTH, THRESHOLD, MODEL_PATH
+
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s [%(levelname)s] %(message)s")
+
+# GPU 사용 가능 여부 로깅
+logging.info(f"Torch CUDA available: {torch.cuda.is_available()}, "
+             f"Torch CUDA device count: {torch.cuda.device_count()}")
+tf_gpus = tf.config.list_physical_devices('GPU')
+logging.info(f"TensorFlow GPU devices: {tf_gpus if tf_gpus else 'None'}")
 
 # 1) SED 모델 래퍼
 class YamNetTFWrapper:

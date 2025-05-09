@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from pydub import AudioSegment
 from pydub.silence import detect_nonsilent
-from ..config import SR, TARGET_AMPLITUDE_DBFS, MIN_SILENCE_LEN_MS, SILENCE_THRESH_OFFSET_DB
+from config import SR, TARGET_AMPLITUDE_DBFS, MIN_SILENCE_LEN_MS, SILENCE_THRESH_OFFSET_DB
 
 def opus_to_wav(opus_path: Path, wav_path: Path):
     """

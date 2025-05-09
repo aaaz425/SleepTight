@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
 
 # 이 파일(config.py) 기준으로 한 단계 위로 올라간 src 루트 경로
