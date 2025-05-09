@@ -13,6 +13,7 @@ pipeline {
     // Git 설정
     GIT_BRANCH        = 'dev/be'
     GIT_URL           = 'https://lab.ssafy.com/s12-final/S12P31S303.git'
+    GIT_CRED_ID       = 'gitlab-access-token-credential'
 
     // EC2 SSH 설정
     DEPLOY_USER       = 'ubuntu'
@@ -29,7 +30,7 @@ pipeline {
       steps {
         // 소스 코드 체크아웃
         git branch: "${GIT_BRANCH}",
-            credentialsId: 'gitlab-access-token-credential',
+            credentialsId: "${GIT_CRED_ID}",
             url: "${GIT_URL}"
 
         // .env 파일 복사
@@ -51,7 +52,10 @@ pipeline {
         )]) {
           sh '''
             set -e
+            docker logout || true
             echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
+            echo ">> docker info 확인 <<"
+            docker info
           '''
         }
       }
@@ -106,14 +110,10 @@ pipeline {
 
   post {
     always {
-      sh 'docker logout'
+      sh 'docker logout || true'
       cleanWs()
     }
-    success {
-      echo '백엔드 배포가 성공적으로 완료되었습니다.'
-    }
-    failure {
-      echo '백엔드 배포 중 오류가 발생했습니다.'
-    }
+    success { echo '✅ 백엔드 배포 완료' }
+    failure { echo '❌ 백엔드 배포 실패' }
   }
 }
