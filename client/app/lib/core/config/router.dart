@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // SvgPicture.asset 사용을 위해 추가
+import 'package:flutter/services.dart'; // Clipboard 사용을 위해 추가
+import '../../features/health/services/health_service.dart'; // HealthService 임포트 추가
 
 // --- Placeholder Screens (실제 화면으로 교체 필요) ---
 enum AuthStatus {
@@ -30,11 +32,47 @@ class AuthState {
 class PlaceholderScreen extends StatelessWidget {
   final String title;
   const PlaceholderScreen({super.key, required this.title});
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(title)),
-    body: Center(child: Text(title)),
-  );
+  Widget build(BuildContext context) {
+    final HealthService healthService =
+        HealthService(); // HealthService 인스턴스 생성
+
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Container(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(title),
+            ElevatedButton(
+              onPressed: () {
+                GoRouter.of(context).go('/home');
+              },
+              child: Text('Go to Home'),
+            ),
+            ElevatedButton(onPressed: () {}, child: Text('api 에러 토스트 테스트')),
+            ElevatedButton(
+              onPressed: () async {
+                print('활동데이터 전송 버튼 클릭됨 -> 클립보드 복사 시도');
+                String dataString = await healthService.getHealthDataAsString();
+                await Clipboard.setData(ClipboardData(text: dataString));
+                // ignore: use_build_context_synchronously
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('데이터가 클립보드에 복사되었습니다.')),
+                );
+                // 기존 printData 호출은 유지하거나 필요에 따라 제거할 수 있습니다.
+                // await healthService.printData();
+              },
+              child: Text('활동데이터 전송 (클립보드 복사)'), // 버튼 텍스트 변경
+            ),
+            ElevatedButton(onPressed: () {}, child: Text('수면데이터 전송')),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // 기존 ShellScreen 및 HomeScreen (예시)
@@ -209,7 +247,10 @@ class HomeScreen extends StatelessWidget {
 // --- End Placeholder Screens ---
 
 // goRouterProvider를 Provider.family로 변경하고 GlobalKey<NavigatorState>를 인자로 받도록 수정합니다.
-final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((ref, navigatorKey) {
+final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
+  ref,
+  navigatorKey,
+) {
   // AuthNotifier를 watch하여 인증 상태 변경 시 GoRouter가 재빌드되고 redirect 로직이 재실행되도록 함
   // final authState = ref.watch(authNotifierProvider);
   final authState = AuthState(status: AuthStatus.active);
