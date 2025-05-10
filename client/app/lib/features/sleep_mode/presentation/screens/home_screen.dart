@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
 
         Center(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.only(top: 20, bottom: 20),
             child: TimeSlotPicker(),
           ),
         ),

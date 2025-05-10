@@ -119,9 +119,15 @@ class _RingingScreenState extends ConsumerState<RingingScreen> {
                   label: '5분 뒤 다시 알람',
                   backgroundColor: const Color(0xFFDFDFE5),
                   textColor: AppColors.primaryHv,
-                  onPressed: () {
-                    ref.read(alarmTimeNotifierProvider.notifier).snoozeAlarm();
-                    context.go('/sleeping');
+                  onPressed: () async {
+                    await ref
+                        .read(alarmTimeNotifierProvider.notifier)
+                        .snoozeAlarm();
+                    ref.invalidate(alarmTimeNotifierProvider);
+
+                    if (mounted && context.mounted) {
+                      context.go('/sleeping');
+                    }
                   },
                 ),
               ],

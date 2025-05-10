@@ -29,7 +29,7 @@ class _AlarmTriggerWatcherState extends ConsumerState<AlarmTriggerWatcher> {
       final asyncAlarm = ref.read(alarmTimeNotifierProvider);
       final alarmData = asyncAlarm.value;
 
-      if (alarmData == null || !alarmData.isAlarmOn || _navigated) return;
+      if (alarmData == null || _navigated) return;
 
       final alarmDateTime = getNextAlarmDateTime(alarmData);
       final now = DateTime.now();
@@ -37,8 +37,12 @@ class _AlarmTriggerWatcherState extends ConsumerState<AlarmTriggerWatcher> {
       if (now.isAfter(alarmDateTime)) {
         _navigated = true;
         _timer?.cancel();
-        if (mounted) {
+        if (!mounted) return;
+
+        if (alarmData.isAlarmOn) {
           context.go('/ringing');
+        } else {
+          context.go('/wake_up');
         }
       }
     });
