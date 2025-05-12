@@ -35,6 +35,8 @@ services:
     image: rabbitmq:3-management
     container_name: app-rabbitmq
     restart: always
+    environment:
+      - RABBITMQ_MANAGEMENT_PATH_PREFIX=/rabbitmq
     env_file:
       - ./.env
     ports:

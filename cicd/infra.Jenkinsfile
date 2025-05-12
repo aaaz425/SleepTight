@@ -13,44 +13,46 @@ pipeline {
 
     stages {
         stage('Checkout Compose') {
-      steps {
-        // 코드 리포지토리에서 docker-compose-infra.yml과 .env 가져오기
-        checkout([$class: 'GitSCM',
-          branches: [[name: env.GIT_BRANCH ?: 'dev/be']],
-          userRemoteConfigs: [[
-            url: 'https://lab.ssafy.com/s12-final/S12P31S303.git',
-            credentialsId: 'gitlab-access-token-credential'
-          ]]
-        ])
-        // .env 파일은 Secret file credential 로 관리했다면, 여기서 복사
-        withCredentials([file(credentialsId: env.ENV_FILE_ID, variable: 'ENV_F')]) {
-          sh '''
-            cp "$ENV_F" ./.env
-          '''
-        }
-      }
+          steps {
+            // 코드 리포지토리에서 docker-compose-infra.yml과 .env 가져오기
+            checkout([$class: 'GitSCM',
+              branches: [[name: env.GIT_BRANCH ?: 'dev/be']],
+              userRemoteConfigs: [[
+                url: 'https://lab.ssafy.com/s12-final/S12P31S303.git',
+                credentialsId: 'gitlab-access-token-credential'
+              ]]
+            ])
+            // .env 파일은 Secret file credential 로 관리했다면, 여기서 복사
+            withCredentials([file(credentialsId: env.ENV_FILE_ID, variable: 'ENV_F')]) {
+              sh '''
+                cp "$ENV_F" ./.env
+              '''
+            }
+          }
         }
 
         stage('Deploy Infra') {
       steps {
         sshagent(credentials: [env.SSH_CRED]) {
           sh """
-            # 1) 배포 디렉터리로 파일 복사
-            ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \\
-              "mkdir -p $APP_DIR"
+                      # 1) 디렉터리 생성 및 파일 복사 (기존과 동일)
+                      ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \\
+                        "mkdir -p $APP_DIR"
 
-            scp -o StrictHostKeyChecking=no \
-              ${WORKSPACE}/cicd/${COMPOSE_FILE} \\
-              $DEPLOY_USER@$DEPLOY_HOST:$APP_DIR/${COMPOSE_FILE}
+                      scp -o StrictHostKeyChecking=no \\
+                        ${WORKSPACE}/cicd/${COMPOSE_FILE} \\
+                        $DEPLOY_USER@$DEPLOY_HOST:$APP_DIR/${COMPOSE_FILE}
 
-            scp -o StrictHostKeyChecking=no ./.env \\
-              $DEPLOY_USER@$DEPLOY_HOST:$APP_DIR/.env
+                      scp -o StrictHostKeyChecking=no ./.env \\
+                        $DEPLOY_USER@$DEPLOY_HOST:$APP_DIR/.env
 
-            # 2) 원격에서 docker-compose 실행
-            ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \\
-              "cd $APP_DIR && docker compose -f ${COMPOSE_FILE} pull && \\
-               docker compose -f ${COMPOSE_FILE} up -d"
-          """
+                      # 2) 원격에서 docker-compose down → pull → up
+                      ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST \\
+                        "cd $APP_DIR && \\
+                         docker compose -f ${COMPOSE_FILE} down && \\
+                         docker compose -f ${COMPOSE_FILE} pull && \\
+                         docker compose -f ${COMPOSE_FILE} up -d"
+                    """
         }
       }
         }
