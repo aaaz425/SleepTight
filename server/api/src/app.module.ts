@@ -9,6 +9,7 @@ import { MusicModule } from './music/music.module';
 import { HealthModule } from './health/health.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskModule } from './task/task.module';
+import { SleepDiariesModule } from './sleep-reports/sleep-diaries.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TaskModule } from './task/task.module';
       }),
     }),
     UserModule,
+    SleepDiariesModule,
     SleepSoundModule,
     AuthModule,
     MusicModule,
