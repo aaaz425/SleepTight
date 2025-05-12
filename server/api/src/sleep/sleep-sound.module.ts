@@ -27,8 +27,8 @@ import { SleepAnalysisResultListener } from './sleep-analysis-result.listener';
             urls: [
               `amqp://${config.get('RABBITMQ_DEFAULT_USER')}:${config.get('RABBITMQ_DEFAULT_PASS')}@${config.get('RABBITMQ_HOST')}:${config.get('RABBITMQ_PORT')}`,
             ],
-            queue: 'sleep.metadata.queue',
-            exchange: 'sleep.exchange',
+            queue: config.get<string>('RMQ_SEND_QUEUE'),
+            exchange: config.get<string>('RMQ_SEND_EXCHANGE'),
             queueOptions: { durable: false },
           },
         }),
