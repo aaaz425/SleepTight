@@ -1,5 +1,7 @@
+import 'package:app/core/storage/shared_preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 import 'core/config/router.dart';
 import 'core/config/theme.dart';
@@ -22,12 +24,19 @@ final apiErrorStreamProvider = StreamProvider<ApiErrorEvent>((ref) {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final sharedPreferences = await SharedPreferences.getInstance();
 
   // ProviderScope로 앱을 감싸 Riverpod을 사용할 수 있도록 합니다.
-  runApp(const ProviderScope(child: SleepTightApp()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: SleepTightApp(),
+    ),
+  );
 }
 
-// StatelessWidget을 ConsumerWidget으로 변경합니다.
 class SleepTightApp extends ConsumerWidget {
   const SleepTightApp({super.key});
 
@@ -35,19 +44,29 @@ class SleepTightApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // apiErrorStreamProvider를 listen하여 에러 발생 시 토스트 메시지 표시
     ref.listen<AsyncValue<ApiErrorEvent>>(apiErrorStreamProvider, (
-      previous,
-      next,
+      previous, // 이전 상태(nullable)
+      next, // 현재 상태
     ) {
       next.whenData((apiErrorEvent) {
-        final currentContext = navigatorKey.currentContext;
-        if (currentContext != null) {
+        // final currentContext = navigatorKey.currentContext;
+        final overlayContext = navigatorKey.currentState?.overlay?.context;
+        if (overlayContext != null) {
+          // ApiErrorEvent에서 ApiException 객체를 추출합니다.
+          final apiException = apiErrorEvent.apiException;
+
           toastification.show(
-            context: currentContext,
-            title: Text(apiErrorEvent.message),
+            context: overlayContext,
             type: ToastificationType.error,
-            style: ToastificationStyle.flatColored,
-            autoCloseDuration: const Duration(seconds: 5),
+            style: ToastificationStyle.fillColored,
+            title: Text(apiException.message),
+            description: Text(
+              'Status: ${apiException.httpStatusCode} | Code: ${apiException.apiErrorCode}\n${apiException.errorData?['message'] ?? ''}',
+            ),
             alignment: Alignment.bottomCenter,
+            autoCloseDuration: const Duration(seconds: 4),
+            borderRadius: BorderRadius.circular(12.0),
+            applyBlurEffect: true,
+            showIcon: false,
           );
         }
       });
@@ -57,12 +76,13 @@ class SleepTightApp extends ConsumerWidget {
     // 이때, 생성한 navigatorKey를 전달합니다.
     final appRouter = ref.watch(goRouterProvider(navigatorKey));
 
-    return MaterialApp.router(
-      title: 'Sleep Tight',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      // routerConfig에 watch를 통해 얻은 appRouter 인스턴스를 전달합니다.
-      routerConfig: appRouter,
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        title: 'Sleep Tight',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        routerConfig: appRouter,
+      ),
     );
   }
 }
