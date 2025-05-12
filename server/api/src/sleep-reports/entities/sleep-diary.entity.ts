@@ -8,17 +8,17 @@ import {
 import { SleepReport } from './sleep-report.entity';
 
 export enum WakeAwareness {
-  NO = '아니요',
-  NORMAL = '보통',
-  YES = '네',
+  NO = 'NO',
+  NORMAL = 'NORMAL',
+  YES = 'YES',
 }
 
 export enum WakeMethod {
-  ALARM = '알람',
-  BY_PERSON = '누군가 깨움',
-  SELF = '스스로 일어남',
-  NOISE = '소음',
-  OTHER = '기타',
+  ALARM = 'ALARM',
+  BY_PERSON = 'BY_PERSON',
+  SELF = 'SELF',
+  NOISE = 'NOISE',
+  OTHER = 'OTHER',
 }
 
 @Entity('sleep_diaries')
