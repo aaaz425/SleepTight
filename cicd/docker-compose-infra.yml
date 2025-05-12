@@ -35,15 +35,16 @@ services:
     image: rabbitmq:3-management
     container_name: app-rabbitmq
     restart: always
-    environment:
-      - RABBITMQ_MANAGEMENT_PATH_PREFIX=/rabbitmq
     env_file:
       - ./.env
+    environment:
+      - RABBITMQ_MANAGEMENT_PATH_PREFIX=/rabbitmq
     ports:
-      - "0.0.0.0:5672:5672"    # 외부에서 접근 허용 AMQP
-      - "127.0.0.1:15672:15672"  # Management UI
+      - "0.0.0.0:5672:5672"     # AMQP
+      - "127.0.0.1:15672:15672" # Management UI (로컬 바인딩)
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro # 호스트의 rabbitmq.conf 를 컨테이너 설정 파일로 마운트
     networks:
       - app-network
 
