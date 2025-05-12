@@ -12,6 +12,8 @@ import { UploadSleepSoundResponseDto } from './dto/upload-sleep-sound.response.d
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { SleepSoundProducer } from './sleep-sound.producer';
 import { throwBadRequest } from 'src/common/exceptions/exception.helper';
+import { AnalysisResultDto } from './dto/analysis-result.dto';
+import { SleepEvent } from './entities/sleep-event.entity';
 
 @Injectable()
 export class SleepSoundService {
@@ -71,4 +73,10 @@ export class SleepSoundService {
     });
     return UploadSleepSoundResponseDto.from({ segmentId, fileUrl });
   }
+
+  async saveSleepEvent(dto: AnalysisResultDto) {
+    const sleepEvent: SleepEvent = AnalysisResultDto.toEntity(dto);
+    this.sleepSoundFactory.saveSleepEvent(sleepEvent);
+  }
+
 }
