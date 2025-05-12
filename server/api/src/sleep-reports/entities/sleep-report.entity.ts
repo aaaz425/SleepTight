@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { SleepSound } from 'src/sleep/entities/sleep-sound.entity';
 import { User } from 'src/users/entities/user.entity';
+import { SleepStageLog } from 'src/sleep/entities/sleep-stage-log.entity';
 
 @Entity('sleep_reports')
 export class SleepReport {
@@ -81,4 +82,8 @@ export class SleepReport {
   // SleepSound와 연결
   @OneToMany(() => SleepSound, (sound) => sound.sleepReport)
   sounds: SleepSound[];
+
+  // SleepStageLog와 연결
+  @OneToMany(() => SleepStageLog, (stage) => stage.sleepReport)
+  stages: SleepStageLog[];
 }
