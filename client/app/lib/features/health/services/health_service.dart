@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:health/health.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HealthService {
   final Health _health = Health();
@@ -26,6 +30,9 @@ class HealthService {
     HealthDataType.WATER,
     HealthDataType.WORKOUT,
     HealthDataType.LEAN_BODY_MASS,
+    HealthDataType.DISTANCE_DELTA,
+    HealthDataType.TOTAL_CALORIES_BURNED,
+    HealthDataType.NUTRITION,
   ];
 
   // 수면 데이터 타입 정의
@@ -60,6 +67,10 @@ class HealthService {
       print("HealthService: 설정 실패, 활동 데이터를 가져올 수 없습니다.");
       return [];
     }
+
+    // Request system permissions first
+    await Permission.activityRecognition.request();
+    await Permission.location.request();
 
     List<HealthDataPoint> activityData = [];
     bool permissionsGranted = false;
@@ -99,6 +110,10 @@ class HealthService {
       print("HealthService: 설정 실패, 수면 데이터를 가져올 수 없습니다.");
       return [];
     }
+
+    // Request system permissions first
+    await Permission.activityRecognition.request();
+    await Permission.location.request();
 
     List<HealthDataPoint> sleepData = [];
     bool permissionsGranted = false;
@@ -149,11 +164,51 @@ class HealthService {
         startDate,
         endDate,
       );
+
+      // CSV 헤더 추가
+      sb.writeln(
+        "uuid,value,unit,dataType,platform,dateFrom,dateTo,sourceName",
+      );
+
       if (activityData.isEmpty) {
         sb.writeln("지난 24시간 동안의 활동 데이터가 없습니다.");
       } else {
         for (HealthDataPoint p in activityData) {
-          sb.writeln("{$p.toString()}");
+          String valueStr = "N/A"; // 기본값
+          String unitDisplayStr = p.unitString; // 기본 단위 문자열
+
+          if (p.value is NumericHealthValue) {
+            // NumericHealthValue인 경우 숫자 값을 문자열로 변환
+            var numVal = (p.value as NumericHealthValue).numericValue;
+            valueStr = numVal.toString();
+          } else if (p.value is WorkoutHealthValue) {
+            var workoutHealthValue = p.value as WorkoutHealthValue; // 한번만 캐스팅
+            var workoutVal = workoutHealthValue.totalEnergyBurned;
+            if (workoutVal != null) {
+              valueStr = workoutVal.toString();
+              // totalEnergyBurnedUnit이 있으면 해당 unit의 이름을 사용, 없으면 기본 p.unitString 사용
+              unitDisplayStr =
+                  workoutHealthValue.totalEnergyBurnedUnit?.name ??
+                  p.unitString;
+            } else {
+              valueStr = "N/A (Workout Energy)";
+            }
+          } else {
+            // 기타 HealthValue 타입에 대한 처리 (필요한 경우 추가)
+            valueStr = p.value.toString(); // 기본 toString() 사용
+          }
+
+          // CSV 데이터 행 추가
+          sb.writeln(
+            "${p.uuid}," +
+                "${valueStr}," +
+                "${unitDisplayStr}," + // 수정된 단위 문자열 사용
+                "${p.typeString}," +
+                "${p.sourcePlatform.name}," +
+                "${p.dateFrom.toIso8601String()}," +
+                "${p.dateTo.toIso8601String()}," +
+                "${p.sourceName}",
+          );
         }
       }
     } catch (e) {
@@ -171,8 +226,34 @@ class HealthService {
       if (sleepData.isEmpty) {
         sb.writeln("지난 24시간 동안의 수면 데이터가 없습니다.");
       } else {
+        // Add a header for sleep data CSV, similar to activity data
+        sb.writeln(
+          "UUID,Value,Unit,Type,SourcePlatform,DateFrom,DateTo,SourceName",
+        );
         for (HealthDataPoint p in sleepData) {
-          sb.writeln("{$p.toString()}");
+          String valueStr = "N/A";
+          String unitDisplayStr = p.unitString;
+
+          // For sleep data, value might not always be Numeric.
+          // Simple toString() for now, can be refined based on actual SleepHealthValue types.
+          if (p.value is NumericHealthValue) {
+            var numVal = (p.value as NumericHealthValue).numericValue;
+            valueStr = numVal.toString();
+          } else {
+            valueStr =
+                p.value.toString(); // Or a more specific property if available
+          }
+
+          sb.writeln(
+            "${p.uuid}," +
+                "${valueStr}," +
+                "${unitDisplayStr}," +
+                "${p.typeString}," +
+                "${p.sourcePlatform.name}," +
+                "${p.dateFrom.toIso8601String()}," +
+                "${p.dateTo.toIso8601String()}," +
+                "${p.sourceName}",
+          );
         }
       }
     } catch (e) {
@@ -188,5 +269,38 @@ class HealthService {
     String dataString = await getHealthDataAsString();
     print(dataString);
     print("HealthService: 데이터 콘솔 출력 완료.");
+  }
+
+  /// Fetches health data, saves it to a temporary .txt file, and shares it.
+  Future<void> exportHealthDataAsTxt() async {
+    try {
+      print("HealthService: 데이터 TXT 파일로 내보내기 시작...");
+      String dataString = await getHealthDataAsString();
+
+      // 1. Get temporary directory
+      final directory = await getTemporaryDirectory();
+      final now = DateTime.now();
+      // 파일 이름에 사용할 수 없는 문자를 제거하거나 대체합니다.
+      // 예: 콜론(:)은 일반적으로 파일 이름에 사용할 수 없습니다.
+      final timestamp =
+          "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
+      final filePath = '${directory.path}/health_data_$timestamp.txt';
+
+      // 2. Create and write to the file
+      final file = File(filePath);
+      await file.writeAsString(dataString);
+      print("HealthService: 데이터 파일 저장 완료 - $filePath");
+
+      // 3. Share the file
+      final shareParams = ShareParams(
+        text: 'Sleep Tight 건강 데이터',
+        files: [XFile(filePath)],
+      );
+      await SharePlus.instance.share(shareParams);
+      print("HealthService: 파일 공유 완료.");
+    } catch (e) {
+      print("HealthService: TXT 파일 내보내기 중 오류 발생: $e");
+      // UI에 오류 메시지를 표시하도록 오류를 다시 throw하거나 상태를 관리할 수 있습니다.
+    }
   }
 }
