@@ -1,7 +1,7 @@
 import 'package:app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:app/features/auth/presentation/screens/home_screen.dart';
 import 'package:app/features/auth/presentation/screens/placeholder_screen.dart';
-import 'package:app/features/auth/presentation/widgets/shell_screen.dart';
+import 'package:app/features/auth/presentation/screens/shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
