@@ -1,35 +1,100 @@
-import 'package:app/core/config/alarm_permission.dart';
-import 'package:app/core/service/alarm_service.dart';
+import 'package:app/core/config/theme/theme.dart';
+import 'package:app/core/storage/shared_preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toastification/toastification.dart';
 import 'core/config/router.dart';
-import 'core/config/theme/theme.dart';
+import 'core/network/api_error_handler.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
+// GoRouter에 전달할 NavigatorKey를 앱의 상위 레벨에 정의합니다.
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+// ApiErrorHandler 인스턴스를 제공하는 Provider
+final apiErrorHandlerProvider = Provider<ApiErrorHandler>((ref) {
+  return ApiErrorHandler();
+});
+
+// ApiErrorHandler의 onError 스트림을 제공하는 StreamProvider
+// ApiErrorEvent 타입을 명시해주는 것이 좋습니다. (ApiErrorEvent가 정의되어 있다고 가정)
+final apiErrorStreamProvider = StreamProvider<ApiErrorEvent>((ref) {
+  final errorHandler = ref.watch(apiErrorHandlerProvider);
+  return errorHandler.onError;
+});
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 세로모드로 고정
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Todo: 로컬라이제이션 추가
+  // TODO: 로컬라이제이션 추가
   await initializeDateFormatting('ko_KR', null);
 
-  runApp(const ProviderScope(child: SleepTightApp()));
+  final sharedPreferences = await SharedPreferences.getInstance();
+
+  // ProviderScope로 앱을 감싸 Riverpod을 사용할 수 있도록 합니다.
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: SleepTightApp(),
+    ),
+  );
 }
 
-class SleepTightApp extends StatelessWidget {
+class SleepTightApp extends ConsumerWidget {
   const SleepTightApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Sleep Tight',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
-      routerConfig: appRouter,
+  Widget build(BuildContext context, WidgetRef ref) {
+    // apiErrorStreamProvider를 listen하여 에러 발생 시 토스트 메시지 표시
+    ref.listen<AsyncValue<ApiErrorEvent>>(apiErrorStreamProvider, (
+      previous, // 이전 상태(nullable)
+      next, // 현재 상태
+    ) {
+      next.whenData((apiErrorEvent) {
+        // final currentContext = navigatorKey.currentContext;
+        final overlayContext = navigatorKey.currentState?.overlay?.context;
+        if (overlayContext != null) {
+          // ApiErrorEvent에서 ApiException 객체를 추출합니다.
+          final apiException = apiErrorEvent.apiException;
+
+          toastification.show(
+            context: overlayContext,
+            type: ToastificationType.error,
+            style: ToastificationStyle.fillColored,
+            title: Text(apiException.message),
+            description: Text(
+              'Status: ${apiException.httpStatusCode} | Code: ${apiException.apiErrorCode}\n${apiException.errorData?['message'] ?? ''}',
+            ),
+            alignment: Alignment.bottomCenter,
+            autoCloseDuration: const Duration(seconds: 4),
+            borderRadius: BorderRadius.circular(12.0),
+            applyBlurEffect: true,
+            showIcon: false,
+          );
+        }
+      });
+    });
+
+    // goRouterProvider를 watch하여 GoRouter 인스턴스를 가져옵니다.
+    // 이때, 생성한 navigatorKey를 전달합니다.
+    final appRouter = ref.watch(goRouterProvider(navigatorKey));
+
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        title: 'Sleep Tight',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.theme,
+        routerConfig: appRouter,
+      ),
     );
   }
 }
