@@ -6,6 +6,8 @@ import { ResponseUserInfoDto } from './dto/response-user-info.dto';
 import { RequestRegisterUserInfoDto } from './dto/request-register-user-info.dto';
 import { ResponseUserInfoWithTokensDto } from './dto/response-user-info-with-tokens.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RequestUpdateHeightDto } from './dto/request.update.height.dto';
+import { RequestUpdateWeightDto } from './dto/request.update.weight.dto';
 
 @ApiTags('USERS')
 @Controller('user')
@@ -82,10 +84,10 @@ export class UserController {
   @Patch('height')
   async updateHeight(
     @Request() req,
-    @Body('height') height: number,
+    @Body() dto :RequestUpdateHeightDto,
   ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
-    return this.userService.updateHeight(userId, height);
+    return this.userService.updateHeight(userId, dto);
   }
 
   // 사용자 몸무게 변경
@@ -95,10 +97,9 @@ export class UserController {
   @Patch('weight')
   async updateWeight(
     @Request() req,
-    @Body('weight') weight: number,
-  ): Promise<ResponseUserInfoDto> {
+    @Body() dto :RequestUpdateWeightDto): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
-    return this.userService.updateWeight(userId, weight);
+    return this.userService.updateWeight(userId, dto);
   }
 
   // 사용자 목표 수면 시간 변경

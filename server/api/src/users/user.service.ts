@@ -12,6 +12,8 @@ import { UserStatus } from "./user-status.enum";
 import { kakaoUser } from "src/auth/interfaces/kakao.user.interface";
 import { ResponseOauthLoginDto } from "src/auth/dto/response-oauth-login.dto";
 import { ExceptionCode } from "src/common/exceptions/exception-code.enum";
+import { RequestUpdateHeightDto } from "./dto/request.update.height.dto";
+import { RequestUpdateWeightDto } from "./dto/request.update.weight.dto";
 
 
 @Injectable()
@@ -112,12 +114,14 @@ export class UserService {
     }
 
     // 사용자 키 변경
-    async updateHeight(id: number, height: number): Promise<ResponseUserInfoDto> {
+    async updateHeight(id: number, dto: RequestUpdateHeightDto): Promise<ResponseUserInfoDto> {
         const user = await this.findById(id);
-        user.height = height
+        user.height = dto.height;
+        user.length_unit = dto.lengthUnit;
         await this.userRepository.update(
             user.id, {
-            height: height
+            height: dto.height,
+            length_unit : dto.lengthUnit
         }
         );
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
@@ -125,12 +129,14 @@ export class UserService {
     }
 
     // 사용자 몸무게 변경
-    async updateWeight(id: number, weight: number): Promise<ResponseUserInfoDto> {
+    async updateWeight(id: number, dto: RequestUpdateWeightDto): Promise<ResponseUserInfoDto> {
         const user = await this.findById(id);
-        user.weight = weight
+        user.weight = dto.weight
+        user.weight_unit = dto.weightUnit;
         await this.userRepository.update(
             user.id, {
-            weight: weight
+            weight: dto.weight,
+            weight_unit : dto.weightUnit
         }
         );
         const responseUserInfoDto = ResponseUserInfoDto.fromEntity(user);
