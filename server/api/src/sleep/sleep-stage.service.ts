@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SleepStageLog } from './entities/sleep-stage-log.entity';
 import { Repository, EntityManager } from 'typeorm';
 import { SleepStageDto } from './dto/upload-sleep-stage.request.dto';
+import { SleepStageFactory } from './sleep-stage.factory';
+import { dot } from 'node:test/reporters';
 
 @Injectable()
 export class SleepStageService {
   constructor(
     @InjectRepository(SleepStageLog)
     private readonly stageRepo: Repository<SleepStageLog>,
+    private readonly factory: SleepStageFactory,
   ) {}
 
   async saveStages(
@@ -16,18 +19,9 @@ export class SleepStageService {
     reportId: number,
     manager: EntityManager,
   ): Promise<void> {
-    const stageEntities = stages.map((stage) => {
-      const start = new Date(stage.startTime);
-      const end = new Date(stage.endTime);
-
-      return this.stageRepo.create({
-        sleepReportId: reportId,
-        stageType: stage.stageType,
-        stageStartTime: start,
-        stageEndTime: end,
-        durationMinutes: Math.floor((end.getTime() - start.getTime()) / 60000),
-      });
-    });
+    const stageEntities = stages.map((dto) =>
+      this.factory.create(dto, reportId),
+    );
 
     await manager.save(stageEntities);
   }

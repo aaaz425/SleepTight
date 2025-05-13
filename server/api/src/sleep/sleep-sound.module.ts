@@ -8,6 +8,8 @@ import { SleepSoundFactory } from './sleep-sound.factory';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SleepSoundProducer } from './sleep-sound.producer';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { SleepStageService } from './sleep-stage.service';
+import { SleepStageFactory } from './sleep-stage.factory';
 
 @Module({
   imports: [
@@ -34,6 +36,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [SleepSoundController],
-  providers: [SleepSoundProducer, SleepSoundService, SleepSoundFactory],
+  providers: [
+    SleepSoundProducer,
+    SleepSoundService,
+    SleepSoundFactory,
+    SleepStageService,
+    SleepStageFactory,
+  ],
+  exports: [SleepStageService],
 })
 export class SleepSoundModule {}
