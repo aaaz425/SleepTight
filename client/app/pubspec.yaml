@@ -123,7 +123,7 @@ flutter:
     - family: Teko
       fonts:
         - asset: assets/fonts/Teko-Bold.ttf
-        
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
