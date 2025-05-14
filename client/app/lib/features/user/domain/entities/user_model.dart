@@ -1,4 +1,4 @@
-import 'package:app/features/auth/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/auth/data/models/enums/auth_status.dart';
 
 class UserModel {
   final int id;
