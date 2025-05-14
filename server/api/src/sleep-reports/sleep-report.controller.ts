@@ -6,13 +6,13 @@ import { StartSleepRequestDto } from './dto/start-sleep.request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { StartSleepResponseDto } from './dto/start-sleep.response.dto';
 
-@ApiTags('Sleep')
-@Controller('sleep')
+@ApiTags('Sleep Report')
+@Controller('sleep-report')
 export class SleepReportController {
   constructor(private readonly sleepReportService: SleepReportService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post('start')
+  @Post('start-sleep')
   @ApiOperation({ summary: '수면 시작' })
   async startSleep(
     @Request() req,
@@ -23,10 +23,11 @@ export class SleepReportController {
     return { reportId };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('end-sleep')
   @ApiOperation({ summary: '수면 종료' })
-  async uploadSleepStages(@Body() dto: UploadSleepStagesDto): Promise<{}> {
-    await this.sleepReportService.uploadSleepData(dto);
-    return {};
+  async endSleep(@Body() dto: UploadSleepStagesDto): Promise<{}> {
+    await this.sleepReportService.endSleep(dto);
+    return {}; // response 수정해야됨
   }
 }

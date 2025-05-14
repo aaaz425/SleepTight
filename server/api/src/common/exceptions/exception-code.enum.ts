@@ -19,6 +19,11 @@ export const ExceptionCode = {
     code: 'DUPLICATE_SEGMENT_ID',
     message: '이미 존재하는 세그먼트 아이디입니다.',
   },
+  REPORT_NOT_FOUND: {
+    status: 404,
+    code: 'REPORT_NOT_FOUND',
+    message: '수면 리포트를 찾을 수 없습니다.',
+  },
   INVALID_TOKEN: {
     status: 401,
     code: 'INVALID_TOKEN',
