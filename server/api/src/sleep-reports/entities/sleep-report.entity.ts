@@ -2,14 +2,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
   OneToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { SleepSound } from 'src/sleep/entities/sleep-sound.entity';
+import { SleepSound } from 'src/sleep-sound/entities/sleep-sound.entity';
 import { User } from 'src/users/entities/user.entity';
-import { SleepStageLog } from 'src/sleep/entities/sleep-stage-log.entity';
+import { SleepStageLog } from 'src/sleep-reports/entities/sleep-stage-log.entity';
 
 @Entity('sleep_reports')
 export class SleepReport {
@@ -19,10 +18,10 @@ export class SleepReport {
   @Column({ name: 'user_id', type: 'int' })
   userId: number;
 
-  @Column({ name: 'sleep_start_time', type: 'timestamp', nullable: true })
+  @Column({ name: 'sleep_start_time', type: 'timestamptz', nullable: true })
   sleepStartTime: Date;
 
-  @Column({ name: 'sleep_end_time', type: 'timestamp', nullable: true })
+  @Column({ name: 'sleep_end_time', type: 'timestamptz', nullable: true })
   sleepEndTime: Date;
 
   @Column({ name: 'target_start_time', type: 'time', nullable: true })
@@ -32,46 +31,45 @@ export class SleepReport {
   targetEndTime: string;
 
   @Column({ name: 'total_sleep_time', type: 'interval', nullable: true })
-  totalSleepTime: any;
+  totalSleepTime: string;
 
   @Column({ name: 'total_awake_time', type: 'interval', nullable: true })
-  totalAwakeTime: any;
+  totalAwakeTime: string;
 
   @Column({ name: 'total_rem_sleep_time', type: 'interval', nullable: true })
-  totalRemSleepTime: any;
+  totalRemSleepTime: string;
 
   @Column({ name: 'total_light_sleep_time', type: 'interval', nullable: true })
-  totalLightSleepTime: any;
+  totalLightSleepTime: string;
 
   @Column({ name: 'total_deep_sleep_time', type: 'interval', nullable: true })
-  totalDeepSleepTime: any;
+  totalDeepSleepTime: string;
 
   @Column({ name: 'awaken_count', type: 'smallint', nullable: true })
   awakenCount: number;
-
-  @Column({ name: 'average_heart_rate', type: 'smallint', nullable: true })
-  averageHeartRate: number;
-
-  @Column({ name: 'min_spo2', type: 'smallint', nullable: true })
-  minSpo2: number;
-
-  @Column({ name: 'max_spo2', type: 'smallint', nullable: true })
-  maxSpo2: number;
 
   @Column({
     name: 'snoring_duration_minutes',
     type: 'interval',
     nullable: true,
   })
-  snoringDurationMinutes: any;
+  snoringDurationMinutes: string;
 
-  @Column({ name: 'sleep_score', type: 'smallint', nullable: true })
-  sleepScore: number;
+  @Column({
+    name: 'somniloquy_duration_minutes',
+    type: 'interval',
+    nullable: true,
+  })
+  somniloquyDurationMinutes: string;
 
-  @Column({ name: 'disturbance_count', type: 'smallint', nullable: true })
-  disturbanceCount: number;
+  @Column({
+    name: 'cough_duration_minutes',
+    type: 'interval',
+    nullable: true,
+  })
+  scoughDurationMinutes: string;
 
-  @Column({ name: 'sleep_date', type: 'date', nullable: false })
+  @Column({ name: 'sleep_date', type: 'date' })
   sleepDate: Date;
 
   // User와 연결
