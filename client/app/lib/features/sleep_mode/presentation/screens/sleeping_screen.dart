@@ -6,8 +6,10 @@ import 'package:app/core/network/dio_provider.dart';
 import 'package:app/core/utils/overlay.dart';
 import 'package:app/features/sleep_mode/data/models/requests/sleep_end_request.dart';
 import 'package:app/features/sleep_mode/domain/services/audio_recording_service.dart';
+import 'package:app/features/sleep_mode/domain/services/sleep_stage_service.dart';
 import 'package:app/features/sleep_mode/presentation/provider/report_id_provider.dart';
 import 'package:app/features/sleep_mode/presentation/provider/sleep_mode_view_model_provider.dart';
+import 'package:app/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
 import 'package:app/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 import 'package:app/features/sleep_mode/presentation/widgets/alarm_time_display.dart';
 import 'package:app/shared/widgets/alarm_trigger_watcher.dart';
@@ -49,12 +51,12 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
     );
 
     // 오디오 녹음 및 전송 시작 (예: 10초마다)
-    // if (reportId != 0) {
-    _sendTimer = Timer.periodic(const Duration(seconds: 10), (_) {
-      print('10초 지남');
-      // audioRecordingService.recordAndSendAudio(reportId.toString());
-    });
-    // }
+    if (reportId != 0) {
+      _sendTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+        print('10초 지남');
+        audioRecordingService.recordAndSendAudio(reportId.toString());
+      });
+    }
   }
 
   @override
@@ -160,13 +162,19 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
                       );
 
                       final now = DateTime.now();
-                      final timestamp = now.toIso8601String();
+                      final startTime = ref.watch(sleepStartTimeProvider);
+                      final endTime = now.toIso8601String();
                       final reportId = ref.read(reportIdNotifierProvider);
+
+                      final sleepStages = await getSleepStages(
+                        startDate: startTime,
+                        endDate: endTime,
+                      );
 
                       final request = SleepEndRequest(
                         reportId: reportId,
-                        sleepEndTime: timestamp,
-                        stages: [],
+                        sleepEndTime: endTime,
+                        stages: sleepStages,
                       );
 
                       final success = await viewModel.endSleep(request);

@@ -162,7 +162,8 @@ class HealthService {
     try {
       List<HealthDataPoint> activityData = await fetchActivityData(
         startDate,
-        endDate,      );
+        endDate,
+      );
 
       // CSV 헤더 추가
       sb.writeln(

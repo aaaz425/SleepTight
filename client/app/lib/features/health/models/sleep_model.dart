@@ -8,7 +8,6 @@ enum SleepStage {
   DEEP, // SLEEP_DEEP
   REM, // SLEEP_REM
   ASLEEP, // SLEEP_ASLEEP (단계 구분 불가)
-  UNKNOWN, // HealthDataType에 매칭되지 않는 경우
 }
 
 // SleepStage enum을 문자열로 변환 (서버 전송용)
@@ -22,10 +21,8 @@ String sleepStageToString(SleepStage stage) {
       return HealthDataType.SLEEP_DEEP.name; // "SLEEP_DEEP"
     case SleepStage.REM:
       return HealthDataType.SLEEP_REM.name; // "SLEEP_REM"
-    case SleepStage.ASLEEP:
-      return HealthDataType.SLEEP_ASLEEP.name; // "SLEEP_ASLEEP"
     default:
-      return "UNKNOWN";
+      return HealthDataType.SLEEP_ASLEEP.name; // "SLEEP_ASLEEP"
   }
 }
 
@@ -42,7 +39,7 @@ SleepStage healthDataTypeToSleepStage(String typeName) {
   } else if (typeName == HealthDataType.SLEEP_ASLEEP.name) {
     return SleepStage.ASLEEP;
   }
-  return SleepStage.UNKNOWN; // 기본값 또는 오류 처리
+  return SleepStage.ASLEEP; // 기본값 또는 오류 처리
 }
 
 // 개별 수면 단계를 나타내는 모델 (시계열 데이터용)
