@@ -1,7 +1,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_test/flutter_test.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:app/features/user/presentation/screens/user_screen.dart';
+// import 'package:sleep_tight/features/user/presentation/screens/user_screen.dart';
 
 // void main() {
 //   testWidgets('User name changes on button press', (WidgetTester tester) async {

@@ -1,5 +1,5 @@
-import 'package:app/core/config/theme/color.dart';
-import 'package:app/features/sleep_mode/presentation/widgets/progress_bar.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/widgets/progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -86,7 +86,7 @@ class WakeUpScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        context.go('/');
+                        context.go('/ringing');
                       },
                       child: const Text('닫기', style: TextStyle(fontSize: 16)),
                     ),

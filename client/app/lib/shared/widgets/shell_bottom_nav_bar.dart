@@ -1,4 +1,4 @@
-import 'package:app/core/config/app_config.dart';
+import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

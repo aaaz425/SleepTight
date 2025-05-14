@@ -1,7 +1,7 @@
-import 'package:app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:app/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:app/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:app/features/auth/data/models/requests/kakao_login_request.dart';
+import 'package:sleep_tight/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sleep_tight/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:sleep_tight/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:sleep_tight/features/auth/data/models/requests/kakao_login_request.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -38,7 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> clearTokenAndStatus() async {
     await localDataSource.clearTokens();
     await localDataSource.clearStatus();
     // remoteDataSource logout

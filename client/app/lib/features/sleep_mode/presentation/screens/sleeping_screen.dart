@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:app/core/config/theme/color.dart';
-import 'package:app/features/sleep_mode/presentation/widgets/alarm_time_display.dart';
-import 'package:app/shared/widgets/alarm_trigger_watcher.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_time_display.dart';
+import 'package:sleep_tight/shared/widgets/alarm_trigger_watcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

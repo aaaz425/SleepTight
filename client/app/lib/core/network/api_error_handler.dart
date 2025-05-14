@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:app/core/error/api_exception.dart';
+import 'package:sleep_tight/core/error/api_exception.dart';
 
 /// API 에러 발생 시 UI에 알리기 위한 이벤트 데이터 클래스입니다.
 /// 필요에 따라 추가 정보를 포함하도록 확장할 수 있습니다. (예: 에러 타입, 특정 코드 등)

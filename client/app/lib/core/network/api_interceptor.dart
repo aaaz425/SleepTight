@@ -1,5 +1,5 @@
-import 'package:app/core/error/api_exception.dart';
-import 'package:app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sleep_tight/core/error/api_exception.dart';
+import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,7 +47,8 @@ class CustomApiInterceptor extends Interceptor {
     // 499: 로그아웃 처리
     if (err.response?.statusCode == 499) {
       debugPrint('499: 로그아웃 처리');
-      await container.read(authRepositoryProvider).logout();
+      await container.read(authRepositoryProvider).clearTokenAndStatus();
+      container.read(authStateProvider.notifier).refreshAuthStatus();
       final apiException = ApiException.fromDioError(err);
       apiErrorHandler.reportError(apiException);
       return handler.reject(err);
@@ -66,7 +67,8 @@ class CustomApiInterceptor extends Interceptor {
       } catch (e) {
         debugPrint('토큰 재발급 실패: $e');
         // 실패 시 로그아웃 처리
-        await container.read(authRepositoryProvider).logout();
+        await container.read(authRepositoryProvider).clearTokenAndStatus();
+        container.read(authStateProvider.notifier).refreshAuthStatus();
         final apiException = ApiException.fromDioError(err);
         apiErrorHandler.reportError(apiException);
         return handler.reject(err);

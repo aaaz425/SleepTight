@@ -1,12 +1,12 @@
-import 'package:app/core/network/dio_provider.dart';
-import 'package:app/core/storage/secure_storage_provider.dart';
-import 'package:app/core/storage/shared_preferences_provider.dart';
-import 'package:app/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:app/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:app/features/auth/data/models/enums/auth_status.dart';
-import 'package:app/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:app/features/auth/domain/entities/auth_state.dart';
-import 'package:app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sleep_tight/core/network/dio_provider.dart';
+import 'package:sleep_tight/core/storage/secure_storage_provider.dart';
+import 'package:sleep_tight/core/storage/shared_preferences_provider.dart';
+import 'package:sleep_tight/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:sleep_tight/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:sleep_tight/features/auth/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:sleep_tight/features/auth/domain/entities/auth_state.dart';
+import 'package:sleep_tight/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

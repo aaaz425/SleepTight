@@ -1,6 +1,6 @@
-import 'package:app/core/config/theme/color.dart';
-import 'package:app/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
-import 'package:app/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

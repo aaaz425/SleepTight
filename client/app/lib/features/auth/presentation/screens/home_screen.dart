@@ -1,5 +1,5 @@
-import 'package:app/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

@@ -1,4 +1,4 @@
-import 'package:app/core/data/models/enums/error_code.dart';
+import 'package:sleep_tight/core/data/models/enums/error_code.dart';
 import 'package:dio/dio.dart';
 
 class ApiException implements Exception {

@@ -1,4 +1,4 @@
-import 'package:app/main.dart';
+import 'package:sleep_tight/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dio_client.dart';
 

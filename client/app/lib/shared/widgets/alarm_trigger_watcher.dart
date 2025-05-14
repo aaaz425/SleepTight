@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:app/core/utils/time.dart';
-import 'package:app/features/sleep_mode/presentation/provider/alarm_provider.dart';
+import 'package:sleep_tight/core/utils/time.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
