@@ -27,5 +27,13 @@ apk-install:
 # 빌드 + 설치를 한 번에 실행하는 명령어
 apk-build-install: icon splash apk-build apk-install
 
-# 여러 명령어를 한 번에 실행하고 싶을 때
-all: clean pubget icon splash build
+apk-build-install-galaxys10: icon splash apk-build
+	adb -s R39M208CZ1B install build/app/outputs/flutter-apk/app-release.apk
+
+# ios simulator
+ios-simulator: icon splash
+	flutter run -d 8E36C206-B199-4E83-BFE2-5095FB37019B
+
+# android simulator
+android-simulator: icon splash
+	flutter run -d emulator-5554
