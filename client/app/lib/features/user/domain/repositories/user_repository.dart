@@ -28,7 +28,7 @@ abstract class UserRepository {
   });
 
   // 회원 탈퇴 (POST api/user/withdraw)
-  Future<UserInformationResponse> withdraw();
+  Future<void> withdraw();
 
   // 사용자 이름 변경 (PATCH api/user/name)
   Future<UserInformationResponse> updateName(UpdateUserNameRequest request);
