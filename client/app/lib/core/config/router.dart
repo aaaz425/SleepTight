@@ -1,7 +1,8 @@
-import 'package:app/features/auth/presentation/providers/auth_provider.dart';
-import 'package:app/features/auth/presentation/screens/home_screen.dart';
-import 'package:app/features/auth/presentation/screens/placeholder_screen.dart';
-import 'package:app/features/auth/presentation/screens/shell_screen.dart';
+import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sleep_tight/features/auth/presentation/screens/home_screen.dart';
+import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
+import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:sleep_tight/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
 
   return GoRouter(
     navigatorKey: navigatorKey, // 전달받은 navigatorKey를 GoRouter에 설정합니다.
-    initialLocation: AppConfig.routes.welcome, // 초기 시작 지점
+    initialLocation: AppConfig.routes.appInit, // 초기 시작 지점
     debugLogDiagnostics: true, // 개발 중 로그 확인에 유용
     // redirect 로직: 인증 상태 및 현재 경로에 따라 적절한 페이지로 리다이렉션
     redirect: (BuildContext context, GoRouterState state) {
@@ -35,7 +36,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
 
       // 2. 임시가입 사용자 (AuthStatus.incomplete_registration)
       final unauthenticatedAllowedPaths = [
-        AppConfig.routes.appInit,
+        AppConfig.routes.welcome,
         AppConfig.routes.signUp,
       ];
       if (currentAuthStatus == AuthStatus.incompleteRegistration) {
@@ -48,7 +49,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
 
       // 3. 탈퇴보류 사용자 (AuthStatus.pending_withdraw)
       final pendingWithdrawAllowedPaths = [
-        AppConfig.routes.appInit,
+        AppConfig.routes.welcome,
         AppConfig.routes.sayGoodbye,
       ];
       if (currentAuthStatus == AuthStatus.pendingWithdraw) {
@@ -58,7 +59,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         // '/app-init', '/say-goodbye' 경로가 아니면 해당 경로로 보냄
         return AppConfig
             .routes
-            .appInit; // 스플래시 화면이 끝나고 권한검사를 할때 복구를 할건지 말건지 confirm
+            .welcome; // 스플래시 화면이 끝나고 권한검사를 할때 복구를 할건지 말건지 confirm
       }
 
       // 4. 인증된 상태 (AuthStatus.active)
@@ -80,18 +81,16 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
     routes: <RouteBase>[
       // --- 초기 및 인증 관련 라우트 ---
       GoRoute(
-        path: AppConfig.routes.welcome,
-        pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: PlaceholderScreen(title: 'Before Login Splash'),
-            ),
-      ),
-      GoRoute(
-        path: AppConfig.routes.appInit, // 로그인 직후 데이터 로딩 등에 사용 가능
+        path: AppConfig.routes.appInit,
         pageBuilder:
             (context, state) => const NoTransitionPage(
               child: PlaceholderScreen(title: 'After Login Splash'),
             ),
+      ),
+      GoRoute(
+        path: AppConfig.routes.welcome,
+        pageBuilder:
+            (context, state) => const NoTransitionPage(child: WelcomeScreen()),
       ),
       GoRoute(
         path: AppConfig.routes.signUp,
