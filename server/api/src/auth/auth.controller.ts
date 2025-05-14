@@ -12,7 +12,7 @@ export class AuthController {
     @ApiOperation({ summary: '카카오 로그인' })
     @HttpCode(200)
     @Post('kakao')
-    async kakaoLogin(@Body('AuthroziationCode') accessToken: string) {
+    async kakaoLogin(@Body('AuthorizationCode') accessToken: string) {
         return this.authService.kakaoLogin(accessToken);
     }
 

@@ -11,10 +11,12 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SleepStageService } from '../sleep-reports/sleep-stage.service';
 import { SleepStageFactory } from '../sleep-reports/sleep-stage.factory';
 import { SleepStageLog } from '../sleep-reports/entities/sleep-stage-log.entity';
+import { SleepEvent } from './entities/sleep-event.entity';
+import { SleepAnalysisResultListener } from './sleep-analysis-result.listener';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SleepSound, SleepStageLog]),
+    TypeOrmModule.forFeature([SleepSound, SleepEvent, SleepStageLog]),
     S3Module,
     ConfigModule,
     ClientsModule.registerAsync([
@@ -28,15 +30,15 @@ import { SleepStageLog } from '../sleep-reports/entities/sleep-stage-log.entity'
             urls: [
               `amqp://${config.get('RABBITMQ_DEFAULT_USER')}:${config.get('RABBITMQ_DEFAULT_PASS')}@${config.get('RABBITMQ_HOST')}:${config.get('RABBITMQ_PORT')}`,
             ],
-            queue: 'sleep.metadata.queue',
-            exchange: 'sleep.exchange',
+            queue: config.get<string>('RMQ_SEND_QUEUE'),
+            exchange: config.get<string>('RMQ_SEND_EXCHANGE'),
             queueOptions: { durable: false },
           },
         }),
       },
     ]),
   ],
-  controllers: [SleepSoundController],
+  controllers: [SleepSoundController, SleepAnalysisResultListener],
   providers: [SleepSoundProducer, SleepSoundService, SleepSoundFactory],
   exports: [SleepSoundService],
 })
