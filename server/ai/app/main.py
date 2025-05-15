@@ -12,5 +12,13 @@ app = FastAPI(
     description="Retrieval Augmented Generation 기반의 수면 코칭 제공 API"
 )
 
+# 헬스체크 엔드포인트
+@app.get("/api/health", tags=["health"])
+async def health_check():
+    """
+    컨테이너 헬스체크용 엔드포인트.
+    """
+    return {"status": "ok"}
+
 # 코칭 라우터 등록
 app.include_router(coaching_router, prefix="/coaching", tags=["coaching"])
