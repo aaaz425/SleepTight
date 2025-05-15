@@ -18,7 +18,7 @@ os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
 
 # Pinecone 클라이언트 초기화
 pc = Pinecone(api_key=settings.PINECONE_API_KEY, environment=settings.PINECONE_ENVIRONMENT)
-index = pc.Index(settings.PINECIONE_INDEX_NAME)
+index = pc.Index(settings.PINECONE_INDEX_NAME)
 
 # 임베딩 및 벡터 스토어 초기화
 embeddings = OpenAIEmbeddings(model=settings.EMBEDDING_MODEL)
