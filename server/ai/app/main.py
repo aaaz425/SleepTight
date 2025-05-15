@@ -1,7 +1,7 @@
 import logging
 from fastapi import FastAPI
-from app.config import settings
-from app.routers.coaching import router as coaching_router
+from config import settings
+from routers.coaching import router as coaching_router
 
 # 필수 환경변수 검증
 if not settings.OPENAI_API_KEY or not settings.PINECONE_API_KEY:

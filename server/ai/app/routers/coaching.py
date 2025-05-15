@@ -1,10 +1,10 @@
 # app/routers/coaching.py
 from fastapi import APIRouter, HTTPException
-from app.config import settings
-from app.models.request import CoachingRequestDTO
-from app.models.response import CoachingResponseDTO
-from app.utils.text_utils import dict_to_text
-from app.prompts.prompt import prompt
+from config import settings
+from models.request import CoachingRequestDTO
+from models.response import CoachingResponseDTO
+from utils.text_utils import dict_to_text
+from prompts.prompt import prompt
 from pinecone import Pinecone
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_pinecone import PineconeVectorStore

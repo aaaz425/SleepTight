@@ -11,7 +11,4 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "text-embedding-3-large"
     TOP_K: int = 2
 
-    class Config:
-        env_file = "app/.env"
-
 settings = Settings()
