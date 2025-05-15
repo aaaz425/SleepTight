@@ -48,8 +48,10 @@ pipeline {
           passwordVariable: 'DOCKERHUB_PSW'
         )]) {
           sh '''
+            set -e
             docker logout || true
             echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
+            echo ">> docker info 확인 <<"
             docker info
           '''
         }
