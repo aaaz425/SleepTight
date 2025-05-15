@@ -1,3 +1,4 @@
+import 'package:app/core/config/app_config.dart';
 import 'package:app/core/config/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +25,7 @@ class _ProgressBarState extends State<ProgressBar>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        context.go('/');
+        context.go(AppConfig.routes.home);
       }
     });
   }

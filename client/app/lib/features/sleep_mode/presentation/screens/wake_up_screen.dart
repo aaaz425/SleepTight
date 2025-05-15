@@ -1,3 +1,4 @@
+import 'package:app/core/config/app_config.dart';
 import 'package:app/core/config/theme/color.dart';
 import 'package:app/features/sleep_mode/presentation/widgets/progress_bar.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,7 @@ class WakeUpScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        context.go('/');
+                        context.go(AppConfig.routes.home);
                       },
                       child: const Text('닫기', style: TextStyle(fontSize: 16)),
                     ),

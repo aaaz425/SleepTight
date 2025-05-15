@@ -1,3 +1,4 @@
+import 'package:app/core/config/app_config.dart';
 import 'package:app/core/config/theme/theme.dart';
 import 'package:app/core/state/navigation/bottom_nav_provider.dart';
 import 'package:flutter/material.dart';
@@ -21,19 +22,19 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
         switch (index) {
           case 0:
-            context.go('/');
+            context.go(AppConfig.routes.home);
             break;
           case 1:
-            context.go('/analysis');
+            context.go(AppConfig.routes.sleepAnalysis);
             break;
           case 2:
-            context.go('/coach');
+            context.go(AppConfig.routes.sleepCoach);
             break;
           case 3:
-            context.go('/sound');
+            context.go(AppConfig.routes.sound);
             break;
           case 4:
-            context.go('/mypage');
+            context.go(AppConfig.routes.mypage);
             break;
         }
       },

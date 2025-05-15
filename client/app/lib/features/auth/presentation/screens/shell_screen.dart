@@ -4,9 +4,15 @@ import 'package:go_router/go_router.dart';
 
 class ShellScreen extends StatelessWidget {
   final Widget body;
+  final bool hasPlayer;
   final bool hasBottomNav;
 
-  const ShellScreen({super.key, required this.body, this.hasBottomNav = true});
+  const ShellScreen({
+    super.key,
+    required this.body,
+    this.hasPlayer = true,
+    this.hasBottomNav = true,
+  });
 
   int _calculateSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
@@ -23,6 +29,7 @@ class ShellScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentIndex = _calculateSelectedIndex(context);
+    // Todo: 미니 플레이어 추가
     return Scaffold(
       body: body,
       bottomNavigationBar:
