@@ -28,7 +28,11 @@ apk-install:
 apk-build-install: icon splash apk-build apk-install
 
 apk-build-install-galaxys10: icon splash apk-build
+	adb -s R39M208CZ1B uninstall com.example.sleeptight
 	adb -s R39M208CZ1B install build/app/outputs/flutter-apk/app-release.apk
+
+galaxy10-simulator: icon splash
+	flutter run -d R39M208CZ1B
 
 # ios simulator
 ios-simulator: icon splash
