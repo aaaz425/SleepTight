@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from config import settings
 from models.request import CoachingRequestDTO
 from models.response import CoachingResponseDTO
-from utils.text_utils import dict_to_text
+from utils.text_utils import items_to_text
 from prompts.prompt import prompt
 from pinecone import Pinecone
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
@@ -36,8 +36,8 @@ async def generate_coaching(request: CoachingRequestDTO):
     JSON 형태의 활동 추천 리스트를 반환
     """
     # dict 데이터를 텍스트로 변환
-    weekly_text = dict_to_text(request.weekly_data)
-    night_text = dict_to_text(request.night_data)
+    weekly_text = items_to_text(request.weekly_data)
+    night_text = items_to_text(request.night_data)
 
     # 질문 형태로 컨텍스트 검색
     question = (
