@@ -74,8 +74,7 @@ export class SleepSoundService {
     return UploadSleepSoundResponseDto.from({ segmentId, fileUrl });
   }
 
-  async saveSleepEvent(dto: AnalysisResultDto) {
-    const sleepEvent: SleepEvent = AnalysisResultDto.toEntity(dto);
+  async saveSleepEvent(sleepEvent: SleepEvent) {
     this.sleepSoundFactory.saveSleepEvent(sleepEvent);
   }
 

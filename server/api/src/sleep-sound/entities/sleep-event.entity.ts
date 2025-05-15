@@ -11,7 +11,7 @@ export class SleepEvent {
     @Column({ name: 'start_sec', type: 'float' })
     startSec: number;
 
-    @Column({name: 'end_sec', type: 'float' })
+    @Column({name: 'end_sec', type: 'float' })  
     endSec: number;
 
     @Column({name: 'inference_ts', type: 'timestamp' })
@@ -20,6 +20,6 @@ export class SleepEvent {
     @Column({ type: 'varchar' })
     anomaly: string;
 
-    @Column({ type: 'int' })
+    @Column({ type: 'numeric', precision: 6, scale: 5,  nullable: true })
     confidence: number;
 }

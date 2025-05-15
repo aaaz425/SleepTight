@@ -4,25 +4,25 @@ import { SleepEvent } from "../entities/sleep-event.entity";
 export class AnalysisResultDto {
     @Expose({ name: 'segment_id' })
     segmentId: string;
-    @Expose({ name: 'start_sec' })
-    startSec: number;
-    @Expose({ name: 'end_sec' })
-    endSec: number;
+    @Expose({ name: 'start' })
+    start: number;
+    @Expose({ name: 'end' })
+    end: number;
     @Expose({ name: 'inference_ts' })
     inferenceTs: Date;
 
-    anomaly: string;
+    label: string;
 
-    confidence: number;
+    prob: number;
 
-    static toEntity(dto: AnalysisResultDto) :SleepEvent{
+    static toSleepEventEntity(dto: AnalysisResultDto) :SleepEvent{
         const sleepEvent: SleepEvent = new SleepEvent();
         sleepEvent.segmentId = dto.segmentId;
-        sleepEvent.startSec = dto.startSec;
-        sleepEvent.endSec = dto.endSec;
+        sleepEvent.startSec = dto.start;
+        sleepEvent.endSec = dto.end;
         sleepEvent.inferenceTs = dto.inferenceTs;
-        sleepEvent.anomaly = dto.anomaly;
-        sleepEvent.confidence = dto.confidence;
+        sleepEvent.anomaly = dto.label;
+        sleepEvent.confidence = dto.prob;
         return sleepEvent;
     }
 }
