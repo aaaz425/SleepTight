@@ -72,7 +72,7 @@ class ApiException implements Exception {
           // If finalMessage is still generic (not from a parsed ApiError), use _handleStatusCode.
           if (finalMessage == '알 수 없는 오류가 발생했습니다.' ||
               finalMessage == '에러가 발생했습니다.') {
-            finalMessage = _handleStatusCode(
+            finalMessage = handleStatusCode(
               finalHttpStatusCode,
               originalErrorData,
             );
@@ -118,7 +118,7 @@ class ApiException implements Exception {
   /// Provides a generic error message based on HTTP status code.
   /// This is a fallback if the server response doesn't contain a specific message
   /// or if the error is not a structured JSON error.
-  static String _handleStatusCode(int? statusCode, dynamic errorBody) {
+  static String handleStatusCode(int? statusCode, dynamic errorBody) {
     // If errorBody is a Map and contains a 'message', prefer that.
     if (errorBody is Map<String, dynamic> &&
         errorBody.containsKey('message') &&
