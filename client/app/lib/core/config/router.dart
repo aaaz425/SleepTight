@@ -1,12 +1,12 @@
-import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/home_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
 import 'package:sleep_tight/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/auth/data/models/enums/auth_status.dart';
+import '../../features/user/data/models/enums/auth_status.dart';
 import 'app_config.dart';
 
 // goRouterProvider를 Provider.family로 변경하고 GlobalKey<NavigatorState>를 인자로 받도록 수정합니다.
@@ -15,17 +15,17 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
   navigatorKey,
 ) {
   // AuthNotifier를 watch하여 인증 상태 변경 시 GoRouter가 재빌드되고 redirect 로직이 재실행되도록 함
-  final authState = ref.watch(authStateProvider);
+  final userModel = ref.watch(userModelProvider);
 
   return GoRouter(
     navigatorKey: navigatorKey, // 전달받은 navigatorKey를 GoRouter에 설정합니다.
-    initialLocation: AppConfig.routes.appInit, // 초기 시작 지점
+    initialLocation: AppConfig.routes.welcome, // 초기 시작 지점
     debugLogDiagnostics: true, // 개발 중 로그 확인에 유용
     // redirect 로직: 인증 상태 및 현재 경로에 따라 적절한 페이지로 리다이렉션
     redirect: (BuildContext context, GoRouterState state) {
-      final currentAuthStatus = authState.status;
+      final currentAuthStatus = userModel?.status ?? AuthStatus.guest;
       final location = state.matchedLocation; // 현재 이동하려는 경로 (정규화된 경로)
-
+      debugPrint('redirect: status=$currentAuthStatus, location=$location');
       // 1. 비로그인 사용자 (AuthStatus.guest)
       if (currentAuthStatus == AuthStatus.guest) {
         // '/welcome' 경로가 아니면 해당 경로로 보냄
@@ -35,10 +35,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
       }
 
       // 2. 임시가입 사용자 (AuthStatus.incomplete_registration)
-      final unauthenticatedAllowedPaths = [
-        AppConfig.routes.welcome,
-        AppConfig.routes.signUp,
-      ];
+      final unauthenticatedAllowedPaths = [AppConfig.routes.signUp];
       if (currentAuthStatus == AuthStatus.incompleteRegistration) {
         if (unauthenticatedAllowedPaths.contains(location)) {
           return null; // 허용된 경로면 그대로 진행
@@ -73,6 +70,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         if (disallowedPathsForAuthenticated.contains(location)) {
           return AppConfig.routes.home; // 메인 화면 (홈)
         }
+        return null;
       }
 
       return null; // 그 외의 경우는 리다이렉션 없음
@@ -80,13 +78,6 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
 
     routes: <RouteBase>[
       // --- 초기 및 인증 관련 라우트 ---
-      GoRoute(
-        path: AppConfig.routes.appInit,
-        pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: PlaceholderScreen(title: 'After Login Splash'),
-            ),
-      ),
       GoRoute(
         path: AppConfig.routes.welcome,
         pageBuilder:
