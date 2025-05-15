@@ -55,6 +55,28 @@ class UserInformationResponse {
       status: json['status'],
     );
   }
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'provider': provider,
+      'lastName': lastName,
+      'firstName': firstName,
+      'email': email,
+      'wakeTime': wakeTime,
+      'sleepTime': sleepTime,
+      'minSleepDuration': minSleepDuration.toJson(),
+      'weight': weight,
+      'height': height,
+      'gender': gender,
+      'birthDate': birthDate,
+      'country': country,
+      'lengthUnit': lengthUnit,
+      'weightUnit': weightUnit,
+      'status': status,
+    };
+  }
 }
 
 class MinSleepDuration {
@@ -74,5 +96,10 @@ class MinSleepDuration {
       minutes: json['minutes'] ?? 0,
       seconds: json['seconds'] ?? 0,
     );
+  }
+
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {'hours': hours, 'minutes': minutes, 'seconds': seconds};
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/features/user/domain/repositories/user_repository.dart';
 import 'package:sleep_tight/features/user/data/datasources/user_remote_data_source.dart';
 import 'package:sleep_tight/features/user/data/models/requests/user_register_request.dart';
@@ -104,9 +103,3 @@ class UserRepositoryImpl implements UserRepository {
     return remoteDataSource.updateWakeTime(request);
   }
 }
-
-// Riverpod provider for UserRepository
-final userRepositoryProvider = Provider<UserRepository>((ref) {
-  final remoteDataSource = ref.watch(userRemoteDataSourceProvider);
-  return UserRepositoryImpl(remoteDataSource);
-});
