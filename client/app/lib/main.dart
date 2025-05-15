@@ -1,4 +1,6 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sleep_tight/core/config/theme/theme.dart';
+import 'package:sleep_tight/core/error/api_exception.dart';
 import 'package:sleep_tight/core/storage/shared_preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,9 +41,11 @@ void main() async {
 
   final sharedPreferences = await SharedPreferences.getInstance();
 
-  KakaoSdk.init(
-    nativeAppKey: '네이티브 앱 키', // 카카오 개발자 콘솔에서 발급받은 네이티브 앱 키
-  );
+  // 반드시 dotenv.load()를 먼저 호출!
+  await dotenv.load(fileName: ".env");
+
+  // 그 다음에 KakaoSdk.init 등 환경변수 사용 코드 작성
+  KakaoSdk.init(nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY']!);
 
   // 여기서 secureStorage에 accessToken이 있는지 확인하고
   // 이 token을 통해 회원정보를 제대로 가져오는지 확인하고
@@ -64,6 +68,7 @@ class SleepTightApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    debugPrint("sleeptightapp started");
     // apiErrorStreamProvider를 listen하여 에러 발생 시 토스트 메시지 표시
     ref.listen<AsyncValue<ApiErrorEvent>>(apiErrorStreamProvider, (
       previous, // 이전 상태(nullable)
@@ -80,9 +85,11 @@ class SleepTightApp extends ConsumerWidget {
             context: overlayContext,
             type: ToastificationType.error,
             style: ToastificationStyle.fillColored,
-            title: Text(apiException.message),
-            description: Text(
-              'Status: ${apiException.httpStatusCode} | Code: ${apiException.apiErrorCode}\n${apiException.errorData?['message'] ?? ''}',
+            title: Text(
+              ApiException.handleStatusCode(
+                apiException.httpStatusCode,
+                apiException.errorData,
+              ),
             ),
             alignment: Alignment.bottomCenter,
             autoCloseDuration: const Duration(seconds: 4),
