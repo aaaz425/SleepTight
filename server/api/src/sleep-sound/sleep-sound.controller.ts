@@ -11,11 +11,15 @@ import { UploadSleepSoundResponseDto } from './dto/upload-sleep-sound.response.d
 import { SleepSoundService } from './sleep-sound.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
+import { DataSource } from 'typeorm';
 
 @ApiTags('Sleep')
 @Controller('sleep/sound')
 export class SleepSoundController {
-  constructor(private readonly sleepSoundService: SleepSoundService) {}
+  constructor(
+    private readonly sleepSoundService: SleepSoundService,
+    private readonly dataSource: DataSource,
+  ) {}
 
   @Post()
   @ApiConsumes('multipart/form-data')
@@ -31,13 +35,5 @@ export class SleepSoundController {
     @Body() body: UploadSleepSoundRequestDto,
   ): Promise<UploadSleepSoundResponseDto> {
     return this.sleepSoundService.handleUpload(file, body);
-  }
-
-  // dev.controller.ts
-  @Post('dev/test-calculate-events')
-  async testCalculate(@Body('reportId') reportId: number) {
-    const durations =
-      await this.sleepSoundService.calculateEventDurations(reportId);
-    return durations;
   }
 }

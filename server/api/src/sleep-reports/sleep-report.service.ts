@@ -114,13 +114,13 @@ export class SleepReportService {
 
   // 수면 종료 + 수면 단계 업로드
   async endSleep(dto: EndSleepRequestDto): Promise<boolean> {
-    const report = await this.reportRepo.findOneBy({ id: dto.reportId });
-    if (!report) {
-      throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
-    }
-
     const result = await this.dataSource.transaction(async (manager) => {
       // 종료 시간 계산
+      const report = await manager.findOne(SleepReport, {
+        where: { id: dto.reportId },
+      });
+      if (!report) throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
+
       const sleepEndTime = new Date(dto.sleepEndTime);
       report.sleepEndTime = sleepEndTime;
 
@@ -130,21 +130,27 @@ export class SleepReportService {
       report.isValidReport = isValidSleep;
 
       if (isValidSleep) {
-        report.totalSleepTime = `${Math.floor(sleepDurationMs / 1000)} seconds`;
+        report.totalSleepTime = `${Math.floor(sleepDurationMs / 60)} minutes`;
 
         await this.sleepStageService.saveStages(dto.stages, report.id, manager);
         await this.setStageDurations(report, manager);
 
         const { snoring, somniloquy, coughing } =
-          await this.sleepSoundService.calculateEventDurations(report.id);
-
-        report.snoringDurationMinutes = `${Math.floor(snoring / 60)} minutes`;
-        report.somniloquyDurationMinutes = `${Math.floor(somniloquy / 60)} minutes`;
-        report.coughingDurationMinutes = `${Math.floor(coughing / 60)} minutes`;
+          await this.sleepSoundService.calculateEventDurations(
+            report.id,
+            manager,
+          );
+        report.snoringDurationSeconds = snoring;
+        report.somniloquyDurationSeconds = somniloquy;
+        report.coughingDurationSeconds = coughing;
       } else {
         report.totalSleepTime = null;
       }
-
+      console.log('🐛 report before save:', {
+        snoring: report.snoringDurationSeconds,
+        somniloquy: report.somniloquyDurationSeconds,
+        coughing: report.coughingDurationSeconds,
+      });
       await manager.save(report);
       return isValidSleep;
     });
