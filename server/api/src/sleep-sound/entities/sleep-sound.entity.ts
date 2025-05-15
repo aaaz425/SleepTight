@@ -7,13 +7,13 @@ import {
   PrimaryColumn,
   ManyToOne,
   JoinColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('sleep_sounds')
 export class SleepSound {
-  @PrimaryColumn({ type: 'uuid' })
-  @Index({ unique: true })
-  segmentId: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => SleepReport, (report) => report.sounds, {
     onDelete: 'CASCADE',
@@ -35,4 +35,8 @@ export class SleepSound {
 
   @Column({ name: 'duration', type: 'float' })
   duration: number;
+
+  @Column({ type: 'uuid' })
+  @Index({ unique: true })
+  segmentId: string;
 }

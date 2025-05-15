@@ -36,11 +36,11 @@ export class SleepSoundFactory {
 
   // UUID 중복 확인
   async exist(options: { where: { segmentId: string } }): Promise<boolean> {
-    const count = await this.sleepSoundRepo.count(options);
-    return count > 0;
+    const result = await this.sleepSoundRepo.findOne(options);
+    return !!result;
   }
 
   async saveSleepEvent(sleepEvent: SleepEvent) {
-    return this.sleepEventRepo.save(sleepEvent)
+    return this.sleepEventRepo.save(sleepEvent);
   }
 }
