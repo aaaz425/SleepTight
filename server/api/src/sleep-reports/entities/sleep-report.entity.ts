@@ -5,6 +5,8 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { SleepSound } from 'src/sleep-sound/entities/sleep-sound.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -31,7 +33,7 @@ export class SleepReport {
   targetEndTime: string;
 
   @Column({ name: 'total_sleep_time', type: 'interval', nullable: true })
-  totalSleepTime: string;
+  totalSleepTime: string | null;
 
   @Column({ name: 'total_awake_time', type: 'interval', nullable: true })
   totalAwakeTime: string;
@@ -71,6 +73,19 @@ export class SleepReport {
 
   @Column({ name: 'sleep_date', type: 'date' })
   sleepDate: Date;
+
+  @Column({
+    name: 'is_valid_report',
+    type: 'boolean',
+    default: true,
+  })
+  isValidReport: boolean;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  updatedAt: Date;
 
   // User와 연결
   @ManyToOne(() => User, { onDelete: 'CASCADE' })

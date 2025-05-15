@@ -7,14 +7,21 @@ import { SleepSoundModule } from 'src/sleep-sound/sleep-sound.module';
 import { SleepStageService } from './sleep-stage.service';
 import { SleepStageFactory } from './sleep-stage.factory';
 import { SleepStageLog } from './entities/sleep-stage-log.entity';
+import { User } from 'src/users/entities/user.entity';
+import { SleepReportFactory } from './sleep-report.factory';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SleepReport, SleepStageLog]),
+    TypeOrmModule.forFeature([SleepReport, User, SleepStageLog]),
     SleepSoundModule,
   ],
   controllers: [SleepReportController],
-  providers: [SleepReportService, SleepStageService, SleepStageFactory],
+  providers: [
+    SleepReportService,
+    SleepStageService,
+    SleepStageFactory,
+    SleepReportFactory,
+  ],
   exports: [SleepStageService],
 })
 export class SleepReportModule {}

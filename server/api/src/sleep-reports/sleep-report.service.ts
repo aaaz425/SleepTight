@@ -1,10 +1,15 @@
+import { SleepReportFactory } from './sleep-report.factory';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { SleepReport } from './entities/sleep-report.entity';
 import { SleepStageService } from 'src/sleep-reports/sleep-stage.service';
-import { UploadSleepStagesDto } from 'src/sleep-reports/dto/upload-sleep-stage.request.dto';
+import { EndSleepRequestDto } from 'src/sleep-reports/dto/end-sleep.request.dto';
 import { StartSleepRequestDto } from './dto/start-sleep.request.dto';
+import { User } from 'src/users/entities/user.entity';
+import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
+import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
+import { SleepStageLog } from './entities/sleep-stage-log.entity';
 
 @Injectable()
 export class SleepReportService {
@@ -12,40 +17,130 @@ export class SleepReportService {
     private readonly dataSource: DataSource,
     @InjectRepository(SleepReport)
     private readonly reportRepo: Repository<SleepReport>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
     private readonly sleepStageService: SleepStageService,
+    private readonly reportFactory: SleepReportFactory,
   ) {}
 
   // 수면 시작
   async startSleep(userId: number, dto: StartSleepRequestDto): Promise<number> {
-    // ISO 8601 문자열을 Date 객체로 변환
     const sleepStartTime = new Date(dto.sleep_start_time);
 
-    // SleepReport 생성
-    const report = this.reportRepo.create({
-      userId,
-      sleepStartTime,
+    const user = await this.userRepo.findOneBy({ id: userId });
+    if (!user) {
+      throwNotFoundException(ExceptionCode.USER_NOT_FOUND);
+    }
+
+    // 목표 기상 시간 기준 sleepDate 계산 (UTC)
+    const [wakeHourStr, wakeMinuteStr] = user.wake_time.split(':');
+    const wakeDateTime = new Date(sleepStartTime);
+    wakeDateTime.setUTCHours(
+      parseInt(wakeHourStr, 10),
+      parseInt(wakeMinuteStr, 10),
+      0,
+      0,
+    );
+
+    const sleepDate = new Date(sleepStartTime);
+    if (sleepStartTime < wakeDateTime) {
+      sleepDate.setUTCDate(sleepDate.getUTCDate() - 1);
+    }
+
+    const sleepDateOnly = new Date(
+      Date.UTC(
+        sleepDate.getUTCFullYear(),
+        sleepDate.getUTCMonth(),
+        sleepDate.getUTCDate(),
+      ),
+    );
+
+    // 기존 유효하지 않은 리포트가 있다면 재사용
+    const existing = await this.reportRepo.findOne({
+      where: {
+        userId,
+        isValidReport: false,
+      },
+      order: { createdAt: 'DESC' },
     });
 
-    // 저장 후 ID 반환
-    const saved = await this.reportRepo.save(report);
+    if (existing) {
+      existing.sleepStartTime = sleepStartTime;
+      existing.sleepDate = sleepDateOnly;
+      existing.isValidReport = true;
+      existing.targetStartTime = user.sleep_time;
+      existing.targetEndTime = user.wake_time;
+      return (await this.reportRepo.save(existing)).id;
+    }
+
+    // 없으면 리포트 새로 생성
+    const newReport = this.reportFactory.createNew(
+      userId,
+      sleepStartTime,
+      sleepDateOnly,
+    );
+    newReport.sleepDate = sleepDateOnly;
+    newReport.targetStartTime = user.sleep_time;
+    newReport.targetEndTime = user.wake_time;
+    newReport.totalSleepTime = user.min_sleep_duration;
+
+    // 저장 후 리포트 ID 반환
+    const saved = await this.reportFactory.save(newReport);
     return saved.id;
   }
 
-  // 수면 종료 + 수면 단계 업로드
-  async uploadSleepData(dto: UploadSleepStagesDto): Promise<void> {
-    const report = await this.reportRepo.findOneByOrFail({ id: dto.reportId });
+  private async setStageDurations(
+    report: SleepReport,
+    manager: EntityManager,
+  ): Promise<void> {
+    const { awake, light, deep, rem, awakenCount } =
+      await this.sleepStageService.calculateStageDurations(report.id, manager);
 
-    await this.dataSource.transaction(async (manager) => {
+    report.totalAwakeTime = `${awake} minutes`;
+    report.totalLightSleepTime = `${light} minutes`;
+    report.totalDeepSleepTime = `${deep} minutes`;
+    report.totalRemSleepTime = `${rem} minutes`;
+    report.awakenCount = awakenCount;
+
+    console.log('Stage duration mins:', {
+      awake,
+      light,
+      deep,
+      rem,
+      awakenCount,
+    });
+  }
+
+  // 수면 종료 + 수면 단계 업로드
+  async endSleep(dto: EndSleepRequestDto): Promise<boolean> {
+    const report = await this.reportRepo.findOneBy({ id: dto.reportId });
+    if (!report) {
+      throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
+    }
+
+    const result = await this.dataSource.transaction(async (manager) => {
       // 종료 시간 계산
       const sleepEndTime = new Date(dto.sleepEndTime);
       report.sleepEndTime = sleepEndTime;
 
-      report.sleepDate = new Date(sleepEndTime.toDateString());
+      const sleepDurationMs =
+        sleepEndTime.getTime() - report.sleepStartTime.getTime();
+      const isValidSleep = sleepDurationMs >= 60 * 60 * 1000; // 1시간 이상이면 유효 수면
+      report.isValidReport = isValidSleep;
+
+      if (isValidSleep) {
+        report.totalSleepTime = `${Math.floor(sleepDurationMs / 1000)} seconds`;
+
+        await this.sleepStageService.saveStages(dto.stages, report.id, manager);
+        await this.setStageDurations(report, manager);
+      } else {
+        report.totalSleepTime = null;
+      }
 
       await manager.save(report);
-
-      // 수면 단계 저장을 sleep 도메인에 위임
-      await this.sleepStageService.saveStages(dto.stages, report.id, manager);
+      return isValidSleep;
     });
+
+    return result;
   }
 }
