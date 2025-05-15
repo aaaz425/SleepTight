@@ -9,7 +9,7 @@ FROM python:3.10-alpine AS builder
 WORKDIR /app
 
 # 의존성 파일 복사 후 캐싱 활용하여 설치
-COPY requirements.txt ./
+COPY app/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # (필요 시) 모델 파일 다운로드 또는 복사
