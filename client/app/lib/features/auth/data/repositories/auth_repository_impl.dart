@@ -21,7 +21,6 @@ class AuthRepositoryImpl implements AuthRepository {
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
     );
-    await localDataSource.saveStatus(response.status);
   }
 
   @override
@@ -38,10 +37,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> clearTokenAndStatus() async {
+  Future<void> clearToken() async {
     await localDataSource.clearTokens();
-    await localDataSource.clearStatus();
-    // remoteDataSource logout
   }
 
   @override
@@ -49,12 +46,4 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String?> getRefreshToken() => localDataSource.getRefreshToken();
-
-  @override
-  Future<String?> getStatus() => localDataSource.getStatus();
-
-  @override
-  Future<void> saveStatus(String status) async {
-    await localDataSource.saveStatus(status);
-  }
 }

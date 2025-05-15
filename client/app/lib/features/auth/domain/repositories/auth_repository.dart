@@ -3,12 +3,8 @@ abstract class AuthRepository {
   Future<void> loginWithKakao(String authorizationCode);
   Future<void> refreshAccessToken();
 
-  // 토큰 및 상태 관리
+  // 토큰 관리
   Future<String?> getAccessToken();
   Future<String?> getRefreshToken();
-  Future<void> clearTokenAndStatus();
-
-  // 인증 상태 관련
-  Future<String?> getStatus();
-  Future<void> saveStatus(String status);
+  Future<void> clearToken();
 }

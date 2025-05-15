@@ -1,4 +1,3 @@
-import 'package:sleep_tight/features/auth/data/models/enums/auth_status.dart';
 import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,37 +30,37 @@ class PlaceholderScreen extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                ref
-                    .read(authRepositoryProvider)
-                    .saveStatus(AuthStatus.guest.value);
-                ref.read(authStateProvider.notifier).refreshAuthStatus();
+                // ref
+                //     .read(authRepositoryProvider)
+                //     .saveStatus(AuthStatus.guest.value);
+                // ref.read(authStateProvider.notifier).refreshAuthStatus();
               },
               child: Text('auth guest'),
             ),
             ElevatedButton(
               onPressed: () {
-                ref
-                    .read(authRepositoryProvider)
-                    .saveStatus(AuthStatus.incompleteRegistration.value);
-                ref.read(authStateProvider.notifier).refreshAuthStatus();
+                // ref
+                //     .read(authRepositoryProvider)
+                //     .saveStatus(AuthStatus.incompleteRegistration.value);
+                // ref.read(authStateProvider.notifier).refreshAuthStatus();
               },
               child: Text('auth incomplete'),
             ),
             ElevatedButton(
               onPressed: () {
-                ref
-                    .read(authRepositoryProvider)
-                    .saveStatus(AuthStatus.pendingWithdraw.value);
-                ref.read(authStateProvider.notifier).refreshAuthStatus();
+                // ref
+                //     .read(authRepositoryProvider)
+                //     .saveStatus(AuthStatus.pendingWithdraw.value);
+                // ref.read(authStateProvider.notifier).refreshAuthStatus();
               },
               child: Text('auth pending'),
             ),
             ElevatedButton(
               onPressed: () {
-                ref
-                    .read(authRepositoryProvider)
-                    .saveStatus(AuthStatus.active.value);
-                ref.read(authStateProvider.notifier).refreshAuthStatus();
+                // ref
+                //     .read(authRepositoryProvider)
+                //     .saveStatus(AuthStatus.active.value);
+                // ref.read(authStateProvider.notifier).refreshAuthStatus();
               },
               child: Text('auth active'),
             ),
