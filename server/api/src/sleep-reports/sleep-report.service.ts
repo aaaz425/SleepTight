@@ -1,7 +1,7 @@
 import { SleepReportFactory } from './sleep-report.factory';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { SleepReport } from './entities/sleep-report.entity';
 import { SleepStageService } from 'src/sleep-reports/sleep-stage.service';
 import { EndSleepRequestDto } from 'src/sleep-reports/dto/end-sleep.request.dto';
@@ -9,6 +9,7 @@ import { StartSleepRequestDto } from './dto/start-sleep.request.dto';
 import { User } from 'src/users/entities/user.entity';
 import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
 import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
+import { SleepStageLog } from './entities/sleep-stage-log.entity';
 
 @Injectable()
 export class SleepReportService {
@@ -32,12 +33,18 @@ export class SleepReportService {
     }
 
     // 목표 기상 시간 기준 sleepDate 계산 (UTC)
-    const [wakeHourStr] = user.wake_time.split(':');
-    const wakeHour = parseInt(wakeHourStr, 10);
+    const [wakeHourStr, wakeMinuteStr] = user.wake_time.split(':');
+    const wakeDateTime = new Date(sleepStartTime);
+    wakeDateTime.setUTCHours(
+      parseInt(wakeHourStr, 10),
+      parseInt(wakeMinuteStr, 10),
+      0,
+      0,
+    );
 
     const sleepDate = new Date(sleepStartTime);
-    if (sleepStartTime.getUTCHours() < wakeHour) {
-      sleepDate.setUTCDate(sleepDate.getDate() - 1);
+    if (sleepStartTime < wakeDateTime) {
+      sleepDate.setUTCDate(sleepDate.getUTCDate() - 1);
     }
 
     const sleepDateOnly = new Date(
@@ -82,6 +89,28 @@ export class SleepReportService {
     return saved.id;
   }
 
+  private async setStageDurations(
+    report: SleepReport,
+    manager: EntityManager,
+  ): Promise<void> {
+    const { awake, light, deep, rem, awakenCount } =
+      await this.sleepStageService.calculateStageDurations(report.id, manager);
+
+    report.totalAwakeTime = `${awake} minutes`;
+    report.totalLightSleepTime = `${light} minutes`;
+    report.totalDeepSleepTime = `${deep} minutes`;
+    report.totalRemSleepTime = `${rem} minutes`;
+    report.awakenCount = awakenCount;
+
+    console.log('Stage duration mins:', {
+      awake,
+      light,
+      deep,
+      rem,
+      awakenCount,
+    });
+  }
+
   // 수면 종료 + 수면 단계 업로드
   async endSleep(dto: EndSleepRequestDto): Promise<boolean> {
     const report = await this.reportRepo.findOneBy({ id: dto.reportId });
@@ -101,10 +130,13 @@ export class SleepReportService {
 
       if (isValidSleep) {
         report.totalSleepTime = `${Math.floor(sleepDurationMs / 1000)} seconds`;
+
         await this.sleepStageService.saveStages(dto.stages, report.id, manager);
+        await this.setStageDurations(report, manager);
       } else {
         report.totalSleepTime = null;
       }
+
       await manager.save(report);
       return isValidSleep;
     });
