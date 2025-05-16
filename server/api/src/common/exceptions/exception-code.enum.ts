@@ -9,6 +9,11 @@ export const ExceptionCode = {
     code: 'MUSIC_NOT_FOUND',
     message: '음악을 찾을 수 없습니다.',
   },
+  ACTIVITY_DATA_NOT_FOUND: {
+    status: 400,
+    code: 'ACTIVITY_DATA_NOT_FOUND',
+    message: '활동데이터를 찾을 수 없습니다.',
+  },
   INCOMPLETE_REGISTRATION: {
     status: 400,
     code: 'INCOMPLETE_REGISTRATION',
