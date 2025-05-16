@@ -9,9 +9,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadSleepSoundRequestDto } from './dto/upload-sleep-sound.request.dto';
 import { UploadSleepSoundResponseDto } from './dto/upload-sleep-sound.response.dto';
 import { SleepSoundService } from './sleep-sound.service';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 
+@ApiBearerAuth()
 @ApiTags('Sleep')
 @Controller('sleep/sound')
 export class SleepSoundController {
