@@ -10,8 +10,9 @@ export class SleepCoachingController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getSleepCoaching(@Request() req, @Body("sleepReportId") sleepReportId: number) {
+  async getSleepCoaching(@Request() req, @Body("sleepReportId") sleepReportId: number) :Promise<any>{
     const userId: number = req.user.userId; // JWT에서 userId를 가져옴
-    this.sleepCoachingService.getSleepCoaching(userId, sleepReportId);
+    const response = this.sleepCoachingService.getSleepCoaching(userId, sleepReportId);
+    return response;
   }
 }
