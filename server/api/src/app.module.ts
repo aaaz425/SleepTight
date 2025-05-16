@@ -11,7 +11,7 @@ import { TaskModule } from './task/task.module';
 import { SleepSoundModule } from './sleep-sound/sleep-sound.module';
 import { SleepReportModule } from './sleep-reports/sleep-report.module';
 import { SleepDiariesModule } from './sleep-reports/sleep-diaries.module';
-import { SleepCoachingModule } from './sleep-coaching/activity-data.module';
+import { SleepCoachingModule } from './sleep-coaching/sleep-coaching.module';
 
 @Module({
   imports: [
