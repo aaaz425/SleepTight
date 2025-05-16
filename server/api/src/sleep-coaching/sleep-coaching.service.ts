@@ -50,12 +50,15 @@ export class SleepCoachingService {
         const sleepTime: SleepTime[] = await this.settingSleepTimeData(sleepReport);
 
         this.settingSleepTimeData(sleepReport);
-        
-        const response = await axios.post('http://sleep-tight-ai:8081/coaching', {
-            weekly_data: activeTime,
-            night_data : sleepTime
-        });
-        console.log(response.data);
+        const response = await axios.post(
+            'http://sleep-tight-ai:8081/coaching',
+            {
+                requestBody: {
+                    weekly_data: activeTime,
+                    night_data:  sleepTime
+                }
+            }
+        );
         return response;
     }
 
