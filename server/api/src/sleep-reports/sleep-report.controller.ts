@@ -1,11 +1,25 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { EndSleepRequestDto } from 'src/sleep-reports/dto/end-sleep.request.dto';
 import { SleepReportService } from './sleep-report.service';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { StartSleepRequestDto } from './dto/start-sleep.request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { StartSleepResponseDto } from './dto/start-sleep.response.dto';
 import { EndSleepResponseDto } from './dto/end-sleep.response.dto';
+import { SleepReportResponseDto } from './dto/sleep-report.response.dto';
 
 @ApiTags('Sleep Report')
 @Controller('sleep-report')
@@ -34,5 +48,22 @@ export class SleepReportController {
   ): Promise<EndSleepResponseDto> {
     const isValidReport = await this.sleepReportService.endSleep(dto);
     return { isValidReport };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get(':date')
+  @ApiOperation({ summary: '해당 일자의 수면 리포트 조회' })
+  @ApiOkResponse({
+    description: '해당 일자의 리포트 목록',
+    type: [SleepReportResponseDto],
+  })
+  async getReportsByDate(@Request() req, @Param('date') date: string) {
+    const userId = req.user.userId;
+    const reportList = await this.sleepReportService.getReportsByDateWithStages(
+      userId,
+      date,
+    );
+    return reportList;
   }
 }

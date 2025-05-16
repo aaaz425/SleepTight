@@ -10,6 +10,7 @@ import { StartSleepRequestDto } from './dto/start-sleep.request.dto';
 import { User } from 'src/users/entities/user.entity';
 import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
 import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
+import { SleepStageLog } from './entities/sleep-stage-log.entity';
 
 @Injectable()
 export class SleepReportService {
@@ -22,6 +23,8 @@ export class SleepReportService {
     private readonly sleepStageService: SleepStageService,
     private readonly reportFactory: SleepReportFactory,
     private readonly sleepSoundService: SleepSoundService,
+    @InjectRepository(SleepStageLog)
+    private readonly stageRepo: Repository<SleepStageLog>,
   ) {}
 
   // 수면 시작
@@ -90,6 +93,7 @@ export class SleepReportService {
     return saved.id;
   }
 
+  // 수면 단계별 총 시간 저장
   private async setStageDurations(
     report: SleepReport,
     manager: EntityManager,
@@ -135,6 +139,22 @@ export class SleepReportService {
         await this.sleepStageService.saveStages(dto.stages, report.id, manager);
         await this.setStageDurations(report, manager);
 
+        const firstStageStart =
+          await this.sleepStageService.getFirstSleepStageStartTime(
+            report.id,
+            manager,
+          );
+
+        if (firstStageStart) {
+          const latencyMs =
+            firstStageStart.getTime() - report.sleepStartTime.getTime();
+          if (latencyMs > 0) {
+            report.sleepLatency = `${Math.floor(latencyMs / 60000)} minutes`;
+          }
+        }
+
+        console.log('sleep latency:', { sleepLatency: report.sleepLatency });
+
         const { snoring, somniloquy, coughing } =
           await this.sleepSoundService.calculateEventDurations(
             report.id,
@@ -154,6 +174,51 @@ export class SleepReportService {
       await manager.save(report);
       return isValidSleep;
     });
+
+    return result;
+  }
+
+  // 해당 일자의 수면로그 갖고오기
+  async getReportsByDateWithStages(
+    userId: number,
+    date: string,
+  ): Promise<any[]> {
+    const targetDate = new Date(date);
+
+    const reports = await this.reportRepo.find({
+      where: {
+        userId,
+        isValidReport: true,
+        sleepDate: targetDate,
+      },
+      order: { sleepEndTime: 'DESC' },
+    });
+
+    const result = await Promise.all(
+      reports.map(async (report) => {
+        const stages = await this.stageRepo.find({
+          where: { sleepReportId: report.id },
+          order: { stageStartTime: 'ASC' },
+        });
+        return {
+          sleepReportId: report.id,
+          sleep_start_time: report.sleepStartTime,
+          sleep_end_time: report.sleepEndTime,
+          sleep_latency: report.sleepLatency,
+          total_awake_time: report.totalAwakeTime,
+          total_rem_sleep_time: report.totalRemSleepTime,
+          total_light_sleep_time: report.totalLightSleepTime,
+          total_deep_sleep_time: report.totalDeepSleepTime,
+          awaken_count: report.awakenCount,
+          sleep_stage: stages.map((s) => ({
+            stageType: s.stageType,
+            startTime: s.stageStartTime,
+            endTime: s.stageEndTime,
+            duration: s.durationMinutes,
+          })),
+        };
+      }),
+    );
 
     return result;
   }

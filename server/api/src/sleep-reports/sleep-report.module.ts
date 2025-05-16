@@ -22,6 +22,6 @@ import { SleepReportFactory } from './sleep-report.factory';
     SleepStageFactory,
     SleepReportFactory,
   ],
-  exports: [SleepStageService],
+  exports: [SleepStageService, SleepReportService],
 })
 export class SleepReportModule {}
