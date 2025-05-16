@@ -52,8 +52,6 @@ export class SleepCoachingService {
             throwNotFoundException(ExceptionCode.ACTIVITY_DATA_NOT_FOUND);
         }
         const sleepTime: SleepTime[] = await this.settingSleepTimeData(sleepReport);
-
-        this.settingSleepTimeData(sleepReport);
         const response = await axios.post(
             'http://sleep-tight-ai:8081/coaching',
             {
@@ -61,8 +59,7 @@ export class SleepCoachingService {
                 night_data:  sleepTime
             }
         );
-
-        return response;
+        return response.data;
     }
 
     private async settingSleepTimeData(sleepReport: SleepReport): Promise<any>{
