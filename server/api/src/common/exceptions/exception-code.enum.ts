@@ -9,6 +9,11 @@ export const ExceptionCode = {
     code: 'MUSIC_NOT_FOUND',
     message: '음악을 찾을 수 없습니다.',
   },
+  ACTIVITY_DATA_NOT_FOUND: {
+    status: 400,
+    code: 'ACTIVITY_DATA_NOT_FOUND',
+    message: '활동데이터를 찾을 수 없습니다.',
+  },
   INCOMPLETE_REGISTRATION: {
     status: 400,
     code: 'INCOMPLETE_REGISTRATION',
@@ -18,6 +23,11 @@ export const ExceptionCode = {
     status: 400,
     code: 'DUPLICATE_SEGMENT_ID',
     message: '이미 존재하는 세그먼트 아이디입니다.',
+  },
+  REPORT_NOT_FOUND: {
+    status: 404,
+    code: 'REPORT_NOT_FOUND',
+    message: '수면 리포트를 찾을 수 없습니다.',
   },
   INVALID_TOKEN: {
     status: 401,

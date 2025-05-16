@@ -1,33 +1,64 @@
-import { ActivityDataType } from './entities/activity-data.enum';
-import { ActivityRecordDto } from './dto/upload-activity-data.request.dto';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
+import { ActivityData } from './entities/activity-data.entity';
+import { SleepReport } from 'src/sleep-reports/entities/sleep-report.entity';
+import { UploadActivityDataRequestDto } from './dto/upload-activity-data.request.dto';
+import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
+import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
 
+@Injectable()
 export class ActivityDataService {
-  constructor(private readonly activityRepo: any) {}
+  constructor(
+    @InjectRepository(ActivityData)
+    private readonly activityRepo: Repository<ActivityData>,
 
-  async saveActivityRecords(
+    @InjectRepository(SleepReport)
+    private readonly sleepReportRepo: Repository<SleepReport>,
+  ) {}
+
+  async saveActivityData(
     userId: number,
-    records: ActivityRecordDto[],
+    dto: UploadActivityDataRequestDto,
   ): Promise<void> {
-    for (const record of records) {
+    // 가장 최근의 유효 수면 리포트 찾기
+    const sleepReport = await this.sleepReportRepo.findOne({
+      where: {
+        userId,
+        isValidReport: true,
+        sleepEndTime: LessThanOrEqual(new Date(dto.endTime)),
+      },
+      order: {
+        sleepEndTime: 'DESC',
+      },
+    });
+
+    if (!sleepReport) {
+      throw throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
+    }
+
+    const sleepDate = sleepReport.sleepDate;
+
+    for (const record of dto.records) {
+      const exists = await this.activityRepo.findOne({
+        where: {
+          userId,
+          dataType: record.dataType,
+          reportDate: sleepDate,
+        },
+      });
+
+      if (exists) continue;
+
       const entity = this.activityRepo.create({
         userId,
         dataType: record.dataType,
+        valueNumber: Number(record.value),
         unit: record.unit,
-        activityStartTime: new Date(record.startTime),
-        activityEndTime: new Date(record.endTime),
+        activityStartTime: new Date(dto.startTime),
+        activityEndTime: new Date(dto.endTime),
+        reportDate: sleepDate,
       });
-
-      if (
-        record.dataType === ActivityDataType.WORKOUT ||
-        record.dataType === ActivityDataType.NUTRITION ||
-        record.dataType === ActivityDataType.MENSTRUATION_FLOW
-      ) {
-        // 복합(json) 형태
-        entity.valueJson = record.value;
-      } else {
-        // 숫자형 데이터
-        entity.valueNumber = Number(record.value);
-      }
 
       await this.activityRepo.save(entity);
     }
