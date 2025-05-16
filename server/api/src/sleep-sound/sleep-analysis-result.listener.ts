@@ -11,6 +11,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 @Controller()
 export class SleepAnalysisResultListener {
     constructor(
+
+        private readonly sleepSoundService :SleepSoundService,
         @InjectRepository(SleepEvent)
         private readonly sleepEventRepository :Repository<SleepEvent>,
     ){}
@@ -49,6 +51,5 @@ export class SleepAnalysisResultListener {
                 console.error('Error processing analysis result:', e);
             }
         }
-
     }
 }

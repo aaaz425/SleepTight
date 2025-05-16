@@ -14,7 +14,7 @@ export class ActivityData {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id' })
+  @Column({name: 'user_id'})
   userId: number;
 
   @Column({
@@ -55,12 +55,18 @@ export class ActivityData {
   })
   unit: ActivityUnit;
 
-  @Column({ name: 'activity_start_time', type: 'timestamptz' })
+  @Column({ 
+    name: 'activity_start_time', 
+    type: 'timestamptz' })
   activityStartTime: Date;
 
-  @Column({ name: 'activity_end_time', type: 'timestamptz' })
+  @Column({ 
+    name: 'activity_end_time',
+    type: 'timestamptz' })
   activityEndTime: Date;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+  })
   createdAt: Date;
 }
