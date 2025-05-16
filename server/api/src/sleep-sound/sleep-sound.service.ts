@@ -14,6 +14,8 @@ import { SleepSoundProducer } from './sleep-sound.producer';
 import { throwBadRequest } from 'src/common/exceptions/exception.helper';
 import { AnalysisResultDto } from './dto/analysis-result.dto';
 import { SleepEvent } from './entities/sleep-event.entity';
+import { AnomalyType } from './entities/anomaly-type.enum';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class SleepSoundService {
@@ -79,4 +81,54 @@ export class SleepSoundService {
     this.sleepSoundFactory.saveSleepEvent(sleepEvent);
   }
 
+  async calculateEventDurations(
+    reportId: number,
+    manager: EntityManager,
+  ): Promise<{
+    snoring: number;
+    somniloquy: number;
+    coughing: number;
+  }> {
+    // 해당 리포트에 연결된 segmentId들 조회
+    const sounds = await this.sleepSoundFactory.findByReportId(
+      reportId,
+      manager,
+    );
+    const segmentIds = sounds.map((sound) => sound.segmentId);
+    if (!segmentIds.length) return { snoring: 0, somniloquy: 0, coughing: 0 };
+
+    // segmentId에 해당하는 이벤트들 조회
+    const events = await this.sleepSoundFactory.findEventsBySegmentIds(
+      segmentIds,
+      manager,
+    );
+    console.log('🧪 segmentIds:', segmentIds);
+    console.log('🧪 loaded events:', events);
+
+    // anomaly 기준으로 누적 시간 계산
+    let snoring = 0,
+      somniloquy = 0,
+      coughing = 0;
+
+    for (const event of events) {
+      const duration = event.endSec - event.startSec;
+      switch (event.anomaly) {
+        case AnomalyType.SNORE:
+          snoring += duration;
+          break;
+        case AnomalyType.SOMNILOQUY:
+          somniloquy += duration;
+          break;
+        case AnomalyType.COUGH:
+          coughing += duration;
+          break;
+      }
+    }
+
+    return {
+      snoring: Math.round(snoring),
+      somniloquy: Math.round(somniloquy),
+      coughing: Math.round(coughing),
+    };
+  }
 }

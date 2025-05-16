@@ -1,3 +1,4 @@
+import { SleepSoundService } from './../sleep-sound/sleep-sound.service';
 import { SleepReportFactory } from './sleep-report.factory';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +10,6 @@ import { StartSleepRequestDto } from './dto/start-sleep.request.dto';
 import { User } from 'src/users/entities/user.entity';
 import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
 import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
-import { SleepStageLog } from './entities/sleep-stage-log.entity';
 
 @Injectable()
 export class SleepReportService {
@@ -21,6 +21,7 @@ export class SleepReportService {
     private readonly userRepo: Repository<User>,
     private readonly sleepStageService: SleepStageService,
     private readonly reportFactory: SleepReportFactory,
+    private readonly sleepSoundService: SleepSoundService,
   ) {}
 
   // 수면 시작
@@ -113,13 +114,13 @@ export class SleepReportService {
 
   // 수면 종료 + 수면 단계 업로드
   async endSleep(dto: EndSleepRequestDto): Promise<boolean> {
-    const report = await this.reportRepo.findOneBy({ id: dto.reportId });
-    if (!report) {
-      throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
-    }
-
     const result = await this.dataSource.transaction(async (manager) => {
       // 종료 시간 계산
+      const report = await manager.findOne(SleepReport, {
+        where: { id: dto.reportId },
+      });
+      if (!report) throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
+
       const sleepEndTime = new Date(dto.sleepEndTime);
       report.sleepEndTime = sleepEndTime;
 
@@ -129,14 +130,27 @@ export class SleepReportService {
       report.isValidReport = isValidSleep;
 
       if (isValidSleep) {
-        report.totalSleepTime = `${Math.floor(sleepDurationMs / 1000)} seconds`;
+        report.totalSleepTime = `${Math.floor(sleepDurationMs / 60)} minutes`;
 
         await this.sleepStageService.saveStages(dto.stages, report.id, manager);
         await this.setStageDurations(report, manager);
+
+        const { snoring, somniloquy, coughing } =
+          await this.sleepSoundService.calculateEventDurations(
+            report.id,
+            manager,
+          );
+        report.snoringDurationSeconds = snoring;
+        report.somniloquyDurationSeconds = somniloquy;
+        report.coughingDurationSeconds = coughing;
       } else {
         report.totalSleepTime = null;
       }
-
+      console.log('🐛 report before save:', {
+        snoring: report.snoringDurationSeconds,
+        somniloquy: report.somniloquyDurationSeconds,
+        coughing: report.coughingDurationSeconds,
+      });
       await manager.save(report);
       return isValidSleep;
     });

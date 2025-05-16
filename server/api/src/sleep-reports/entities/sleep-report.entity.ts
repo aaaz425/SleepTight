@@ -51,25 +51,25 @@ export class SleepReport {
   awakenCount: number;
 
   @Column({
-    name: 'snoring_duration_minutes',
-    type: 'interval',
+    name: 'snoring_duration_seconds',
+    type: 'int',
     nullable: true,
   })
-  snoringDurationMinutes: string;
+  snoringDurationSeconds: number;
 
   @Column({
-    name: 'somniloquy_duration_minutes',
-    type: 'interval',
+    name: 'somniloquy_duration_seconds',
+    type: 'int',
     nullable: true,
   })
-  somniloquyDurationMinutes: string;
+  somniloquyDurationSeconds: number;
 
   @Column({
-    name: 'cough_duration_minutes',
-    type: 'interval',
+    name: 'coughing_duration_seconds',
+    type: 'int',
     nullable: true,
   })
-  scoughDurationMinutes: string;
+  coughingDurationSeconds: number;
 
   @Column({ name: 'sleep_date', type: 'date' })
   sleepDate: Date;
