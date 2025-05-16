@@ -47,13 +47,17 @@ export class SleepCoachingService {
             value : activityData.valueNumber,
             unit : activityData.unit
         }));
+        //활동데이터가 없는경우 예외처리
+        if(!activeTime || activeTime.length===0) {
+            throwNotFoundException(ExceptionCode.ACTIVITY_DATA_NOT_FOUND);
+        }
         const sleepTime: SleepTime[] = await this.settingSleepTimeData(sleepReport);
 
         this.settingSleepTimeData(sleepReport);
         const response = await axios.post(
             'http://sleep-tight-ai:8081/coaching',
             {
-                requestBody: {
+                request: {
                     weekly_data: activeTime,
                     night_data:  sleepTime
                 }
