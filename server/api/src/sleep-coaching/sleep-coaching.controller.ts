@@ -8,17 +8,10 @@ export class SleepCoachingController {
     private readonly sleepCoachingService: SleepCoachingService,
   ) {}
 
-  
-  @Get("test")
-  async test() {
-    return "test";
-  }
-
-  
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getSleepCoaching(@Request() req, @Body() date: Date) {
+  async getSleepCoaching(@Request() req, @Body("sleepReportId") sleepReportId: number) {
     const userId: number = req.user.userId; // JWT에서 userId를 가져옴
-    this.sleepCoachingService.getSleepCoaching(userId, date);
+    this.sleepCoachingService.getSleepCoaching(userId, sleepReportId);
   }
 }

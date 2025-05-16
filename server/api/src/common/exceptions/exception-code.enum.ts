@@ -14,6 +14,11 @@ export const ExceptionCode = {
     code: 'ACTIVITY_DATA_NOT_FOUND',
     message: '활동데이터를 찾을 수 없습니다.',
   },
+  REPORT_NOT_FOUND: {
+    status: 400,
+    code: 'ACTIVITY_DATA_NOT_FOUND',
+    message: '활동데이터를 찾을 수 없습니다.',
+  },
   INCOMPLETE_REGISTRATION: {
     status: 400,
     code: 'INCOMPLETE_REGISTRATION',

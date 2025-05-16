@@ -5,11 +5,12 @@ import { SleepCoachingController } from './sleep-coaching.controller';
 import { SleepCoachingService } from './sleep-coaching.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityData } from './entities/activity-data.entity';
+import { SleepReport } from 'src/sleep-reports/entities/sleep-report.entity';
 
 @Module({
 
   imports: [
-    TypeOrmModule.forFeature([ActivityData]),
+    TypeOrmModule.forFeature([ActivityData, SleepReport]),
   ],
   controllers: [ActivityDataController, SleepCoachingController],
   providers: [ActivityDataService, SleepCoachingService],
