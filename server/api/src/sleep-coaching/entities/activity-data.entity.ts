@@ -18,34 +18,18 @@ export class ActivityData {
   userId: number;
 
   @Column({
-    name: 'uuid',
-    type: 'uuid',
-    nullable: true,
-  })
-  uuid: string;
-
-  @Column({
     name: 'data_type',
     type: 'enum',
     enum: ActivityDataType,
   })
   dataType: ActivityDataType;
 
-  // 수치 데이터
   @Column({
     name: 'value_number',
     type: 'float',
     nullable: true,
   })
   valueNumber: number;
-
-  // 복합 데이터
-  @Column({
-    name: 'value_json',
-    type: 'jsonb',
-    nullable: true,
-  })
-  valueJson: Record<string, any>;
 
   @Column({
     name: 'unit',
@@ -65,8 +49,9 @@ export class ActivityData {
     type: 'timestamptz' })
   activityEndTime: Date;
 
-  @CreateDateColumn({
-    name: 'created_at',
-  })
+  @Column({ name: 'report_date', type: 'date' })
+  reportDate: Date; // 기준 수면 일자
+
+  @CreateDateColumn({ name: 'creatd_at' })
   createdAt: Date;
 }
