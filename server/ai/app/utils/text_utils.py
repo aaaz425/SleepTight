@@ -1,6 +1,6 @@
 # app/utils/text_utils.py
 from typing import List, Union
-from app.models.request import WeeklyDataItem, NightDataItem
+from models.request import WeeklyDataItem, NightDataItem
 
 # 영문 코드 → 한글 라벨 매핑
 DATA_TYPE_LABELS = {
