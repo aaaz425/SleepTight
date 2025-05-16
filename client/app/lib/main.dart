@@ -8,9 +8,15 @@ import 'package:toastification/toastification.dart';
 import 'core/config/router.dart';
 import 'core/network/api_error_handler.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:app/features/health/services/wear_communication_service.dart';
 
 // GoRouter에 전달할 NavigatorKey를 앱의 상위 레벨에 정의합니다.
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+// WearCommunicationService 인스턴스를 제공하는 Provider
+final wearCommunicationServiceProvider = Provider<WearCommunicationService>((ref) {
+  return WearCommunicationService();
+});
 
 // ApiErrorHandler 인스턴스를 제공하는 Provider
 final apiErrorHandlerProvider = Provider<ApiErrorHandler>((ref) {
@@ -54,6 +60,11 @@ class SleepTightApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Wear OS 통신 서비스 초기화
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeWearCommunication(ref);
+    });
+
     // apiErrorStreamProvider를 listen하여 에러 발생 시 토스트 메시지 표시
     ref.listen<AsyncValue<ApiErrorEvent>>(apiErrorStreamProvider, (
       previous, // 이전 상태(nullable)
@@ -96,5 +107,11 @@ class SleepTightApp extends ConsumerWidget {
         routerConfig: appRouter,
       ),
     );
+  }
+
+  // Wear OS 통신 초기화
+  Future<void> _initializeWearCommunication(WidgetRef ref) async {
+    final wearService = ref.read(wearCommunicationServiceProvider);
+    await wearService.initialize();
   }
 }
