@@ -57,12 +57,11 @@ export class SleepCoachingService {
         const response = await axios.post(
             'http://sleep-tight-ai:8081/coaching',
             {
-                request: {
-                    weekly_data: activeTime,
-                    night_data:  sleepTime
-                }
+                weekly_data: activeTime,
+                night_data:  sleepTime
             }
         );
+
         return response;
     }
 
