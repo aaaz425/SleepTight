@@ -55,6 +55,7 @@ export class SleepSoundService {
     );
 
     const fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+    const startTime = new Date(timestamp);
 
     // DB에 음성 메타데이터 저장
     const sleepSound = this.sleepSoundFactory.create({
@@ -62,6 +63,7 @@ export class SleepSoundService {
       segmentId,
       fileUrl,
       duration,
+      startTime,
     });
     await this.sleepSoundFactory.save(sleepSound);
 

@@ -30,6 +30,9 @@ export class SleepSound {
   @Column({ name: 'inference_completed', type: 'boolean', default: false })
   inferenceCompleted: boolean;
 
+  @Column({ name: 'start_time', type: 'timestamptz' })
+  startTime: Date;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

@@ -19,14 +19,16 @@ export class SleepSoundFactory {
     segmentId: string;
     fileUrl: string;
     duration: number;
+    startTime: Date;
   }): SleepSound {
-    const { reportId, segmentId, fileUrl, duration } = params;
+    const { reportId, segmentId, fileUrl, duration, startTime } = params;
 
     return this.sleepSoundRepo.create({
       sleepReport: { id: reportId },
       segmentId,
       voiceUrl: fileUrl,
       duration,
+      startTime,
     });
   }
 
