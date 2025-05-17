@@ -68,6 +68,8 @@ class AppColors {
   static const font1 = Color(0xDEFFFFFF);
   static const font2 = Color(0x99FFFFFF);
   static const font3 = Color(0x4DFFFFFF);
+  static const fontGray1 = Color(0xFFCCCCCC);
+  static const fontGray2 = Color(0xFFB0B0B0);
 
   // 라인 색상
   static const lineLight = Color(0xFFEEEEEE);
