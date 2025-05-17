@@ -62,6 +62,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   @override
   Future<void> logout() async {
     await dio.post(apiPaths.user.logout);
+    // TODO: cleartoken
   }
 
   @override
