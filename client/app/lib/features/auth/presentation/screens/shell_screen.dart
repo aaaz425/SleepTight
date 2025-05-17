@@ -1,6 +1,6 @@
-import 'package:app/features/auth/presentation/widgets/shell_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sleep_tight/shared/widgets/shell_bottom_nav_bar.dart';
 
 class ShellScreen extends StatelessWidget {
   final Widget body;

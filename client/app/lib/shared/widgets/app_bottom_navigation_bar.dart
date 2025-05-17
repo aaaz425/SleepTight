@@ -1,6 +1,6 @@
-import 'package:app/core/config/app_config.dart';
-import 'package:app/core/config/theme/theme.dart';
-import 'package:app/core/state/navigation/bottom_nav_provider.dart';
+import 'package:sleep_tight/core/config/app_config.dart';
+import 'package:sleep_tight/core/config/theme/theme.dart';
+import 'package:sleep_tight/core/state/navigation/bottom_nav_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

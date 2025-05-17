@@ -1,4 +1,4 @@
-import 'package:app/features/health/services/health_service.dart';
+import 'package:sleep_tight/features/health/services/health_service.dart';
 import 'package:health/health.dart';
 
 Future<List<Map<String, dynamic>>> getActivityData(
