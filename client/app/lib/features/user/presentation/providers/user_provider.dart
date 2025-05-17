@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sleep_tight/features/user/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/user/data/models/requests/user_register_request.dart';
 import 'package:sleep_tight/features/user/data/models/responses/user_information_response.dart';
 import 'package:sleep_tight/features/user/data/models/requests/update_user_birth_date_request.dart';
 import 'package:sleep_tight/features/user/data/models/requests/update_user_country_request.dart';
@@ -24,18 +26,31 @@ final userModelProvider = StateNotifierProvider<UserModelNotifier, UserModel?>((
   ref,
 ) {
   final repo = ref.watch(userRepositoryProvider);
-  return UserModelNotifier(repo);
+  return UserModelNotifier(ref, repo);
 });
 
 class UserModelNotifier extends StateNotifier<UserModel?> {
+  final Ref ref;
   final UserRepository repo;
-  UserModelNotifier(this.repo) : super(null) {
+  UserModelNotifier(this.ref, this.repo) : super(null) {
     // loadUser();
   }
 
   // PATCH/PUT 등에서 받은 UserInformationResponse를 바로 state로 반영
   void updateFromResponse(UserInformationResponse response) {
     state = UserModel.fromJson(response.toJson());
+  }
+
+  // 회원 등록 (POST api/user/register)
+  Future<void> registerUser(UserRegisterRequest request) async {
+    final response = await repo.registerUser(request: request);
+    ref
+        .read(authRepositoryProvider)
+        .saveTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        );
+    updateFromResponse(response.userInfo);
   }
 
   // 최초 유저 정보 불러오기 (GET)
