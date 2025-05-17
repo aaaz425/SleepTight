@@ -37,6 +37,11 @@ class CustomApiInterceptor extends Interceptor {
     debugPrint(
       'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
     );
+    // 응답 래퍼 언랩 (최상위 {success, data} 구조에서 실제 payload만 추출)
+    if (response.data is Map<String, dynamic> &&
+        (response.data as Map<String, dynamic>).containsKey('data')) {
+      response.data = (response.data as Map<String, dynamic>)['data'];
+    }
     super.onResponse(response, handler);
   }
 
