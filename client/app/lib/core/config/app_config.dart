@@ -22,7 +22,6 @@ class Routes {
   // Main Application Routes (Bottom Navigation)
   final String home = '/home';
   final String homeSleeping = '/home/sleeping';
-  final String homeAlarmRinging = '/home/alarm-ringing';
 
   final String sleepAnalysis = '/sleep-analysis';
   final String sleepCoach = '/sleep-coach';

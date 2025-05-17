@@ -1,9 +1,11 @@
 import 'dart:async';
-import 'package:sleep_tight/core/utils/time.dart';
-import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:sleep_tight/core/utils/overlay.dart';
+import 'package:sleep_tight/core/utils/time.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/ringing_screen.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 
 class AlarmTriggerWatcher extends ConsumerStatefulWidget {
   final Widget child;
@@ -40,9 +42,9 @@ class _AlarmTriggerWatcherState extends ConsumerState<AlarmTriggerWatcher> {
         if (!mounted) return;
 
         if (alarmData.isAlarmOn) {
-          context.go('/ringing');
+          showOverlay(context: context, child: RingingScreen());
         } else {
-          context.go('/wake_up');
+          showOverlay(context: context, child: WakeUpScreen());
         }
       }
     });

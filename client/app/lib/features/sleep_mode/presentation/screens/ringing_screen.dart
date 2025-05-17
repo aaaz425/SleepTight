@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/utils/overlay.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 
 class RingingScreen extends ConsumerStatefulWidget {
   const RingingScreen({super.key});
@@ -41,7 +42,7 @@ class _RingingScreenState extends ConsumerState<RingingScreen> {
     _overlayTimer = Timer(const Duration(minutes: 5), () async {
       await _player.stop();
       if (!mounted) return;
-      context.go('/wake_up');
+      showOverlay(context: context, child: WakeUpScreen());
     });
   }
 
@@ -109,7 +110,9 @@ class _RingingScreenState extends ConsumerState<RingingScreen> {
                   onPressed: () async {
                     await _player.stop();
                     if (!context.mounted) return;
-                    context.go('/wake_up');
+                    Navigator.of(context).pop();
+
+                    showOverlay(context: context, child: WakeUpScreen());
                   },
                 ),
                 const SizedBox(height: 10),
@@ -126,7 +129,7 @@ class _RingingScreenState extends ConsumerState<RingingScreen> {
                     ref.invalidate(alarmTimeNotifierProvider);
 
                     if (mounted && context.mounted) {
-                      context.go('/sleeping');
+                      Navigator.of(context).pop();
                     }
                   },
                 ),

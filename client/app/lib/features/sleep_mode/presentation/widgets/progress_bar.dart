@@ -1,6 +1,7 @@
-import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sleep_tight/core/config/app_config.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
 
 class ProgressBar extends StatefulWidget {
   const ProgressBar({super.key});
@@ -24,7 +25,7 @@ class _ProgressBarState extends State<ProgressBar>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        context.go('/');
+        context.go(AppConfig.routes.home);
       }
     });
   }

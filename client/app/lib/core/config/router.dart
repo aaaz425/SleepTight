@@ -1,4 +1,3 @@
-import 'package:sleep_tight/features/auth/presentation/screens/home_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
@@ -8,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/user/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/home_screen.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/sleeping_screen.dart';
+
 import 'app_config.dart';
 
 // goRouterProvider를 Provider.family로 변경하고 GlobalKey<NavigatorState>를 인자로 받도록 수정합니다.
@@ -122,18 +124,8 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 (context, state) => const NoTransitionPage(
                   child: ShellScreen(
                     // 부모와 동일한 ShellScreen을 사용
-                    body: PlaceholderScreen(title: 'Sleeping Mode'), // 본문만 교체
-                  ),
-                ),
-          ),
-          GoRoute(
-            path: 'alarm-ringing', // 상대 경로이므로 '/home/alarm-ringing'이 됩니다.
-            name: 'home-alarm-ringing',
-            pageBuilder:
-                (context, state) => const NoTransitionPage(
-                  child: ShellScreen(
-                    // 부모와 동일한 ShellScreen을 사용
-                    body: PlaceholderScreen(title: 'Alarm Ringing!'), // 본문만 교체
+                    body: SleepingScreen(), // 본문만 교체
+                    hasBottomNav: false,
                   ),
                 ),
           ),
