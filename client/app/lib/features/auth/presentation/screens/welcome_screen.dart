@@ -37,7 +37,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       });
 
       // 타이틀 애니메이션이 끝난 뒤(예: 1000ms 후) 라우팅 실행
-      Future.delayed(const Duration(milliseconds: 800), () {
+      Future.delayed(const Duration(milliseconds: 600), () {
         if (!mounted) return;
 
         // 1. provider의 notifier를 읽어서
@@ -130,7 +130,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
         }
 
         if (status == AuthStatus.guest) {
-          Future.delayed(const Duration(milliseconds: 200), () {
+          Future.delayed(const Duration(milliseconds: 400), () {
             if (!mounted) return;
             setState(() {
               _opacity = 1;
