@@ -1,3 +1,6 @@
+DRIVE_FOLDER_ID := 1n9kgxKuYCZkNL3oVY0opMEImHCHPQed5
+APK := build/app/outputs/flutter-apk/app-release.apk
+
 # Flutter/Dart 자주 쓰는 명령어 단축
 
 icon:
@@ -9,7 +12,7 @@ splash:
 run:
 	flutter run
 
-apk-build:
+apk-build: icon splash
 	flutter build apk --release
 
 clean:
@@ -25,9 +28,9 @@ apk-install:
 	adb install build/app/outputs/flutter-apk/app-release.apk
 
 # 빌드 + 설치를 한 번에 실행하는 명령어
-apk-build-install: icon splash apk-build apk-install
+apk-build-install: apk-build apk-install
 
-apk-build-install-galaxys10: icon splash apk-build
+apk-build-install-galaxys10: apk-build
 	adb -s 192.168.137.89:35707 uninstall com.example.sleeptight
 	adb -s 192.168.137.89:35707 install build/app/outputs/flutter-apk/app-release.apk
 
@@ -41,3 +44,7 @@ ios-simulator: icon splash
 # android simulator
 android-simulator: icon splash
 	flutter run -d emulator-5554
+
+# release apk build 후 구글 드라이브에 업로드
+google-drive-upload: apk-build
+	rclone copy $(APK) drive: --drive-root-folder-id $(DRIVE_FOLDER_ID) --progress
