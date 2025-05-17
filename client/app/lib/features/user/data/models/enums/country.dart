@@ -279,9 +279,6 @@ enum Country {
   final String koreanName;
   final String countryCode;
 
-  // API 요청/응답 시 사용할 값 (일반적으로 영어 이름)
-  String get apiValue => englishName;
-
   // 현재 언어 설정에 따라 표시할 이름을 반환하는 메소드
   // 실제 앱에서는 Flutter의 국제화 기능 (AppLocalizations) 사용을 강력히 권장합니다.
   // 예시: String getDisplayName(BuildContext context) => AppLocalizations.of(context)!.countryName(this);
@@ -297,25 +294,29 @@ enum Country {
   }
 
   // API 응답 값(영어 이름)으로부터 Country enum 멤버를 찾는 정적 메소드
-  static Country? fromApiValue(String? apiValue) {
-    if (apiValue == null) return null;
+  static Country? findByCountryCode(String? countryCode) {
+    if (countryCode == null) return null;
     for (final country in values) {
       // 대소문자 구분 없이 비교 (API 응답이 일관되지 않을 수 있으므로)
-      if (country.apiValue.toLowerCase() == apiValue.toLowerCase()) {
+      if (country.countryCode.toLowerCase() == countryCode.toLowerCase()) {
         return country;
       }
     }
-    print('Warning: Unknown Country API value encountered: $apiValue');
+    print('Warning: Unknown Country API value encountered: $countryCode');
     return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
   }
 
-  // (선택 사항) 영어 이름으로 Country enum 멤버를 찾는 헬퍼 메소드
-  static Country? fromEnglishName(String? name) {
-    return fromApiValue(name); // apiValue가 영어 이름이라고 가정
+  // ko로 en을 찾는 함수
+  static String? findByKoreanName(String? koreanName) {
+    if (koreanName == null) return null;
+    for (final country in values) {
+      // 대소문자 구분 없이 비교 (API 응답이 일관되지 않을 수 있으므로)
+      if (country.koreanName.toLowerCase() == koreanName.toLowerCase()) {
+        return country.englishName;
+      }
+    }
+    return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
   }
-
-  // SelectBox 등에서 전체 국가 목록을 쉽게 가져오기 위한 정적 getter
-  static List<Country> get list => values;
 }
 
 // --- 사용 예시 ---
@@ -326,7 +327,7 @@ enum Country {
 // print(myCountry.getDisplayName('ko')); // "대한민국" (UI 표시용 - 한국어)
 // print(myCountry.getDisplayName('en')); // "South Korea" (UI 표시용 - 영어)
 
-// Country? foundCountry = Country.fromApiValue("United States");
+// Country? foundCountry = Country.findByCountryCode("US");
 // if (foundCountry != null) {
 //   print(foundCountry.getDisplayName('ko')); // "미국"
 // }
