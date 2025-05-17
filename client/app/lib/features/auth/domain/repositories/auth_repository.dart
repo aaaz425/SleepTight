@@ -7,4 +7,8 @@ abstract class AuthRepository {
   Future<String?> getAccessToken();
   Future<String?> getRefreshToken();
   Future<void> clearToken();
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  });
 }

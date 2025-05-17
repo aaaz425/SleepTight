@@ -17,7 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
     final response = await remoteDataSource.loginWithKakao(
       KakaoLoginRequestModel(authorizationCode: authorizationCode),
     );
-    await localDataSource.saveTokens(
+    await saveTokens(
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
     );
@@ -30,8 +30,16 @@ class AuthRepositoryImpl implements AuthRepository {
     final newAccessToken = await remoteDataSource.refreshAccessToken(
       refreshToken,
     );
+    await saveTokens(accessToken: newAccessToken, refreshToken: refreshToken);
+  }
+
+  // savetoken
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
     await localDataSource.saveTokens(
-      accessToken: newAccessToken,
+      accessToken: accessToken,
       refreshToken: refreshToken,
     );
   }
