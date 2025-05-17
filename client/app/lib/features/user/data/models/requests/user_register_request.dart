@@ -21,6 +21,21 @@ class UserRegisterRequest {
     required this.weightUnit,
   });
 
+  // fromJson()
+  factory UserRegisterRequest.fromJson(Map<String, dynamic> json) {
+    return UserRegisterRequest(
+      firstName: json['first_name'] as String,
+      lastName: json['last_name'] as String,
+      gender: json['gender'] as String,
+      birthDate: json['birth_date'] as String,
+      country: json['country'] as String,
+      height: json['height'] as num,
+      weight: json['weight'] as num,
+      lengthUnit: json['length_unit'] as String,
+      weightUnit: json['weight_unit'] as String,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'first_name': firstName,
