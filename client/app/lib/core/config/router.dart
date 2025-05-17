@@ -2,6 +2,7 @@ import 'package:sleep_tight/features/auth/presentation/screens/home_screen.dart'
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
+import 'package:sleep_tight/features/user/presentation/screens/signup_screen.dart';
 import 'package:sleep_tight/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -86,9 +87,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
       GoRoute(
         path: AppConfig.routes.signUp,
         pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: PlaceholderScreen(title: 'Signup'),
-            ),
+            (context, state) => const NoTransitionPage(child: SignupScreen()),
       ),
       GoRoute(
         path: AppConfig.routes.onboarding,
