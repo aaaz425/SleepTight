@@ -1,9 +1,10 @@
 class UpdateUserHeightRequest {
-  final int height; // 정수 값 (예: 180)
+  final num height; // 소수 둘째자리 까지
+  final String lengthUnit;
 
-  UpdateUserHeightRequest({required this.height});
+  UpdateUserHeightRequest({required this.height, required this.lengthUnit});
 
   Map<String, dynamic> toJson() {
-    return {'height': height};
+    return {'height': height, 'length_unit': lengthUnit};
   }
 }
