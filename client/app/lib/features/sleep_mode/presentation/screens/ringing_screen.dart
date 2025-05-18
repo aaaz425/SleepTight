@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:app/core/config/theme/color.dart';
-import 'package:app/core/utils/overlay.dart';
-import 'package:app/features/sleep_mode/presentation/provider/alarm_provider.dart';
-import 'package:app/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/utils/overlay.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 
 class RingingScreen extends ConsumerStatefulWidget {
   const RingingScreen({super.key});

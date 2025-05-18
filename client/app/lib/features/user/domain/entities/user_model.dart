@@ -1,8 +1,8 @@
-import 'package:app/features/auth/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/user/data/models/enums/auth_status.dart';
 
 class UserModel {
-  final int id;
-  final String provider;
+  final int? id;
+  final String? provider;
   final String? lastName;
   final String? firstName;
   final String? email;
@@ -18,10 +18,9 @@ class UserModel {
   final String? weightUnit; // "kg", "lb"
   final AuthStatus? status;
 
-  // 필요하다면 전체 이름을 반환하는 getter 추가 가능
   String? get fullName {
     if (firstName != null && lastName != null) {
-      return '$lastName$firstName'; // 또는 '$firstName $lastName' 등 원하는 형식으로
+      return '$lastName$firstName';
     }
     if (firstName != null) return firstName;
     if (lastName != null) return lastName;
@@ -29,8 +28,8 @@ class UserModel {
   }
 
   UserModel({
-    required this.id,
-    required this.provider,
+    this.id,
+    this.provider,
     this.lastName,
     this.firstName,
     this.email,
@@ -48,9 +47,7 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // API 응답에서 "data" 객체 내부의 값을 사용
-    final data =
-        json; // 이미 data 객체만 전달받는다고 가정, 아니라면 json['data'] as Map<String, dynamic>;
+    final data = json;
 
     int? calculatedMinSleepDurationInMinutes;
     if (data['minSleepDuration'] != null && data['minSleepDuration'] is Map) {
@@ -65,8 +62,8 @@ class UserModel {
     }
 
     return UserModel(
-      id: data['id'] as int,
-      provider: data['provider'] as String,
+      id: data['id'] as int?,
+      provider: data['provider'] as String?,
       lastName: data['lastName'] as String?,
       firstName: data['firstName'] as String?,
       email: data['email'] as String?,

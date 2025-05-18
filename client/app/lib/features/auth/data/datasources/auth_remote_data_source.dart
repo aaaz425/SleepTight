@@ -1,6 +1,6 @@
-import 'package:app/core/config/app_config.dart';
-import 'package:app/features/auth/data/models/requests/kakao_login_request.dart';
-import 'package:app/features/auth/data/models/responses/kakao_login_response.dart';
+import 'package:sleep_tight/core/config/app_config.dart';
+import 'package:sleep_tight/features/auth/data/models/requests/kakao_login_request.dart';
+import 'package:sleep_tight/features/auth/data/models/responses/kakao_login_response.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 

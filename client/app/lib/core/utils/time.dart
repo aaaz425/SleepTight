@@ -1,4 +1,4 @@
-import 'package:app/features/sleep_mode/presentation/provider/alarm_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 
 DateTime getNextAlarmDateTime(AlarmTime alarm) {
   final now = DateTime.now();

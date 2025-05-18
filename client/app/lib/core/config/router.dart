@@ -1,12 +1,14 @@
-import 'package:app/features/auth/data/models/enums/auth_status.dart';
-import 'package:app/features/auth/presentation/providers/auth_provider.dart';
-import 'package:app/features/auth/presentation/screens/placeholder_screen.dart';
-import 'package:app/features/auth/presentation/screens/shell_screen.dart';
-import 'package:app/features/sleep_mode/presentation/screens/home_screen.dart';
-import 'package:app/features/sleep_mode/presentation/screens/sleeping_screen.dart';
+import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
+import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
+import 'package:sleep_tight/features/user/presentation/screens/signup_screen.dart';
+import 'package:sleep_tight/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../features/user/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/home_screen.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/sleeping_screen.dart';
 
 import 'app_config.dart';
 
@@ -16,7 +18,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
   navigatorKey,
 ) {
   // AuthNotifier를 watch하여 인증 상태 변경 시 GoRouter가 재빌드되고 redirect 로직이 재실행되도록 함
-  final authState = ref.watch(authStateProvider);
+  final userModel = ref.watch(userModelProvider);
 
   return GoRouter(
     navigatorKey: navigatorKey, // 전달받은 navigatorKey를 GoRouter에 설정합니다.
@@ -24,9 +26,9 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
     debugLogDiagnostics: true, // 개발 중 로그 확인에 유용
     // redirect 로직: 인증 상태 및 현재 경로에 따라 적절한 페이지로 리다이렉션
     redirect: (BuildContext context, GoRouterState state) {
-      final currentAuthStatus = authState.status;
+      final currentAuthStatus = userModel?.status ?? AuthStatus.guest;
       final location = state.matchedLocation; // 현재 이동하려는 경로 (정규화된 경로)
-
+      debugPrint('redirect: status=$currentAuthStatus, location=$location');
       // 1. 비로그인 사용자 (AuthStatus.guest)
       if (currentAuthStatus == AuthStatus.guest) {
         // '/welcome' 경로가 아니면 해당 경로로 보냄
@@ -36,10 +38,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
       }
 
       // 2. 임시가입 사용자 (AuthStatus.incomplete_registration)
-      final unauthenticatedAllowedPaths = [
-        AppConfig.routes.appInit,
-        AppConfig.routes.signUp,
-      ];
+      final unauthenticatedAllowedPaths = [AppConfig.routes.signUp];
       if (currentAuthStatus == AuthStatus.incompleteRegistration) {
         if (unauthenticatedAllowedPaths.contains(location)) {
           return null; // 허용된 경로면 그대로 진행
@@ -50,7 +49,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
 
       // 3. 탈퇴보류 사용자 (AuthStatus.pending_withdraw)
       final pendingWithdrawAllowedPaths = [
-        AppConfig.routes.appInit,
+        AppConfig.routes.welcome,
         AppConfig.routes.sayGoodbye,
       ];
       if (currentAuthStatus == AuthStatus.pendingWithdraw) {
@@ -60,7 +59,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         // '/app-init', '/say-goodbye' 경로가 아니면 해당 경로로 보냄
         return AppConfig
             .routes
-            .appInit; // 스플래시 화면이 끝나고 권한검사를 할때 복구를 할건지 말건지 confirm
+            .welcome; // 스플래시 화면이 끝나고 권한검사를 할때 복구를 할건지 말건지 confirm
       }
 
       // 4. 인증된 상태 (AuthStatus.active)
@@ -74,6 +73,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         if (disallowedPathsForAuthenticated.contains(location)) {
           return AppConfig.routes.home; // 메인 화면 (홈)
         }
+        return null;
       }
 
       return null; // 그 외의 경우는 리다이렉션 없음
@@ -84,23 +84,12 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
       GoRoute(
         path: AppConfig.routes.welcome,
         pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: PlaceholderScreen(title: 'Before Login Splash'),
-            ),
-      ),
-      GoRoute(
-        path: AppConfig.routes.appInit, // 로그인 직후 데이터 로딩 등에 사용 가능
-        pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: PlaceholderScreen(title: 'After Login Splash'),
-            ),
+            (context, state) => const NoTransitionPage(child: WelcomeScreen()),
       ),
       GoRoute(
         path: AppConfig.routes.signUp,
         pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: PlaceholderScreen(title: 'Signup'),
-            ),
+            (context, state) => const NoTransitionPage(child: SignupScreen()),
       ),
       GoRoute(
         path: AppConfig.routes.onboarding,

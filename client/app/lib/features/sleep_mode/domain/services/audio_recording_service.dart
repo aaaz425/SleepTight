@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:app/core/config/app_config.dart';
+import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:uuid/uuid.dart';
-import 'package:app/features/sleep_mode/data/models/requests/sleep_sound_request.dart';
+import 'package:sleep_tight/features/sleep_mode/data/models/requests/sleep_sound_request.dart';
 
 class AudioRecordingService {
   final FlutterSoundRecorder flutterSound;

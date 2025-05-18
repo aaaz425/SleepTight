@@ -1,25 +1,25 @@
 import 'dart:async';
 
-import 'package:app/core/config/app_config.dart';
-import 'package:app/core/config/theme/color.dart';
-import 'package:app/core/network/dio_provider.dart';
-import 'package:app/core/utils/overlay.dart';
-import 'package:app/features/sleep_mode/data/models/requests/sleep_end_request.dart';
-import 'package:app/features/sleep_mode/domain/services/activity_data_service.dart';
-import 'package:app/features/sleep_mode/domain/services/audio_recording_service.dart';
-import 'package:app/features/sleep_mode/domain/services/sleep_stage_service.dart';
-import 'package:app/features/sleep_mode/presentation/provider/report_id_provider.dart';
-import 'package:app/features/sleep_mode/presentation/provider/sleep_mode_view_model_provider.dart';
-import 'package:app/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
-import 'package:app/features/sleep_mode/presentation/screens/wake_up_screen.dart';
-import 'package:app/features/sleep_mode/presentation/widgets/alarm_time_display.dart';
-import 'package:app/main.dart';
-import 'package:app/shared/widgets/alarm_trigger_watcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:sleep_tight/core/config/app_config.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/network/dio_provider.dart';
+import 'package:sleep_tight/core/utils/overlay.dart';
+import 'package:sleep_tight/features/sleep_mode/data/models/requests/sleep_end_request.dart';
+import 'package:sleep_tight/features/sleep_mode/domain/services/activity_data_service.dart';
+import 'package:sleep_tight/features/sleep_mode/domain/services/audio_recording_service.dart';
+import 'package:sleep_tight/features/sleep_mode/domain/services/sleep_stage_service.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/report_id_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_mode_view_model_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/screens/wake_up_screen.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_time_display.dart';
+import 'package:sleep_tight/main.dart';
+import 'package:sleep_tight/shared/widgets/alarm_trigger_watcher.dart';
 import 'package:toastification/toastification.dart';
 
 class SleepingScreen extends ConsumerStatefulWidget {

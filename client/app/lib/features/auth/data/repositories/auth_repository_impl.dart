@@ -1,7 +1,7 @@
-import 'package:app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:app/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:app/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:app/features/auth/data/models/requests/kakao_login_request.dart';
+import 'package:sleep_tight/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sleep_tight/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:sleep_tight/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:sleep_tight/features/auth/data/models/requests/kakao_login_request.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -17,11 +17,10 @@ class AuthRepositoryImpl implements AuthRepository {
     final response = await remoteDataSource.loginWithKakao(
       KakaoLoginRequestModel(authorizationCode: authorizationCode),
     );
-    await localDataSource.saveTokens(
+    await saveTokens(
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
     );
-    await localDataSource.saveStatus(response.status);
   }
 
   @override
@@ -31,17 +30,23 @@ class AuthRepositoryImpl implements AuthRepository {
     final newAccessToken = await remoteDataSource.refreshAccessToken(
       refreshToken,
     );
+    await saveTokens(accessToken: newAccessToken, refreshToken: refreshToken);
+  }
+
+  // savetoken
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
     await localDataSource.saveTokens(
-      accessToken: newAccessToken,
+      accessToken: accessToken,
       refreshToken: refreshToken,
     );
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> clearToken() async {
     await localDataSource.clearTokens();
-    await localDataSource.clearStatus();
-    // remoteDataSource logout
   }
 
   @override
@@ -49,12 +54,4 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String?> getRefreshToken() => localDataSource.getRefreshToken();
-
-  @override
-  Future<String?> getStatus() => localDataSource.getStatus();
-
-  @override
-  Future<void> saveStatus(String status) async {
-    await localDataSource.saveStatus(status);
-  }
 }

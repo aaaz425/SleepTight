@@ -1,8 +1,10 @@
-import 'package:app/core/error/api_exception.dart';
-import 'package:app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sleep_tight/core/error/api_exception.dart';
+import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sleep_tight/features/user/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
 import './api_error_handler.dart';
 
 class CustomApiInterceptor extends Interceptor {
@@ -21,6 +23,7 @@ class CustomApiInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    debugPrint('REQUEST[${options.method}] => PATH: ${options.path}');
     final accessToken =
         await container.read(authRepositoryProvider).getAccessToken();
     if (accessToken != null && accessToken.isNotEmpty) {
@@ -34,6 +37,11 @@ class CustomApiInterceptor extends Interceptor {
     debugPrint(
       'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
     );
+    // 응답 래퍼 언랩 (최상위 {success, data} 구조에서 실제 payload만 추출)
+    if (response.data is Map<String, dynamic> &&
+        (response.data as Map<String, dynamic>).containsKey('data')) {
+      response.data = (response.data as Map<String, dynamic>)['data'];
+    }
     super.onResponse(response, handler);
   }
 
@@ -44,10 +52,26 @@ class CustomApiInterceptor extends Interceptor {
   ) async {
     debugPrint('ERROR TEST: ${err.toString()}');
 
+    // 400 이면서 'INCOMPLETE_REGISTRATION'인 경우
+    final errorData = err.response?.data['data'];
+    if (errorData != null &&
+        errorData['status'] == 400 &&
+        errorData['code'] == 'INCOMPLETE_REGISTRATION') {
+      debugPrint('INCOMPLETE_REGISTRATION: 유저 정보 불러오기');
+      container
+          .read(userModelProvider.notifier)
+          .setStatus(AuthStatus.incompleteRegistration);
+
+      // 에러도 래핑해서 전달
+      final apiException = ApiException.fromDioError(err);
+      apiErrorHandler.reportError(apiException);
+      return handler.reject(err);
+    }
+
     // 499: 로그아웃 처리
     if (err.response?.statusCode == 499) {
       debugPrint('499: 로그아웃 처리');
-      await container.read(authRepositoryProvider).logout();
+      await container.read(authRepositoryProvider).clearToken();
       final apiException = ApiException.fromDioError(err);
       apiErrorHandler.reportError(apiException);
       return handler.reject(err);
@@ -66,7 +90,7 @@ class CustomApiInterceptor extends Interceptor {
       } catch (e) {
         debugPrint('토큰 재발급 실패: $e');
         // 실패 시 로그아웃 처리
-        await container.read(authRepositoryProvider).logout();
+        await container.read(authRepositoryProvider).clearToken();
         final apiException = ApiException.fromDioError(err);
         apiErrorHandler.reportError(apiException);
         return handler.reject(err);

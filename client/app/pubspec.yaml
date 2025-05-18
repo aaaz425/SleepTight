@@ -1,4 +1,4 @@
-name: app
+name: sleep_tight
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -50,8 +50,15 @@ dependencies:
   http_parser: ^4.1.2
   flutter_secure_storage: ^9.2.4
   connectivity_plus: ^6.1.4
-  intl: ^0.20.2
   just_audio: ^0.10.2
+  flutter_native_splash: ^2.4.6
+  kakao_flutter_sdk_user: ^1.9.7+3
+  flutter_launcher_icons: ^0.14.3
+  flutter_dotenv: ^5.2.1
+  flutter_form_builder: ^10.0.1
+  form_builder_validators: ^11.1.2
+  dropdown_button2: ^2.3.9
+  group_button: ^5.3.4
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +74,7 @@ dev_dependencies:
   build_runner: ^2.4.15
   custom_lint: ^0.7.5
   riverpod_lint: ^2.6.5
+  change_app_package_name: ^1.5.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -119,10 +127,71 @@ flutter:
     - family: Seven_Segment
       fonts:
         - asset: assets/fonts/Seven-Segment.ttf
+
+    - family: Teko
+      fonts:
+        - asset: assets/fonts/Teko-Bold.ttf
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
   assets:
+    - .env # env file
     - assets/images/ # 이미지 폴더 경로 추가
     - assets/icons/ # 아이콘 폴더 경로 추가
     - assets/sound/ # 사운드 폴더 경로 추가
+
+flutter_native_splash:
+  # This package generates native code to customize Flutter's default white native splash screen
+  # with background color and splash image.
+  # Customize the parameters below, and run the following command in the terminal:
+  # dart run flutter_native_splash:create
+  # To restore Flutter's default white splash screen, run the following command in the terminal:
+  # dart run flutter_native_splash:remove
+
+  # color or background_image is the only required parameter.
+  color: "#121212"
+  #background_image: "assets/background.png"
+
+  # The image parameter allows you to specify an image used in the splash screen.
+  image: assets/images/sleeptight_icon_blank.png
+
+  # Optional parameters
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+
+  # For Android 12 and later, use the android_12 section below.
+  android_12:
+    image: assets/images/sleeptight_icon_blank.png
+    color: "#121212"
+    #icon_background_color: "#121212"
+    #branding: assets/images/branding.png
+    # Optional: dark mode 지원 시 아래 옵션 사용
+    #image_dark: assets/images/sleeptight_logo_00_dark.png
+    #color_dark: "#000000"
+
+  # 아래는 필요시 사용할 수 있는 추가 옵션(주석 처리)
+  #branding: assets/images/branding.png
+  #branding_mode: bottom
+  #branding_bottom_padding: 24
+  #color_dark: "#042a49"
+  #background_image_dark: "assets/dark-background.png"
+  #image_dark: assets/splash-invert.png
+  #branding_dark: assets/dart_dark.png
+  #android_screen_orientation: sensorLandscape
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/sleeptight_icon.png"
+  image_path_android: "assets/images/sleeptight_icon.png"
+  image_path_ios: "assets/images/sleeptight_icon.png"
+  background_color_android: "#121212"
+  background_color_ios: "#FFFFFF"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#121212"
+  adaptive_icon_foreground: "assets/images/sleeptight_icon.png"

@@ -1,6 +1,6 @@
-import 'package:app/core/error/api_exception.dart';
-import 'package:app/core/network/api_error_handler.dart';
-import 'package:app/core/network/api_interceptor.dart';
+import 'package:sleep_tight/core/error/api_exception.dart';
+import 'package:sleep_tight/core/network/api_error_handler.dart';
+import 'package:sleep_tight/core/network/api_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
