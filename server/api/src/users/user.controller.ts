@@ -42,7 +42,7 @@ export class UserController {
   @ApiOperation({ summary: '유저 생년월일 변경' })
   @ApiBearerAuth() // JWT 인증 필요
   @UseGuards(JwtAuthGuard)
-  @Patch('birthDate')
+  @Patch('birth-date')
   async updateBirthDate(
     @Request() req,
     @Body('birthDate') birthDate: Date,
