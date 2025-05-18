@@ -31,11 +31,14 @@ class Routes {
   final String mypage = '/mypage';
   final String mypageInfo = '/mypage/info';
   final String mypageInfoName = '/mypage/info/name';
+  final String mypageInfoBirthDate = '/mypage/info/birth-date';
   final String mypageInfoGender = '/mypage/info/gender';
   final String mypageInfoNationality = '/mypage/info/nationality';
   final String mypageInfoOauth = '/mypage/info/oauth';
   final String mypageInfoLogout = '/mypage/info/logout';
   final String mypageInfoWithdraw = '/mypage/info/withdraw';
+  final String mypageInfoWithdrawConfirmation =
+      '/mypage/info/withdraw-confirmation';
 
   final String mypageBody = '/mypage/body';
   final String mypageBodyHeight = '/mypage/body/height';
