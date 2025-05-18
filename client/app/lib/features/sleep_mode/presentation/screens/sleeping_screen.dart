@@ -98,7 +98,6 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
       });
     }
 
-    ref.read(reportIdNotifierProvider.notifier).clear();
     _timer.cancel();
     _sendTimer.cancel();
     _recorder.closeRecorder();
