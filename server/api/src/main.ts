@@ -9,10 +9,10 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   const configService = app.get(ConfigService);
 
-  const uri = `amqp://${configService.get('RABBITMQ_DEFAULT_USER')}:${configService.get('RABBITMQ_DEFAULT_PASS')}@${configService.get('RABBITMQ_HOST')}:${configService.get('RABBITMQ_PORT')}`;
+  // const uri = `amqp://${configService.get('RABBITMQ_DEFAULT_USER')}:${configService.get('RABBITMQ_DEFAULT_PASS')}@${configService.get('RABBITMQ_HOST')}:${configService.get('RABBITMQ_PORT')}`;
+  const uri = configService.get("RMQ_REMOTE_URI");
   const queue = configService.get('RABBITMQ_QUEUE');
 
   // MQ 마이크로서비스 연결
@@ -21,9 +21,10 @@ async function bootstrap() {
     options: {
       urls: [uri],
       exchange: configService.get<string>('RMQ_RECV_EXCHANGE'),
+      exchangeType: 'direct',
       routingKey: configService.get<string>('RMQ_RECV_ROUTING_KEY'),
       queue: configService.get<string>('RMQ_RECV_QUEUE'),
-      queueOptions: { durable: false},
+      queueOptions: { durable: true},
       noAck: true,
     },
   });

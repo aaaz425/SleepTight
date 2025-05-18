@@ -42,7 +42,7 @@ export class UserController {
   @ApiOperation({ summary: '유저 생년월일 변경' })
   @ApiBearerAuth() // JWT 인증 필요
   @UseGuards(JwtAuthGuard)
-  @Patch('birthDate')
+  @Patch('birth-date')
   async updateBirthDate(
     @Request() req,
     @Body('birthDate') birthDate: Date,
@@ -158,7 +158,7 @@ export class UserController {
   @ApiOperation({ summary: '로그아웃' })
   @ApiBearerAuth() // JWT 인증 필요
   @UseGuards(JwtAuthGuard)
-  @Get('logout')
+  @Post('logout')
   async logout(@Request() req) {
     const userId :number = req.user.userId;
     this.userService.logout(userId);
