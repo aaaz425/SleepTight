@@ -5,6 +5,10 @@ abstract class AuthLocalDataSource {
     required String accessToken,
     required String refreshToken,
   });
+
+  Future<void> saveAccessToken(String accessToken);
+  Future<void> saveRefreshToken(String refreshToken);
+
   Future<String?> getAccessToken();
   Future<String?> getRefreshToken();
   Future<void> clearTokens();
@@ -23,7 +27,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     required String accessToken,
     required String refreshToken,
   }) async {
+    await saveAccessToken(accessToken);
+    await saveRefreshToken(refreshToken);
+  }
+
+  Future<void> saveAccessToken(String accessToken) async {
     await secureStorage.write(key: _accessTokenKey, value: accessToken);
+  }
+
+  Future<void> saveRefreshToken(String refreshToken) async {
     await secureStorage.write(key: _refreshTokenKey, value: refreshToken);
   }
 

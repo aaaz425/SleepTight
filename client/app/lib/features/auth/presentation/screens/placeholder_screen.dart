@@ -1,3 +1,4 @@
+import 'package:sleep_tight/features/auth/data/models/requests/kakao_login_request.dart';
 import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,7 +72,11 @@ class PlaceholderScreen extends ConsumerWidget {
                 try {
                   await ref
                       .read(authRepositoryProvider)
-                      .loginWithKakao('invalid_auth_code_for_test');
+                      .loginWithKakao(
+                        KakaoLoginRequestModel(
+                          authorizationCode: 'invalid_auth_code_for_test',
+                        ),
+                      );
                 } catch (e) {
                   // 일반적으로 인터셉터에서 처리되므로 별도 처리는 필요 없을 수 있으나,
                   // 확인을 위해 로그를 남길 수 있습니다.

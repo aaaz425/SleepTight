@@ -59,6 +59,7 @@ dependencies:
   form_builder_validators: ^11.1.2
   dropdown_button2: ^2.3.9
   group_button: ^5.3.4
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:
@@ -191,7 +192,7 @@ flutter_launcher_icons:
   image_path_android: "assets/images/sleeptight_icon.png"
   image_path_ios: "assets/images/sleeptight_icon.png"
   background_color_android: "#121212"
-  background_color_ios: "#FFFFFF"
+  background_color_ios: "#121212"
   remove_alpha_ios: true
   adaptive_icon_background: "#121212"
   adaptive_icon_foreground: "assets/images/sleeptight_icon.png"
