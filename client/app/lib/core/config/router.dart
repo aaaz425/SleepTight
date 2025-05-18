@@ -1,3 +1,4 @@
+import 'package:sleep_tight/features/analysis/presentation/screens/analysis_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
@@ -167,13 +168,15 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
       ),
 
       GoRoute(
-        path: AppConfig.routes.sleepAnalysis, // 수면분석
-        pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: ShellScreen(
-                body: PlaceholderScreen(title: 'Sleep Analysis'),
-              ),
-            ),
+        path: AppConfig.routes.sleepAnalysis, // 수면 분석
+        pageBuilder: (context, state) {
+          final tabParam = state.uri.queryParameters['tab'];
+          final tabIndex = (tabParam == 'diary') ? 1 : 0;
+
+          return NoTransitionPage(
+            child: ShellScreen(body: AnalysisScreen(initialTabIndex: tabIndex)),
+          );
+        },
       ),
       GoRoute(
         path: AppConfig.routes.sleepCoach, // 수면코치

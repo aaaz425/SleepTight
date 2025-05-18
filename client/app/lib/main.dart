@@ -1,4 +1,5 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/theme.dart';
 import 'package:sleep_tight/core/error/api_exception.dart';
 import 'package:sleep_tight/core/storage/shared_preferences_provider.dart';
@@ -35,6 +36,16 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  // 상태바, 네비게이션바 색상
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: AppColors.gray01,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Color(0xFF121212),
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  );
 
   // TODO: 로컬라이제이션 추가
   await initializeDateFormatting('ko_KR', null);
