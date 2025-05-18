@@ -1,14 +1,18 @@
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/features/auth/data/models/requests/kakao_login_request.dart';
+import 'package:sleep_tight/features/auth/data/models/requests/refresh_token_request.dart';
 import 'package:sleep_tight/features/auth/data/models/responses/kakao_login_response.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:sleep_tight/features/auth/data/models/responses/refresh_token_response.dart';
 
 abstract class AuthRemoteDataSource {
   Future<KakaoLoginResponseModel> loginWithKakao(
     KakaoLoginRequestModel request,
   );
-  Future<String> refreshAccessToken(String refreshToken);
+  Future<RefreshTokenResponseModel> refreshAccessToken(
+    RefreshTokenRequestModel request,
+  );
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -28,11 +32,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<String> refreshAccessToken(String refreshToken) async {
+  Future<RefreshTokenResponseModel> refreshAccessToken(
+    RefreshTokenRequestModel request,
+  ) async {
     final response = await dio.post(
       AppConfig.api.auth.refresh,
-      data: {'refreshToken': refreshToken},
+      data: request.toJson(),
     );
-    return response.data['data']['accessToken'];
+    return RefreshTokenResponseModel.fromJson(response.data);
   }
 }

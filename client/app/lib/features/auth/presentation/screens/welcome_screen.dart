@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/auth/data/models/requests/kakao_login_request.dart';
 import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sleep_tight/features/auth/presentation/widgets/login_button.dart';
 import 'package:sleep_tight/features/user/data/models/enums/auth_status.dart';
@@ -301,12 +302,13 @@ Future<void> kakaoLoginProcess(WidgetRef ref, BuildContext context) async {
 
   if (token != null) {
     // 1. 로그인 및 토큰 저장 (status도 반환받는다고 가정)
-    await ref.read(authRepositoryProvider).loginWithKakao(token.accessToken);
+    await ref
+        .read(authModelProvider.notifier)
+        .loginWithKakao(
+          KakaoLoginRequestModel(authorizationCode: token.accessToken),
+        );
 
-    // 2. 유저 정보 fetch
-    await ref.read(userRepositoryProvider).getUserInfo();
-
-    // 3. userModelProvider의 상태 갱신
-    // ref.read(userModelProvider.notifier).updateFromResponse(userInfo);
+    // 2. 유저 정보 fetch 및 상태 업데이트
+    await ref.read(userModelProvider.notifier).loadUser();
   }
 }
