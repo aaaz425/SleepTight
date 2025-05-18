@@ -1,6 +1,10 @@
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_birthdate_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_withdraw_confirmation_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_screen.dart';
 import 'package:sleep_tight/features/user/presentation/screens/signup_screen.dart';
 import 'package:sleep_tight/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,24 +15,54 @@ import 'package:sleep_tight/features/sleep_mode/presentation/screens/home_screen
 import 'package:sleep_tight/features/sleep_mode/presentation/screens/sleeping_screen.dart';
 
 import 'app_config.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_name_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_gender_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_nationality_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_oauth_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_logout_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_withdraw_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_body_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_body_height_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_body_weight_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_sleeptime_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_push_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_appinfo_screen.dart';
 
 // goRouterProvider를 Provider.family로 변경하고 GlobalKey<NavigatorState>를 인자로 받도록 수정합니다.
 final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
   ref,
   navigatorKey,
 ) {
-  // AuthNotifier를 watch하여 인증 상태 변경 시 GoRouter가 재빌드되고 redirect 로직이 재실행되도록 함
-  final userModel = ref.watch(userModelProvider);
+  // 1. userModelProvider에서 status만 선택하여 감시하는 새로운 Listenable을 만듭니다.
+  //    ValueNotifier를 사용하거나 Riverpod의 select와 listen을 조합할 수 있습니다.
+  final authStatusNotifier = ValueNotifier<AuthStatus?>(
+    ref.watch(userModelProvider.select((model) => model?.status)), // 초기값 설정
+  );
+
+  // userModelProvider의 status가 변경될 때마다 authStatusNotifier의 값을 업데이트합니다.
+  ref.listen<AuthStatus?>(userModelProvider.select((model) => model?.status), (
+    previousStatus,
+    newStatus,
+  ) {
+    authStatusNotifier.value = newStatus;
+  });
 
   return GoRouter(
     navigatorKey: navigatorKey, // 전달받은 navigatorKey를 GoRouter에 설정합니다.
     initialLocation: AppConfig.routes.welcome, // 초기 시작 지점
     debugLogDiagnostics: true, // 개발 중 로그 확인에 유용
+    refreshListenable: authStatusNotifier, // status 변경만 감지하도록 설정
     // redirect 로직: 인증 상태 및 현재 경로에 따라 적절한 페이지로 리다이렉션
     redirect: (BuildContext context, GoRouterState state) {
-      final currentAuthStatus = userModel?.status ?? AuthStatus.guest;
-      final location = state.matchedLocation; // 현재 이동하려는 경로 (정규화된 경로)
-      debugPrint('redirect: status=$currentAuthStatus, location=$location');
+      final currentAuthStatus = authStatusNotifier.value ?? AuthStatus.guest;
+      // 또는 final currentAuthStatus = ref.read(userModelProvider)?.status ?? AuthStatus.guest;
+
+      final location = state.matchedLocation;
+      // 여기에 userModel?.status 대신 currentAuthStatus를 사용하도록 로그 수정
+      debugPrint(
+        'GoRouter Redirect: status=$currentAuthStatus, location=$location',
+      );
+
       // 1. 비로그인 사용자 (AuthStatus.guest)
       if (currentAuthStatus == AuthStatus.guest) {
         // '/welcome' 경로가 아니면 해당 경로로 보냄
@@ -166,7 +200,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         // 마이페이지 기본 화면은 ShellScreen 내에 표시
         pageBuilder:
             (context, state) => const NoTransitionPage(
-              child: ShellScreen(body: PlaceholderScreen(title: 'MyPage Main')),
+              child: ShellScreen(body: MyPageScreen()),
             ),
         routes: <RouteBase>[
           GoRoute(
@@ -177,31 +211,39 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             // 여기서는 간단히 builder 사용. ShellScreen을 계속 사용하려면 MyPage 자체를 ShellRoute로 고려.
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: PlaceholderScreen(title: 'MyPage Info'),
-                ), // 또는 MyPageInfoScreen()
+                  child: ShellScreen(body: MyPageInfoScreen()),
+                ),
             routes: <RouteBase>[
               GoRoute(
                 path: 'name', // /mypage/info/name
                 name: 'mypage-info-name',
                 pageBuilder:
-                    (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(title: 'Info - Name'),
+                    (context, state) => NoTransitionPage(
+                      child: ShellScreen(body: MyPageInfoNameScreen()),
+                    ),
+              ),
+              GoRoute(
+                path: 'birth-date', // /mypage/info/birth-date
+                name: 'mypage-info-birth-date',
+                pageBuilder:
+                    (context, state) => NoTransitionPage(
+                      child: ShellScreen(body: MyPageInfoBirthDateScreen()),
                     ),
               ),
               GoRoute(
                 path: 'gender', // /mypage/info/gender
                 name: 'mypage-info-gender',
                 pageBuilder:
-                    (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(title: 'Info - Gender'),
+                    (context, state) => NoTransitionPage(
+                      child: ShellScreen(body: MyPageInfoGenderScreen()),
                     ),
               ),
               GoRoute(
                 path: 'nationality', // /mypage/info/nationality
                 name: 'mypage-info-nationality',
                 pageBuilder:
-                    (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(title: 'Info - Nationality'),
+                    (context, state) => NoTransitionPage(
+                      child: ShellScreen(body: MyPageInfoNationalityScreen()),
                     ),
               ),
               GoRoute(
@@ -209,9 +251,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-oauth',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(
-                        title: 'Info - OAuth Connections',
-                      ),
+                      child: ShellScreen(body: MyPageInfoOauthScreen()),
                     ),
               ),
               GoRoute(
@@ -219,7 +259,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-logout',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(title: 'Info - Logout Confirm'),
+                      child: ShellScreen(body: MyPageInfoLogoutScreen()),
                     ),
               ),
               GoRoute(
@@ -227,9 +267,16 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-withdraw',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(
-                        title: 'Info - Withdraw Account',
-                      ),
+                      child: ShellScreen(body: MyPageInfoWithdrawScreen()),
+                    ),
+              ),
+              GoRoute(
+                path:
+                    'withdraw-confirmation', // “/mypage/info/withdraw-confirmation”
+                name: 'mypage-info-withdraw-confirmation',
+                pageBuilder:
+                    (context, state) => const NoTransitionPage(
+                      child: MyPageInfoWithdrawConfirmationScreen(),
                     ),
               ),
             ],
@@ -239,23 +286,23 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-body',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: PlaceholderScreen(title: 'MyPage Body Info'),
+                  child: ShellScreen(body: MyPageBodyScreen()),
                 ),
             routes: <RouteBase>[
               GoRoute(
                 path: 'height', // /mypage/body/height
                 name: 'mypage-body-height',
                 pageBuilder:
-                    (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(title: 'Body - Height'),
+                    (context, state) => NoTransitionPage(
+                      child: ShellScreen(body: MyPageBodyHeightScreen()),
                     ),
               ),
               GoRoute(
                 path: 'weight', // /mypage/body/weight
                 name: 'mypage-body-weight',
                 pageBuilder:
-                    (context, state) => const NoTransitionPage(
-                      child: PlaceholderScreen(title: 'Body - Weight'),
+                    (context, state) => NoTransitionPage(
+                      child: ShellScreen(body: MyPageBodyWeightScreen()),
                     ),
               ),
             ],
@@ -265,7 +312,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-sleep-time',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: PlaceholderScreen(title: 'MyPage Sleep Time Settings'),
+                  child: ShellScreen(body: MyPageSleeptimeScreen()),
                 ),
           ),
           GoRoute(
@@ -273,9 +320,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-push',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: PlaceholderScreen(
-                    title: 'MyPage Push Notification Settings',
-                  ),
+                  child: ShellScreen(body: MyPagePushScreen()),
                 ),
           ),
           GoRoute(
@@ -283,7 +328,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-app-info',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: PlaceholderScreen(title: 'MyPage App Info'),
+                  child: ShellScreen(body: MyPageAppInfoScreen()),
                 ),
           ),
         ],
