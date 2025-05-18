@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
   final String? initialValue;
   final FocusNode? focusNode;
   final String? Function(String?)? validator;
+  final TextAlign? textAlign;
 
   const CustomTextField({
     super.key,
@@ -21,6 +22,7 @@ class CustomTextField extends StatelessWidget {
     this.initialValue,
     this.focusNode,
     this.validator,
+    this.textAlign,
   });
 
   InputDecoration _inputDecoration(String? label) {
@@ -109,6 +111,7 @@ class CustomTextField extends StatelessWidget {
                   style: textStyle,
                   decoration: _inputDecoration(label),
                   validator: validator,
+                  textAlign: textAlign ?? TextAlign.start,
                   onChanged: (value) {
                     final validatorFn = validator;
 

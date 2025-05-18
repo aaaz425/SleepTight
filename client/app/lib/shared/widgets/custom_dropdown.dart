@@ -109,8 +109,8 @@ class CustomDropdown extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 16),
                         child: SvgPicture.asset(
                           isOpen
-                              ? 'assets/icons/arrow_up.svg'
-                              : 'assets/icons/arrow_down.svg',
+                              ? 'assets/icons/chevron_up.svg'
+                              : 'assets/icons/chevron_down.svg',
                         ),
                       ),
                     ),
