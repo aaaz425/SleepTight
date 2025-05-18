@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sleep_tight/features/user/data/models/enums/auth_status.dart';
@@ -62,7 +63,9 @@ class UserModelNotifier extends StateNotifier<UserModel?> {
   // 이름 변경
   Future<void> updateName(UpdateUserNameRequest request) async {
     final response = await repo.updateName(request);
+    debugPrint("UserModelNotifier: Status BEFORE update: ${state?.status}");
     updateFromResponse(response);
+    debugPrint("UserModelNotifier: Status AFTER update: ${state?.status}");
   }
 
   // 생년월일 변경
@@ -101,6 +104,13 @@ class UserModelNotifier extends StateNotifier<UserModel?> {
   ) async {
     final response = await repo.updateMinSleepDuration(request);
     updateFromResponse(response);
+  }
+
+  // logout
+  Future<void> logout() async {
+    await repo.logout(); // 로그아웃 API 호출
+    await ref.read(authRepositoryProvider).clearToken(); // 토큰 삭제
+    clear(); // UserModel 초기화
   }
 
   // getStatus
