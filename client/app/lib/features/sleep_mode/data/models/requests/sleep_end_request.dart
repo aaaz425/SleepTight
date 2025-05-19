@@ -1,6 +1,6 @@
 class SleepEndRequest {
   final int reportId;
-  final String sleepEndTime;
+  final DateTime sleepEndTime;
   final List<Map<String, dynamic>> stages;
 
   SleepEndRequest({
@@ -12,7 +12,7 @@ class SleepEndRequest {
   Map<String, dynamic> toJson() {
     return {
       'reportId': reportId,
-      'sleepEndTime': sleepEndTime,
+      'sleepEndTime': sleepEndTime.toIso8601String(),
       'stages': stages,
     };
   }

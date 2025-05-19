@@ -3,14 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/network/dio_provider.dart';
 import 'package:sleep_tight/features/sleep_mode/data/models/requests/sleep_start_request.dart';
-import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_mode_view_model_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/data/models/responses/sleep_start_response.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/report_id_provider.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
+  Future<SleepStartResponse> startSleep(
+    WidgetRef ref,
+    DateTime sleepStartTime,
+  ) async {
+    final dio = ref.read(dioClientProvider);
+    final response = await dio.post(
+      AppConfig.api.sleep.startSleep,
+      data: SleepStartRequest(sleepStartTime: sleepStartTime).toJson(),
+    );
+
+    return SleepStartResponse.fromJson(response);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,20 +80,21 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               onPressed: () async {
-                final viewModel = ref.read(sleepModeViewModelProvider.notifier);
-
                 final now = DateTime.now();
-                final timestamp = now.toIso8601String();
+                final timestamp = now;
                 ref.read(sleepStartTimeProvider.notifier).state = timestamp;
 
-                final request = SleepStartRequest(sleepStartTime: timestamp);
-                final success = await viewModel.startSleep(request);
+                final response = await startSleep(ref, timestamp);
 
                 if (!context.mounted) return;
 
-                if (success) {
-                  context.go(AppConfig.routes.homeSleeping);
-                }
+                ref
+                    .read(reportIdNotifierProvider.notifier)
+                    .set(response.reportId);
+                final currentId = ref.read(reportIdNotifierProvider);
+                print('📌 현재 reportIdProvider 상태: $currentId');
+
+                context.go(AppConfig.routes.homeSleeping);
               },
               child: const Text(
                 '수면 시작',

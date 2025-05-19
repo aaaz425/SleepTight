@@ -1,6 +1,7 @@
 import 'package:sleep_tight/features/analysis/presentation/screens/analysis_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:sleep_tight/features/coach/presentation/screens/sleep_coach_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
 import 'package:sleep_tight/features/user/presentation/screens/my_page_info_birthdate_screen.dart';
 import 'package:sleep_tight/features/user/presentation/screens/my_page_info_screen.dart';
@@ -55,6 +56,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
     refreshListenable: authStatusNotifier, // status 변경만 감지하도록 설정
     // redirect 로직: 인증 상태 및 현재 경로에 따라 적절한 페이지로 리다이렉션
     redirect: (BuildContext context, GoRouterState state) {
+      // return AppConfig.routes.sleepAnalysis;
       final currentAuthStatus = authStatusNotifier.value ?? AuthStatus.guest;
       // 또는 final currentAuthStatus = ref.read(userModelProvider)?.status ?? AuthStatus.guest;
 
@@ -182,7 +184,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         path: AppConfig.routes.sleepCoach, // 수면코치
         pageBuilder:
             (context, state) => const NoTransitionPage(
-              child: ShellScreen(body: PlaceholderScreen(title: 'Sleep Coach')),
+              child: ShellScreen(body: SleepCoachingScreen()),
             ),
       ),
       GoRoute(

@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:sleep_tight/features/analysis/presentation/screens/sleep_diary_view.dart';
-import 'package:sleep_tight/features/analysis/presentation/screens/sleep_report_view.dart';
+import 'package:sleep_tight/features/analysis/presentation/screens/sleep_report_page_view.dart';
 
 class AnalysisTab extends ConsumerStatefulWidget {
   final int initialTabIndex;
@@ -44,6 +45,8 @@ class _AnalysisTabState extends ConsumerState<AnalysisTab>
 
   @override
   Widget build(BuildContext context) {
+    final selectedDate = ref.watch(selectedDateProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -62,7 +65,10 @@ class _AnalysisTabState extends ConsumerState<AnalysisTab>
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [SleepReportView(), SleepDiaryView()],
+            children: [
+              SleepReportPageView(date: selectedDate),
+              SleepDiaryView(),
+            ],
           ),
         ),
       ],

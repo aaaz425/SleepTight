@@ -30,7 +30,7 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
+    return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

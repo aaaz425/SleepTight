@@ -31,6 +31,12 @@ final apiErrorStreamProvider = StreamProvider<ApiErrorEvent>((ref) {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    // 예외 발생해도 앱 종료/중단 막기
+    debugPrint('Caught Flutter error: ${details.exception}');
+  };
+
   // 세로모드로 고정
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
