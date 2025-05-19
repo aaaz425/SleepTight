@@ -69,6 +69,11 @@ export const ExceptionCode = {
     message: '리프레시 토큰 검증이 실패했습니다.',
   },
   FORBIDDEN: { status: 403, code: 'FORBIDDEN', message: '권한이 없습니다.' },
+  INTERNAL_SERVER_ERROR: {
+    status: 500,
+    code: 'INTERNAL_SERVER_ERROR',
+    message: '서버 내부 오류가 발생했습니다.',
+  },
   // 추가 가능
 } as const;
 
