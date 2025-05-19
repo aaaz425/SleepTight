@@ -23,9 +23,7 @@ S3_BUCKET_REGION    = os.getenv("S3_BUCKET_REGION")
 
 # Audio processing constants
 SR = 16_000  # YamNet이 기대하는 샘플레이트
-TARGET_AMPLITUDE_DBFS = -20.0      # 목표 데시벨값 (dBFS)
-MIN_SILENCE_LEN_MS = 500           # 최소 무음 길이 (ms)
-SILENCE_THRESH_OFFSET_DB = 16      # 무음 임계치 오프셋 (dB)
+TARGET_AMPLITUDE_DBFS = -23.0      # 목표 데시벨값 (dBFS)
 
 # Inference settings
 WINDOW_LENGTH = 2.0  # 슬라이딩 윈도 길이 (초)

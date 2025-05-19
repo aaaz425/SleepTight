@@ -8,7 +8,7 @@ prompt = PromptTemplate(
 다음은 RAG를 통해 검색된 수면 관련 논문 정보입니다:
 {context}
 
-사용자의 주간 활동 데이터(수분_섭취량(water_intake), 운동량(exercise), 걸음_수(step_count), 활동_에너지_소모량(activity_energy_expenditure), 카페인(caffein), 열량(calorie), 콜레스테롤(cholesterol), 비타민D(vitamin_d), 당(glucose)):
+사용자의 주간 활동 데이터(수분_섭취량(WATER), 운동량(MOMENTUM), 걸음_수(WALK), 활동_에너지_소모량(TOTAL_ENERGY_BURNED), 카페인(CAFFEINE), 열량(CALORIES), 콜레스테롤(CHOLESTEROL), 비타민D(VITAMIN_D), 당(SUGAR)):
 {weekly_data}
 
 야간 수면 데이터:
@@ -23,7 +23,7 @@ prompt = PromptTemplate(
 - 목표 초과 시: 최대(max) 형태로 현 상태보다 낮은 목표 제안
 
 각 항목에 대해 다음 필드를 포함한 JSON 객체를 생성하세요:
-{{ "activity":"(주간 데이터 영어 소문자_언더바)","type":"total|min|max","value":숫자,"description":"50자 내외 설명" }}
+{{ "activity":"(주간 데이터 영어 대문자_언더바)","type":"total|min|max","value":숫자,"description":"50자 내외 설명" }}
 
 **설명(description) 작성 지침 (매우 중요!):**
 1.  **창의성과 다양성**: 각 추천 항목의 `description`은 **고유하고 창의적이어야 합니다.** 아래 예시들은 단순히 다양한 스타일을 보여주기 위한 것이며, **절대로 예시의 문장 구조나 표현을 그대로 모방하거나 반복해서는 안 됩니다.**
