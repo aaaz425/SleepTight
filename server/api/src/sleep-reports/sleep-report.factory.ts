@@ -20,7 +20,6 @@ export class SleepReportFactory {
       userId,
       sleepStartTime,
       sleepDate,
-      isValidReport: true,
     });
   }
 

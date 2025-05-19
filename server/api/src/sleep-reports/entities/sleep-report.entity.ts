@@ -80,7 +80,7 @@ export class SleepReport {
   @Column({
     name: 'is_valid_report',
     type: 'boolean',
-    default: true,
+    default: false,
   })
   isValidReport: boolean;
 

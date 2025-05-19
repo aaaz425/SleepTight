@@ -71,7 +71,6 @@ export class SleepReportService {
     if (existing) {
       existing.sleepStartTime = sleepStartTime;
       existing.sleepDate = sleepDateOnly;
-      existing.isValidReport = true;
       existing.targetStartTime = user.sleep_time;
       existing.targetEndTime = user.wake_time;
       return (await this.reportRepo.save(existing)).id;
@@ -83,6 +82,7 @@ export class SleepReportService {
       sleepStartTime,
       sleepDateOnly,
     );
+    newReport.isValidReport = false;
     newReport.sleepDate = sleepDateOnly;
     newReport.targetStartTime = user.sleep_time;
     newReport.targetEndTime = user.wake_time;
