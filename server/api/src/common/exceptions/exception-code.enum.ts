@@ -14,6 +14,11 @@ export const ExceptionCode = {
     code: 'ACTIVITY_DATA_NOT_FOUND',
     message: '활동 데이터를 찾을 수 없습니다.',
   },
+  SlEEP_COACHING_NOT_FOUND: {
+    status: 400,
+    code: 'SlEEP_COACHING_NOT_FOUND',
+    message: '코칭데이터를 찾을 수 없습니다.',
+  },
   INCOMPLETE_REGISTRATION: {
     status: 400,
     code: 'INCOMPLETE_REGISTRATION',

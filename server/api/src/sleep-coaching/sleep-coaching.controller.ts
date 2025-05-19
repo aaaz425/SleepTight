@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { SleepCoachingService } from "./sleep-coaching.service";
+import { SleepCoachingResponseDto } from "./dto/sleep-coaching.response.dto";
 
 @Controller("sleep-coaching")
 export class SleepCoachingController {
@@ -8,11 +9,20 @@ export class SleepCoachingController {
     private readonly sleepCoachingService: SleepCoachingService,
   ) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getSleepCoaching(@Request() req, @Body('coaching_date') date :Date) {
+    const userId: number = req.user.userId; // JWT에서 userId를 가져옴
+    const dtoList: SleepCoachingResponseDto[] = await this.sleepCoachingService.getSleepCoaching(userId, date) 
+    return dtoList;
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
-  async getSleepCoaching(@Request() req, @Body("sleepReportId") sleepReportId: number) :Promise<any>{
+  async createSleepCoaching(@Request() req, @Body("sleepReportId") sleepReportId: number) :Promise<any>{
     const userId: number = req.user.userId; // JWT에서 userId를 가져옴
-    const response = await this.sleepCoachingService.getSleepCoaching(userId, sleepReportId);
-    return response;
+    await this.sleepCoachingService.createSleepCoaching(userId, sleepReportId);
+    return "sleep-coaching is processing";
   }
+
 }

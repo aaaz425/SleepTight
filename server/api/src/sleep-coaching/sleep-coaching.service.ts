@@ -9,6 +9,8 @@ import { ActiveTime } from "./interfaces/active-time.interface";
 import { SleepTime } from "./interfaces/sleep-time.interface";
 import { SleepDiary } from "src/sleep-reports/entities/sleep-diary.entity";
 import axios from "axios";
+import { SleepCoaching } from "./entities/sleep-coaching.entity";
+import { SleepCoachingResponseDto } from "./dto/sleep-coaching.response.dto";
 
 @Injectable()
 export class SleepCoachingService {
@@ -19,9 +21,24 @@ export class SleepCoachingService {
         private readonly sleepReportRepository: Repository<SleepReport>,
         @InjectRepository(SleepDiary)
         private readonly sleepDiaryRepository: Repository<SleepDiary>,
+        @InjectRepository(SleepCoaching)
+        private readonly sleepCoachingRepository: Repository<SleepCoaching>,
     ) {}
-
-    async getSleepCoaching(userId: number, sleepReportId :number): Promise<any> {
+    async getSleepCoaching(userId: number, date: Date): Promise<SleepCoachingResponseDto[]> {
+        const sleepCoachings: SleepCoaching[] = await this.sleepCoachingRepository.findBy({
+            userId : userId,
+            sleepCoachingDate : date
+        });
+        //오늘 수면 코칭이 생성되지 않은 경우, 예외 발생
+        //추후 화면에 따라 바로 생성되도록 할 수 있음
+        if(!sleepCoachings || sleepCoachings.length===0) {
+            throwNotFoundException(ExceptionCode.SlEEP_COACHING_NOT_FOUND);
+        }
+        const dtoList: SleepCoachingResponseDto[] = sleepCoachings.map(
+            entity => SleepCoachingResponseDto.fromEntity(entity))
+        return dtoList;
+    }
+    async createSleepCoaching(userId: number, sleepReportId :number): Promise<any> {
         const sleepReport: SleepReport | null = await this.sleepReportRepository.findOneBy({id : sleepReportId});
         if(!sleepReport) {
             throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
@@ -36,21 +53,17 @@ export class SleepCoachingService {
                 activityEndTime: Between(startTime, baseTime),
             },
         });
-
+        //활동데이터가 없는경우 예외처리
         if (!activityDataList || activityDataList.length === 0) {
             throwNotFoundException(ExceptionCode.ACTIVITY_DATA_NOT_FOUND);
         }
-
         //fastAPI서버에 요청을 보내는 로직
         const activeTime :ActiveTime[] = activityDataList.map((activityData) => ({
             dataType : activityData.dataType,
             value : activityData.valueNumber,
             unit : activityData.unit
         }));
-        //활동데이터가 없는경우 예외처리
-        if(!activeTime || activeTime.length===0) {
-            throwNotFoundException(ExceptionCode.ACTIVITY_DATA_NOT_FOUND);
-        }
+        
         const sleepTime: SleepTime[] = await this.settingSleepTimeData(sleepReport);
         const response = await axios.post(
             'http://sleep-tight-ai:8081/coaching',
@@ -59,7 +72,13 @@ export class SleepCoachingService {
                 night_data:  sleepTime
             }
         );
-        return response.data;
+        const coachings = response.data;
+        //데이터 코칭 엔티티로 변환
+        const sleepCoachingEntities: SleepCoaching[] = coachings.map(
+            coaching => SleepCoaching.responseToSleepCoaching(userId, sleepReportId, coaching));
+        //코칭 엔티티 테이블에 저장
+        sleepCoachingEntities.map(entity => this.sleepCoachingRepository.save(entity));
+        return;
     }
 
     private async settingSleepTimeData(sleepReport: SleepReport): Promise<any>{

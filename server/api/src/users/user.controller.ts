@@ -6,8 +6,8 @@ import { ResponseUserInfoDto } from './dto/response-user-info.dto';
 import { RequestRegisterUserInfoDto } from './dto/request-register-user-info.dto';
 import { ResponseUserInfoWithTokensDto } from './dto/response-user-info-with-tokens.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RequestUpdateHeightDto } from './dto/request.update.height.dto';
-import { RequestUpdateWeightDto } from './dto/request.update.weight.dto';
+import { RequestUpdateHeightDto } from './dto/request-update.height.dto';
+import { RequestUpdateWeightDto } from './dto/request-update.weight.dto';
 
 @ApiTags('USERS')
 @Controller('user')
@@ -182,5 +182,15 @@ export class UserController {
   async reinstate(@Request() req) :Promise<ResponseUserInfoWithTokensDto> {
     const userId :number = req.user.userId;
     return this.userService.reinstate(userId);
+  }
+
+  //수면 목표 조회
+  @ApiOperation({ summary: '수면 목표 조회' })
+  @ApiBearerAuth() // JWT 인증 필요
+  @UseGuards(JwtAuthGuard)
+  @Get('sleep-goal')
+  async getSleepGoal(@Request() req) {
+    const userId :number = req.user.userId;
+    return this.userService.getSleepGoal(userId);
   }
 }

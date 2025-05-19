@@ -12,8 +12,9 @@ import { UserStatus } from "./user-status.enum";
 import { kakaoUser } from "src/auth/interfaces/kakao.user.interface";
 import { ResponseOauthLoginDto } from "src/auth/dto/response-oauth-login.dto";
 import { ExceptionCode } from "src/common/exceptions/exception-code.enum";
-import { RequestUpdateHeightDto } from "./dto/request.update.height.dto";
-import { RequestUpdateWeightDto } from "./dto/request.update.weight.dto";
+import { RequestUpdateHeightDto } from "./dto/request-update.height.dto";
+import { RequestUpdateWeightDto } from "./dto/request-update.weight.dto";
+import { ResponseSleepGoalDto } from "./dto/response-sleep-goal.dto";
 
 
 @Injectable()
@@ -245,5 +246,11 @@ export class UserService {
         });
         const responseUserInfoWithTokensDto = ResponseUserInfoWithTokensDto.fromEntity(user, accessToken, refreshToken);
         return responseUserInfoWithTokensDto;
+    }
+
+    async getSleepGoal(userId: number): Promise<ResponseSleepGoalDto> {
+        const user: User = await this.findById(userId);
+        const dto = ResponseSleepGoalDto.fromEntity(user);
+        return dto;
     }
 }
