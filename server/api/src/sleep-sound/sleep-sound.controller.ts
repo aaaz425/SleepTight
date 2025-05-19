@@ -18,7 +18,7 @@ import { throwInternalServerError } from 'src/common/exceptions/exception.helper
 
 @ApiBearerAuth()
 @ApiTags('Sleep')
-@Controller('sleep/sound')
+@Controller('sleep-sound')
 export class SleepSoundController {
   constructor(
     private readonly sleepSoundService: SleepSoundService,
