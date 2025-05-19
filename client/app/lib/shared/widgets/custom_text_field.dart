@@ -133,6 +133,8 @@ class CustomTextField extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 6),
                       child: Text(
                         currentErrorText!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontFamily: 'Pretendard',
                           fontWeight: FontWeight.w400,
