@@ -1,8 +1,8 @@
 import { SleepSoundService } from './../sleep-sound/sleep-sound.service';
 import { SleepReportFactory } from './sleep-report.factory';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, EntityManager } from 'typeorm';
+import { Repository, DataSource, EntityManager, Between } from 'typeorm';
 import { SleepReport } from './entities/sleep-report.entity';
 import { SleepStageService } from 'src/sleep-reports/sleep-stage.service';
 import { EndSleepRequestDto } from 'src/sleep-reports/dto/end-sleep.request.dto';
@@ -184,7 +184,9 @@ export class SleepReportService {
     date: string,
   ): Promise<any[]> {
     const targetDate = new Date(date);
-
+    if (!date || isNaN(targetDate.getTime())) {
+      throw new BadRequestException(ExceptionCode.INVALID_DATE_FORMAT);
+    }
     const reports = await this.reportRepo.find({
       where: {
         userId,
@@ -221,5 +223,32 @@ export class SleepReportService {
     );
 
     return result;
+  }
+
+  // 리포트 ID로 수면 이벤트 조회
+  async getSleepEventsByReportId(reportId: number) {
+    return this.sleepSoundService.getSleepEventsByReportId(reportId);
+  }
+
+  // 월별 수면 리포트가 존재하는 날짜 조회
+  async getReportDaysInMonth(
+    userId: number,
+    year: number,
+    month: number,
+  ): Promise<number[]> {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999)); // 말일
+
+    const reports = await this.reportRepo.find({
+      where: {
+        userId,
+        isValidReport: true,
+        sleepDate: Between(startDate, endDate),
+      },
+      select: ['sleepDate'],
+    });
+
+    const dateList = reports.map((r) => new Date(r.sleepDate).getUTCDate());
+    return [...new Set(dateList)].sort((a, b) => a - b);
   }
 }

@@ -19,14 +19,16 @@ export class SleepSoundFactory {
     segmentId: string;
     fileUrl: string;
     duration: number;
+    startTime: Date;
   }): SleepSound {
-    const { reportId, segmentId, fileUrl, duration } = params;
+    const { reportId, segmentId, fileUrl, duration, startTime } = params;
 
     return this.sleepSoundRepo.create({
       sleepReport: { id: reportId },
       segmentId,
       voiceUrl: fileUrl,
       duration,
+      startTime,
     });
   }
 
@@ -59,5 +61,9 @@ export class SleepSoundFactory {
     return manager.find(SleepEvent, {
       where: { segmentId: In(segmentIds) },
     });
+  }
+
+  getManager(): EntityManager {
+    return this.sleepSoundRepo.manager;
   }
 }

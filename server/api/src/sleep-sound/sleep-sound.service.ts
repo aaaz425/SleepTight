@@ -1,21 +1,25 @@
 import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
 import { ConfigService } from '@nestjs/config';
 import { SleepSoundFactory } from './sleep-sound.factory';
-import {
-  ConflictException,
-  forwardRef,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UploadSleepSoundRequestDto } from './dto/upload-sleep-sound.request.dto';
 import { UploadSleepSoundResponseDto } from './dto/upload-sleep-sound.response.dto';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
 import { SleepSoundProducer } from './sleep-sound.producer';
 import { throwBadRequest } from 'src/common/exceptions/exception.helper';
-import { AnalysisResultDto } from './dto/analysis-result.dto';
 import { SleepEvent } from './entities/sleep-event.entity';
 import { AnomalyType } from './entities/anomaly-type.enum';
 import { EntityManager } from 'typeorm';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { SleepSoundAnalysisResponseDto } from 'src/sleep-reports/dto/sleep-sound-analysis.response.dto';
+
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 
 @Injectable()
 export class SleepSoundService {
@@ -55,6 +59,7 @@ export class SleepSoundService {
     );
 
     const fileUrl = `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+    const startTime = new Date(timestamp);
 
     // DB에 음성 메타데이터 저장
     const sleepSound = this.sleepSoundFactory.create({
@@ -62,6 +67,7 @@ export class SleepSoundService {
       segmentId,
       fileUrl,
       duration,
+      startTime,
     });
     await this.sleepSoundFactory.save(sleepSound);
 
@@ -128,6 +134,70 @@ export class SleepSoundService {
       snoring: Math.round(snoring),
       somniloquy: Math.round(somniloquy),
       coughing: Math.round(coughing),
+    };
+  }
+
+  // Presigned URL 만들기
+  async getPresignedUrl(key: string): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.configService.get('AWS_S3_BUCKET'),
+      Key: key,
+    });
+
+    const url = await getSignedUrl(this.s3, command, { expiresIn: 60 }); // 60초 유효
+    return url;
+  }
+
+  // 수면 분석 결과 조회
+  async getSleepEventsByReportId(
+    reportId: number,
+  ): Promise<SleepSoundAnalysisResponseDto> {
+    const sounds = await this.sleepSoundFactory.findByReportId(
+      reportId,
+      this.sleepSoundFactory.getManager(),
+    );
+    if (!sounds.length) {
+      throwBadRequest(ExceptionCode.SLEEP_SOUND_NOT_FOUND);
+    }
+
+    const segmentIds = sounds.map((s) => s.segmentId);
+    const events = await this.sleepSoundFactory.findEventsBySegmentIds(
+      segmentIds,
+      this.sleepSoundFactory.getManager(),
+    );
+
+    const result = await Promise.all(
+      sounds.map(async (sound) => {
+        const relatedEvents = events.filter(
+          (e) => e.segmentId === sound.segmentId,
+        );
+        const soundStart = dayjs(sound.startTime);
+        const soundEnd = soundStart.add(sound.duration, 'seconds');
+
+        const presignedUrl = await this.getPresignedUrl(
+          `audio-prod/${sound.segmentId}.opus`,
+        );
+
+        return {
+          soundId: sound.id,
+          soundStartTime: soundStart.utc().format('HH:mm:ss'),
+          soundEndTime: soundEnd.utc().format('HH:mm:ss'),
+          clipUrl: presignedUrl,
+          events: relatedEvents.map((e) => ({
+            eventId: e.id,
+            anomaly: e.anomaly,
+            eventStartSec: e.startSec,
+            eventEndSec: e.endSec,
+            confidence: e.confidence,
+          })),
+        };
+      }),
+    );
+
+    return {
+      reportId,
+      date: dayjs(sounds[0].startTime).utc().format('YYYY-MM-DD'),
+      sounds: result,
     };
   }
 }
