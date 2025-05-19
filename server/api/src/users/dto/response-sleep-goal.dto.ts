@@ -13,11 +13,7 @@ export class ResponseSleepGoalDto {
         const dto: ResponseSleepGoalDto = new ResponseSleepGoalDto();
         dto.sleepTime = user.sleep_time;
         dto.wakeTime = user.wake_time;
-        // const interval = parse(user.min_sleep_duration);
-        // const hours = interval.hours;
-        // const minutes = interval.minutes;
-        // const formatted = `${hours}h ${minutes}m`;
-        // dto.minSleepDuration = formatted;
+        dto.minSleepDuration = user.min_sleep_duration;
         return dto;
     }
 }
