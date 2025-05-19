@@ -5,9 +5,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ResponseUserInfoDto } from './dto/response-user-info.dto';
 import { RequestRegisterUserInfoDto } from './dto/request-register-user-info.dto';
 import { ResponseUserInfoWithTokensDto } from './dto/response-user-info-with-tokens.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { RequestUpdateHeightDto } from './dto/request-update.height.dto';
 import { RequestUpdateWeightDto } from './dto/request-update.weight.dto';
+import { RequestUpdateNameDto } from './dto/request-update-name.dto';
+import { RequestUpdateBirthDateDto } from './dto/request-update-birth-date.dto';
 
 @ApiTags('USERS')
 @Controller('user')
@@ -31,11 +33,10 @@ export class UserController {
   @Patch('name')
   async updateName(
     @Request() req,
-    @Body('firstName') firstName: string,
-    @Body('lastName') lastName: string,
+    @Body() dto: RequestUpdateNameDto,
   ): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
-    return this.userService.updateName(userId, firstName, lastName);
+    return this.userService.updateName(userId, dto.firstName, dto.lastName);
   }
 
   // 사용자 생년월일 변경
@@ -43,12 +44,9 @@ export class UserController {
   @ApiBearerAuth() // JWT 인증 필요
   @UseGuards(JwtAuthGuard)
   @Patch('birth-date')
-  async updateBirthDate(
-    @Request() req,
-    @Body('birthDate') birthDate: Date,
-  ): Promise<ResponseUserInfoDto> {
+  async updateBirthDate( @Request() req, @Body() requestDto: RequestUpdateBirthDateDto): Promise<ResponseUserInfoDto> {
     const userId = req.user.userId // JWT에서 userId를 가져옴
-    return this.userService.updateBirthdate(userId, birthDate);
+    return this.userService.updateBirthdate(userId, requestDto.birthDate);
   }
 
   // 사용자 성별 변경
