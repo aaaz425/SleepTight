@@ -72,10 +72,7 @@ export class SleepCoachingService {
                 night_data:  sleepTime
             }
         );
-        const coachings = response.data;
-        console.log(coachings);
-        console.log("===========================")
-        console.log("================is ARRAY?? : " , Array.isArray(coachings))
+        const coachings = response.data.activity_list;
         //데이터 코칭 엔티티로 변환
         const sleepCoachingEntities: SleepCoaching[] = coachings.map(
             coaching => SleepCoaching.responseToSleepCoaching(userId, sleepReportId, coaching));
