@@ -12,8 +12,6 @@ class MyPageInfoLogoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userModelProvider);
-
     return SafeArea(
       child: Scaffold(
         appBar: MyPageAppBar(
@@ -49,7 +47,6 @@ class MyPageInfoLogoutScreen extends ConsumerWidget {
               children: [
                 CustomButton(
                   onPressed: () {
-                    // TODO: 로그아웃 API
                     ref.read(userModelProvider.notifier).logout();
                     context.pop();
                   },
