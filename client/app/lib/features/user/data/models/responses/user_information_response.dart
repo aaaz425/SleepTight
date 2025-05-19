@@ -7,7 +7,7 @@ class UserInformationResponse {
   final String wakeTime; // "HH:MM:SS"
   final String sleepTime; // "HH:MM:SS"
   final MinSleepDuration minSleepDuration;
-  final int weight;
+  final double weight;
   final double height;
   final String gender;
   final String birthDate; // "YYYY-MM-DD"
@@ -47,12 +47,12 @@ class UserInformationResponse {
       minSleepDuration: MinSleepDuration.fromJson(json['minSleepDuration']),
       weight:
           json['weight'] is num
-              ? (json['weight'] as num).toInt()
-              : int.tryParse(json['weight'] as String) ?? 0,
+              ? (json['weight'] as num).toDouble()
+              : double.tryParse(json['weight'] as String) ?? 0,
       height:
           json['height'] is num
               ? (json['height'] as num).toDouble()
-              : double.tryParse(json['height'] as String) ?? 0.0,
+              : double.tryParse(json['height'] as String) ?? 0,
       gender: json['gender'],
       birthDate: json['birthDate'],
       country: json['country'],

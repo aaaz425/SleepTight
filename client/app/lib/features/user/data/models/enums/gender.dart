@@ -9,6 +9,7 @@ enum Gender {
 
   // API에서 사용하는 문자열 값을 반환하는 getter
   String get toJson => en;
+  String get toKor => ko;
 
   // API 응답 문자열로부터 Gender enum 값을 가져오는 factory 생성자
   static Gender? fromJson(String? value) {

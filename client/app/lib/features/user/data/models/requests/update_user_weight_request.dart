@@ -1,9 +1,10 @@
 class UpdateUserWeightRequest {
-  final int weight; // 정수 값 (예: 75)
+  final num weight;
+  final String weightUnit;
 
-  UpdateUserWeightRequest({required this.weight});
+  UpdateUserWeightRequest({required this.weight, required this.weightUnit});
 
   Map<String, dynamic> toJson() {
-    return {'weight': weight};
+    return {'weight': weight, 'weight_unit': weightUnit};
   }
 }

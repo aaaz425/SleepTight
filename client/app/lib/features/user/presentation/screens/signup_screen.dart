@@ -3,18 +3,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/user/data/models/enums/country.dart';
 import 'package:sleep_tight/features/user/data/models/enums/gender.dart';
-import 'package:sleep_tight/features/user/data/models/enums/length_unit.dart';
-import 'package:sleep_tight/features/user/data/models/enums/weight_unit.dart';
 import 'package:sleep_tight/features/user/data/models/requests/user_register_request.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
-import 'package:sleep_tight/shared/widgets/custom_text_field.dart';
-import 'package:sleep_tight/shared/widgets/custom_dropdown.dart';
-import 'package:sleep_tight/shared/widgets/custom_radio_group.dart';
+import 'package:sleep_tight/features/user/presentation/widgets/birth_date_form_field.dart';
+import 'package:sleep_tight/features/user/presentation/widgets/country_form_field.dart';
+import 'package:sleep_tight/features/user/presentation/widgets/gender_form_field.dart';
+import 'package:sleep_tight/features/user/presentation/widgets/height_form_field.dart';
+import 'package:sleep_tight/features/user/presentation/widgets/name_form_field.dart';
+import 'package:sleep_tight/features/user/presentation/widgets/weight_form_field.dart';
 import 'package:sleep_tight/core/network/dio_provider.dart';
 
 class SignupScreen extends StatelessWidget {
@@ -174,40 +174,7 @@ class _SignupFormBodyState extends ConsumerState<_SignupFormBody> {
               ),
             ),
             SizedBox(height: 4),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    name: 'last_name',
-                    label: '성',
-                    hintText: '성을 입력해주세요.',
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(errorText: '성을 입력하세요.'),
-                      FormBuilderValidators.maxLength(
-                        20,
-                        errorText: '20자 이하로 입력하세요.',
-                      ),
-                    ]),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: CustomTextField(
-                    name: 'first_name',
-                    label: '이름',
-                    hintText: '이름을 입력해주세요.',
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(errorText: '이름을 입력하세요.'),
-                      FormBuilderValidators.maxLength(
-                        20,
-                        errorText: '20자 이하로 입력하세요.',
-                      ),
-                    ]),
-                  ),
-                ),
-              ],
-            ),
-
+            NameFormField(),
             // 성별
             Align(
               alignment: Alignment.centerLeft,
@@ -218,19 +185,7 @@ class _SignupFormBodyState extends ConsumerState<_SignupFormBody> {
             ),
             SizedBox(height: 12),
 
-            CustomRadioGroup<Gender>(
-              name: 'gender',
-              initialValue: Gender.male,
-              options: Gender.values,
-              labels: Gender.values.map((gender) => gender.ko).toList(),
-              selectedColor: AppColors.primary,
-              unselectedColor: Colors.transparent,
-              borderColor: AppColors.gray06,
-              validator: FormBuilderValidators.required(
-                errorText: '성별을 선택하세요.',
-              ),
-              direction: Axis.horizontal,
-            ),
+            GenderFormField(),
 
             SizedBox(height: 20),
 
@@ -245,54 +200,7 @@ class _SignupFormBodyState extends ConsumerState<_SignupFormBody> {
             ),
             SizedBox(height: 12),
 
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDropdown(
-                    name: 'year',
-                    initialValue: null,
-                    hintText: 'YYYY',
-                    validator: FormBuilderValidators.required(
-                      errorText: '년도를 선택하세요.',
-                    ),
-                    values: List.generate(
-                      100,
-                      (index) => (2025 - 100 + index).toString(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: CustomDropdown(
-                    name: 'month',
-                    initialValue: null,
-                    hintText: 'MM',
-                    validator: FormBuilderValidators.required(
-                      errorText: '월을 선택하세요.',
-                    ),
-                    values: List.generate(
-                      12,
-                      (index) => (index + 1).toString(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: CustomDropdown(
-                    name: 'day',
-                    initialValue: null,
-                    hintText: 'DD',
-                    validator: FormBuilderValidators.required(
-                      errorText: '일을 선택하세요.',
-                    ),
-                    values: List.generate(
-                      31,
-                      (index) => (index + 1).toString(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            BirthDateFormField(),
 
             SizedBox(height: 20),
 
@@ -313,19 +221,7 @@ class _SignupFormBodyState extends ConsumerState<_SignupFormBody> {
                         ? snapshot.data
                         : null;
                 debugPrint(countryByIp?.getDisplayName('ko') ?? '');
-                return CustomDropdown(
-                  key: ValueKey(countryByIp?.getDisplayName('ko') ?? ''),
-                  name: 'country',
-                  initialValue: countryByIp?.getDisplayName('ko'),
-                  hintText: '선택',
-                  validator: FormBuilderValidators.required(
-                    errorText: '국적을 선택하세요.',
-                  ),
-                  values:
-                      Country.values
-                          .map((c) => c.getDisplayName('ko'))
-                          .toList(),
-                );
+                return CountryFormField(initialValue: countryByIp);
               },
             ),
 
@@ -340,65 +236,8 @@ class _SignupFormBodyState extends ConsumerState<_SignupFormBody> {
               ),
             ),
             SizedBox(height: 12),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: CustomTextField(
-                    name: 'height',
 
-                    hintText: '키를 입력해주세요.',
-                    keyboardType: TextInputType.number,
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(errorText: '키를 입력하세요.'),
-                      FormBuilderValidators.numeric(errorText: '숫자만 입력하세요.'),
-                      // length_unit에 따라서 validation 다르게 적용
-                      // cm면 100이상 300 이하
-                      // ft/in면 3이상 10 이하
-                      (value) {
-                        final unit =
-                            widget
-                                .formKey
-                                .currentState
-                                ?.fields['length_unit']
-                                ?.value;
-                        if (value == null || value.isEmpty) return null;
-                        final num? height = num.tryParse(value);
-                        if (height == null) return null;
-
-                        if (unit == 'cm') {
-                          if (height < 100 || height > 300) {
-                            return '키(cm)는 100~300 사이여야 합니다.';
-                          }
-                        } else if (unit == 'ft/in') {
-                          if (height < 3 || height > 10) {
-                            return '키(ft/in)는 3~10 사이여야 합니다.';
-                          }
-                        }
-                        return null;
-                      },
-                    ]),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  flex: 1,
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: CustomDropdown(
-                      name: 'length_unit',
-                      initialValue: LengthUnit.cm.value,
-                      values: LengthUnit.values.map((u) => u.value).toList(),
-                      validator: FormBuilderValidators.required(
-                        errorText: '길이 단위를 선택하세요.',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            HeightFormField(formKey: widget.formKey),
 
             const SizedBox(height: 12),
 
@@ -411,60 +250,8 @@ class _SignupFormBodyState extends ConsumerState<_SignupFormBody> {
               ),
             ),
             const SizedBox(height: 12),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: CustomTextField(
-                    name: 'weight',
-                    hintText: '몸무게를 입력해주세요.',
-                    keyboardType: TextInputType.number,
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(errorText: '몸무게를 입력하세요.'),
-                      FormBuilderValidators.numeric(errorText: '숫자만 입력하세요.'),
-                      (value) {
-                        final unit =
-                            widget
-                                .formKey
-                                .currentState
-                                ?.fields['weight_unit']
-                                ?.value;
-                        if (value == null || value.isEmpty) return null;
-                        final num? weight = num.tryParse(value);
-                        if (weight == null) return null;
-                        if (unit == 'kg') {
-                          if (weight < 20 || weight > 300) {
-                            return '몸무게(kg)는 20~300 사이여야 합니다.';
-                          }
-                        } else if (unit == 'lb') {
-                          if (weight < 44 || weight > 660) {
-                            return '몸무게(lb)는 44~660 사이여야 합니다.';
-                          }
-                        }
-                        return null;
-                      },
-                    ]),
-                  ),
-                ),
-                SizedBox(width: 4),
-                Expanded(
-                  flex: 1,
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: CustomDropdown(
-                      name: 'weight_unit',
-                      initialValue: WeightUnit.kg.value,
-                      values: WeightUnit.values.map((u) => u.value).toList(),
-                      validator: FormBuilderValidators.required(
-                        errorText: '몸무게 단위를 선택하세요.',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+
+            WeightFormField(formKey: widget.formKey),
 
             SizedBox(height: 20),
           ],
