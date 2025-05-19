@@ -99,9 +99,11 @@ export class AuthService {
     });
 
     existingUser.refresh_token = refreshToken;
-    await this.userRepository.update(existingUser.id, {
-      refresh_token: refreshToken,
-    });
+    await this.userRepository.update(existingUser.id, 
+      {
+        refresh_token: refreshToken,
+        visited_at : new Date()
+      });
 
     return ResponseOauthLoginDto.fromEntity(
       existingUser,
