@@ -1,9 +1,9 @@
 class SleepStartRequest {
-  final String sleepStartTime;
+  final DateTime sleepStartTime;
 
   SleepStartRequest({required this.sleepStartTime});
 
-  Map<String, dynamic> toJson() {
-    return {'sleep_start_time': sleepStartTime};
-  }
+  Map<String, dynamic> toJson() => {
+    'sleep_start_time': sleepStartTime.toUtc().toIso8601String(),
+  };
 }

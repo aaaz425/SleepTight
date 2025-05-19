@@ -1,35 +1,22 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_sound.dart';
+import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_stage_line_chart.dart';
 
-class SleepReportView extends ConsumerStatefulWidget {
-  const SleepReportView({super.key});
+class SleepReportView extends ConsumerWidget {
+  final SleepReport report;
 
-  @override
-  ConsumerState<SleepReportView> createState() => _SleepReportViewState();
-}
-
-class _SleepReportViewState extends ConsumerState<SleepReportView> {
-  @override
-  void initState() {
-    super.initState();
-    // 예시: 데이터 패칭 시작
-    Future.microtask(() {
-      // ref.read(sleepReportProvider.notifier).fetch(); // 예시
-    });
-  }
+  const SleepReportView({super.key, required this.report});
 
   @override
-  Widget build(BuildContext context) {
-    // final report = ref.watch(sleepReportProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stages = report.sleepStages;
 
-    // return report.when(
-    //   data: (data) => Center(child: Text('수면 리포트: ${data.title}')),
-    //   loading: () => const Center(child: CircularProgressIndicator()),
-    //   error: (err, stack) => Center(child: Text('오류: $err')),
-    // );
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -220,19 +207,16 @@ class _SleepReportViewState extends ConsumerState<SleepReportView> {
                   ),
                 ),
                 SizedBox(height: 16),
-                Center(
-                  // Todo: 파형 그래프 수정
-                  child: Image.asset(
-                    'assets/images/sound_wave.png',
-                    width: double.infinity,
-                    fit: BoxFit.fitWidth,
-                  ),
+
+                SizedBox(
+                  height: 100, // or any height you want
+                  child: SleepStageLineChart(stages: stages),
                 ),
               ],
             ),
           ),
 
-          // 수면 단계
+          // 수면 단계별 시간
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -477,3 +461,66 @@ class _SleepReportViewState extends ConsumerState<SleepReportView> {
     );
   }
 }
+
+final mockStages = [
+  SleepStage(
+    stageType: 'AWAKE',
+    startTime: DateTime.parse("2025-05-16T01:00:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T01:10:00.000Z"),
+    duration: 10,
+  ),
+  SleepStage(
+    stageType: 'LIGHT',
+    startTime: DateTime.parse("2025-05-16T01:10:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T02:10:00.000Z"),
+    duration: 60,
+  ),
+  SleepStage(
+    stageType: 'DEEP',
+    startTime: DateTime.parse("2025-05-16T02:10:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T03:00:00.000Z"),
+    duration: 50,
+  ),
+  SleepStage(
+    stageType: 'REM',
+    startTime: DateTime.parse("2025-05-16T03:00:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T04:00:00.000Z"),
+    duration: 80,
+  ),
+  SleepStage(
+    stageType: 'AWAKE',
+    startTime: DateTime.parse("2025-05-16T04:00:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T04:30:00.000Z"),
+    duration: 30,
+  ),
+  SleepStage(
+    stageType: 'LIGHT',
+    startTime: DateTime.parse("2025-05-16T04:30:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T05:20:00.000Z"),
+    duration: 50,
+  ),
+  SleepStage(
+    stageType: 'DEEP',
+    startTime: DateTime.parse("2025-05-16T05:20:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T05:30:00.000Z"),
+    duration: 10,
+  ),
+  SleepStage(
+    stageType: 'REM',
+    startTime: DateTime.parse("2025-05-16T05:30:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T05:50:00.000Z"),
+    duration: 20,
+  ),
+  SleepStage(
+    stageType: 'LIGHT',
+    startTime: DateTime.parse("2025-05-16T05:50:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T06:20:00.000Z"),
+    duration: 30,
+  ),
+  SleepStage(
+    stageType: 'AWAKE',
+    startTime: DateTime.parse("2025-05-16T06:20:00.000Z"),
+    endTime: DateTime.parse("2025-05-16T06:40:00.000Z"),
+    duration: 20,
+  ),
+];

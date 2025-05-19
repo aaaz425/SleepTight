@@ -1,4 +1,5 @@
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class AlarmTimeDisplay extends ConsumerWidget {
             '${alarm.amPm} ${alarm.hour.toString().padLeft(2, '0')}:${alarm.minute.toString().padLeft(2, '0')}';
         return Text(
           time,
-          style: const TextStyle(fontSize: 16, color: AppColors.primary),
+          style: AppTextStyles.titleT3Sb(color: AppColors.font1),
         );
       },
     );

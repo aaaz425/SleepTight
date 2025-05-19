@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 
 class SleepSound extends ConsumerStatefulWidget {
@@ -11,14 +11,17 @@ class SleepSound extends ConsumerStatefulWidget {
 }
 
 class _SleepSoundState extends ConsumerState<SleepSound> {
-  final Map<int, AudioPlayer> _players = {};
+  int? _currentlyPlayingId;
 
-  @override
-  void dispose() {
-    for (var player in _players.values) {
-      player.dispose();
-    }
-    super.dispose();
+  void _togglePlayback(int soundId) {
+    // Todo: 음성 재생 추가
+    setState(() {
+      if (_currentlyPlayingId == soundId) {
+        _currentlyPlayingId = null; // 멈춤
+      } else {
+        _currentlyPlayingId = soundId; // 재생 시작
+      }
+    });
   }
 
   @override
@@ -40,78 +43,51 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
             ),
           ),
           const SizedBox(height: 16),
-          for (var sound in (sounds)) _buildSoundItem(sound),
+          for (var i = 0; i < sounds.length; i++) _buildSoundItem(i, sounds[i]),
         ],
       ),
     );
   }
 
-  Widget _buildSoundItem(Map<String, dynamic> sound) {
+  Widget _buildSoundItem(int index, Map<String, dynamic> sound) {
     final soundId = sound['soundId'] as int;
-    final clipUrl = sound['clipUrl'] as String;
     final start = sound['soundStartTime'];
     final end = sound['soundEndTime'];
-    final events = sound['events'] as List<dynamic>;
+    final isPlaying = _currentlyPlayingId == soundId;
 
-    _players.putIfAbsent(soundId, () {
-      final player = AudioPlayer();
-      player.setUrl(clipUrl);
-      return player;
-    });
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 60,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white10,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.play_arrow, color: Colors.white),
-                onPressed: () => _players[soundId]!.play(),
-              ),
-              const Text('오디오 재생', style: TextStyle(color: Colors.white)),
-            ],
-          ),
+    return GestureDetector(
+      onTap: () => _togglePlayback(soundId),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  '이상현상 ${index + 1}',
+                  style: TextStyle(color: AppColors.font1, fontSize: 12),
+                ),
+                const SizedBox(width: 2),
+                SvgPicture.asset(
+                  isPlaying
+                      ? "assets/icons/pause.svg"
+                      : "assets/icons/play.svg",
+                  color: AppColors.gray06,
+                  width: 12,
+                  height: 12,
+                ),
+              ],
+            ),
+            Text(
+              '$start ~ $end',
+              style: TextStyle(color: AppColors.font2, fontSize: 12),
+            ),
+          ],
         ),
-        Text(
-          '$start ~ $end',
-          style: const TextStyle(color: Colors.white60, fontSize: 12),
-        ),
-        const SizedBox(height: 8),
-        for (var event in events)
-          Text(
-            '${_getAnomalyLabel(event['anomaly'])} (${_formatSec(event['eventStartSec'])} ~ ${_formatSec(event['eventEndSec'])})',
-            style: const TextStyle(color: Colors.white, fontSize: 13),
-          ),
-        const SizedBox(height: 20),
-      ],
+      ),
     );
-  }
-
-  String _getAnomalyLabel(String anomaly) {
-    switch (anomaly) {
-      case 'snore':
-        return '코골이';
-      case 'talk':
-        return '잠꼬대';
-      case 'cough':
-        return '기침';
-      default:
-        return anomaly;
-    }
-  }
-
-  String _formatSec(num sec) {
-    final minutes = (sec ~/ 60).toString().padLeft(2, '0');
-    final seconds = (sec % 60).toInt().toString().padLeft(2, '0');
-    return '$minutes:$seconds';
   }
 }
 
@@ -123,7 +99,29 @@ const mockSleepSoundData = {
       "soundId": 1,
       "soundStartTime": "04:52:12",
       "soundEndTime": "04:52:22",
-      "clipUrl": "https://s3.amazonaws.com/audio-prod/.../events/1023.opus",
+      "clipUrl": "assets/sound/alarm.mp3",
+      "events": [
+        {
+          "eventId": "ffggh1asdjsdzxc",
+          "anomaly": "snore",
+          "eventStartSec": 0,
+          "eventEndSec": 2,
+          "confidence": 0.92,
+        },
+        {
+          "eventId": "asdgh1asdj1hjk5h",
+          "anomaly": "talk",
+          "eventStartSec": 2,
+          "eventEndSec": 6,
+          "confidence": 0.98,
+        },
+      ],
+    },
+    {
+      "soundId": 2,
+      "soundStartTime": "05:52:12",
+      "soundEndTime": "05:52:22",
+      "clipUrl": "assets/sound/alarm.mp3",
       "events": [
         {
           "eventId": "ffggh1asdjsdzxc",
