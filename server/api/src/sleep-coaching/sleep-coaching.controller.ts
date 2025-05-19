@@ -11,7 +11,7 @@ export class SleepCoachingController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getSleepCoaching(@Request() req, @Body('date') date :Date) {
+  async getSleepCoaching(@Request() req, @Body('coaching_date') date :Date) {
     const userId: number = req.user.userId; // JWT에서 userId를 가져옴
     const dtoList: SleepCoachingResponseDto[] = await this.sleepCoachingService.getSleepCoaching(userId, date) 
     return dtoList;
