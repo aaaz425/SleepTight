@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sleep_tight/features/user/data/models/enums/auth_status.dart';
+import 'package:sleep_tight/features/user/data/models/requests/update_user_sleep_time_request.dart';
+import 'package:sleep_tight/features/user/data/models/requests/update_user_wake_time_request.dart';
 import 'package:sleep_tight/features/user/data/models/requests/user_register_request.dart';
 import 'package:sleep_tight/features/user/data/models/responses/user_information_response.dart';
 import 'package:sleep_tight/features/user/data/models/requests/update_user_birth_date_request.dart';
@@ -103,6 +105,18 @@ class UserModelNotifier extends StateNotifier<UserModel?> {
     UpdateUserMinSleepDurationRequest request,
   ) async {
     final response = await repo.updateMinSleepDuration(request);
+    updateFromResponse(response);
+  }
+
+  // 취침시간 변경
+  Future<void> updateSleepTime(UpdateUserSleepTimeRequest request) async {
+    final response = await repo.updateSleepTime(request);
+    updateFromResponse(response);
+  }
+
+  // 기상시간 변경
+  Future<void> updateWakeTime(UpdateUserWakeTimeRequest request) async {
+    final response = await repo.updateWakeTime(request);
     updateFromResponse(response);
   }
 

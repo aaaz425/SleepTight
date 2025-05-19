@@ -57,9 +57,13 @@ abstract class UserRepository {
     UpdateUserMinSleepDurationRequest request,
   );
 
-  // 사용자 취침 시간 설정 (PATCH api/user/sleep-time) - 응답 없음
-  Future<void> updateSleepTime(UpdateUserSleepTimeRequest request);
+  // 사용자 취침 시간 설정 (PATCH api/user/sleep-time)
+  Future<UserInformationResponse> updateSleepTime(
+    UpdateUserSleepTimeRequest request,
+  );
 
-  // 사용자 기상 시간 설정 (PATCH api/user/wake-time) - 응답 없음
-  Future<void> updateWakeTime(UpdateUserWakeTimeRequest request);
+  // 사용자 기상 시간 설정 (PATCH api/user/wake-time)
+  Future<UserInformationResponse> updateWakeTime(
+    UpdateUserWakeTimeRequest request,
+  );
 }

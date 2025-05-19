@@ -94,12 +94,16 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> updateSleepTime(UpdateUserSleepTimeRequest request) {
+  Future<UserInformationResponse> updateSleepTime(
+    UpdateUserSleepTimeRequest request,
+  ) {
     return remoteDataSource.updateSleepTime(request);
   }
 
   @override
-  Future<void> updateWakeTime(UpdateUserWakeTimeRequest request) {
+  Future<UserInformationResponse> updateWakeTime(
+    UpdateUserWakeTimeRequest request,
+  ) {
     return remoteDataSource.updateWakeTime(request);
   }
 }

@@ -37,8 +37,12 @@ abstract class UserRemoteDataSource {
     UpdateUserMinSleepDurationRequest request,
   );
 
-  Future<void> updateSleepTime(UpdateUserSleepTimeRequest request);
-  Future<void> updateWakeTime(UpdateUserWakeTimeRequest request);
+  Future<UserInformationResponse> updateSleepTime(
+    UpdateUserSleepTimeRequest request,
+  );
+  Future<UserInformationResponse> updateWakeTime(
+    UpdateUserWakeTimeRequest request,
+  );
 }
 
 class UserRemoteDataSourceImpl implements UserRemoteDataSource {
@@ -62,7 +66,6 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   @override
   Future<void> logout() async {
     await dio.post(apiPaths.user.logout);
-    // TODO: cleartoken
   }
 
   @override
@@ -158,13 +161,25 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   }
 
   @override
-  Future<void> updateSleepTime(UpdateUserSleepTimeRequest request) async {
-    await dio.patch(apiPaths.user.sleepTime, data: request.toJson());
+  Future<UserInformationResponse> updateSleepTime(
+    UpdateUserSleepTimeRequest request,
+  ) async {
+    final response = await dio.patch(
+      apiPaths.user.sleepTime,
+      data: request.toJson(),
+    );
+    return UserInformationResponse.fromJson(response.data);
   }
 
   @override
-  Future<void> updateWakeTime(UpdateUserWakeTimeRequest request) async {
-    await dio.patch(apiPaths.user.wakeTime, data: request.toJson());
+  Future<UserInformationResponse> updateWakeTime(
+    UpdateUserWakeTimeRequest request,
+  ) async {
+    final response = await dio.patch(
+      apiPaths.user.wakeTime,
+      data: request.toJson(),
+    );
+    return UserInformationResponse.fromJson(response.data);
   }
 }
 
