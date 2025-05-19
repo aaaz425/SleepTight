@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common"
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { SleepCoachingService } from "./sleep-coaching.service";
 import { SleepCoachingResponseDto } from "./dto/sleep-coaching.response.dto";
+import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 
 @Controller("sleep-coaching")
 export class SleepCoachingController {
@@ -9,6 +10,8 @@ export class SleepCoachingController {
     private readonly sleepCoachingService: SleepCoachingService,
   ) {}
 
+  @ApiOperation({ summary: '수면 코칭 조회' })
+  @ApiBearerAuth() // JWT 인증 필요
   @Get()
   @UseGuards(JwtAuthGuard)
   async getSleepCoaching(@Request() req, @Body('coaching_date') date :Date) {
@@ -17,6 +20,8 @@ export class SleepCoachingController {
     return dtoList;
   }
 
+  @ApiOperation({ summary: '수면 코칭 생성' })
+  @ApiBearerAuth() // JWT 인증 필요
   @Post()
   @UseGuards(JwtAuthGuard)
   async createSleepCoaching(@Request() req, @Body("sleepReportId") sleepReportId: number) :Promise<any>{
