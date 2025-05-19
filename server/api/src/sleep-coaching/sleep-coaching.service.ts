@@ -73,11 +73,16 @@ export class SleepCoachingService {
             }
         );
         const coachings = response.data;
+        console.log(coachings);
+        console.log("===========================")
+        console.log("================is ARRAY?? : " , Array.isArray(coachings))
         //데이터 코칭 엔티티로 변환
         const sleepCoachingEntities: SleepCoaching[] = coachings.map(
             coaching => SleepCoaching.responseToSleepCoaching(userId, sleepReportId, coaching));
         //코칭 엔티티 테이블에 저장
-        sleepCoachingEntities.map(entity => this.sleepCoachingRepository.save(entity));
+        await Promise.all(
+            sleepCoachingEntities.map(entity => this.sleepCoachingRepository.save(entity))
+        );
         return;
     }
 
