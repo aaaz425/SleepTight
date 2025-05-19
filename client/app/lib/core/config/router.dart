@@ -275,7 +275,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
               ),
               GoRoute(
                 path:
-                    'withdraw-confirmation', // “/mypage/info/withdraw-confirmation”
+                    'withdraw-confirmation', // "/mypage/info/withdraw-confirmation"
                 name: 'mypage-info-withdraw-confirmation',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(

@@ -43,3 +43,9 @@ android {
 flutter {
     source = "../.."
 }
+
+// Wear OS 통신을 위한 종속성 추가
+dependencies {
+    // Google Play Services Wearable
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
+}

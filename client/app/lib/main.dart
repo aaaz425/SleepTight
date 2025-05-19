@@ -9,16 +9,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
-import 'core/config/router.dart';
+import 'package:sleep_tight/core/config/router.dart';
 import 'core/network/api_error_handler.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:app/features/health/services/wear_communication_service.dart';
+import 'package:sleep_tight/features/health/services/wear_communication_service.dart';
 
 // GoRouter에 전달할 NavigatorKey를 앱의 상위 레벨에 정의합니다.
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // WearCommunicationService 인스턴스를 제공하는 Provider
-final wearCommunicationServiceProvider = Provider<WearCommunicationService>((ref) {
+final wearCommunicationServiceProvider = Provider<WearCommunicationService>((
+  ref,
+) {
   return WearCommunicationService();
 });
 

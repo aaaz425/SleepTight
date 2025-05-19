@@ -1,129 +1,149 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:wear/wear.dart';
-import 'package:app/features/health/services/health_service.dart';
+import 'package:flutter/services.dart';
 
-/// Wear OS와의 통신을 관리하는 서비스
+/// Wear OS 통신을 위한 API 클래스
+class WearAPI {
+  // 메서드 채널 이름
+  static const MethodChannel _channel = MethodChannel(
+    'com.example.sleeptight/wear_os',
+  );
+
+  // 연결된 노드(Wear OS 기기) 목록 가져오기
+  static Future<List<Map<String, dynamic>>> getConnectedNodes() async {
+    try {
+      final result = await _channel.invokeMethod('getConnectedNodes');
+      return List<Map<String, dynamic>>.from(result ?? []);
+    } catch (e) {
+      debugPrint('연결된 노드 가져오기 실패: $e');
+      return [];
+    }
+  }
+
+  // 헬스 데이터 요청
+  static Future<Map<String, dynamic>?> requestHealthData() async {
+    try {
+      final result = await _channel.invokeMethod('requestHealthData');
+      if (result != null) {
+        return jsonDecode(result as String) as Map<String, dynamic>;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('헬스 데이터 요청 실패: $e');
+      return null;
+    }
+  }
+
+  // 물 섭취량 업데이트
+  static Future<bool> updateWaterIntake(double amount) async {
+    try {
+      final result = await _channel.invokeMethod('updateWaterIntake', {
+        'amount': amount,
+      });
+
+      if (result != null) {
+        final response = jsonDecode(result as String) as Map<String, dynamic>;
+        return response['success'] as bool? ?? false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('물 섭취량 업데이트 실패: $e');
+      return false;
+    }
+  }
+
+  // 카페인 섭취량 업데이트
+  static Future<bool> updateCaffeineIntake(double amount) async {
+    try {
+      final result = await _channel.invokeMethod('updateCaffeineIntake', {
+        'amount': amount,
+      });
+
+      if (result != null) {
+        final response = jsonDecode(result as String) as Map<String, dynamic>;
+        return response['success'] as bool? ?? false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('카페인 섭취량 업데이트 실패: $e');
+      return false;
+    }
+  }
+
+  // 메시지 전송
+  static Future<bool> sendMessage(
+    String nodeId,
+    String path,
+    String message,
+  ) async {
+    try {
+      await _channel.invokeMethod('sendMessage', {
+        'nodeId': nodeId,
+        'path': path,
+        'message': message,
+      });
+      return true;
+    } catch (e) {
+      debugPrint('메시지 전송 실패: $e');
+      return false;
+    }
+  }
+}
+
+/// Wear OS 통신 서비스
 class WearCommunicationService {
-  final HealthService _healthService = HealthService();
   bool _isInitialized = false;
 
   // 워치 통신이 설정됐는지 확인
   bool get isInitialized => _isInitialized;
 
-  // 서비스 초기화 및 메시지 리스너 설정
+  // 서비스 초기화
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
-      _setupMessageListeners();
+      // 연결 상태 확인
+      final nodes = await WearAPI.getConnectedNodes();
       _isInitialized = true;
-      debugPrint('WearCommunicationService: 초기화 완료');
+      debugPrint('WearCommunicationService: 초기화 완료 (연결된 기기: ${nodes.length}개)');
     } catch (e) {
       debugPrint('WearCommunicationService: 초기화 실패 - $e');
       _isInitialized = false;
     }
   }
 
-  // 메시지 리스너 설정
-  void _setupMessageListeners() {
-    Wear().onMessageReceived.listen((message) async {
-      debugPrint('메시지 수신: ${message.path}');
-      
-      if (message.path == '/request_health_data') {
-        await _handleHealthDataRequest();
-      } else if (message.path == '/update_water_intake') {
-        await _handleWaterIntakeUpdate(message.data);
-      } else if (message.path == '/update_caffeine_intake') {
-        await _handleCaffeineIntakeUpdate(message.data);
-      }
-    });
-  }
-
-  // 헬스 데이터 요청 처리
-  Future<void> _handleHealthDataRequest() async {
+  // 워치에서 헬스 데이터 가져오기
+  Future<Map<String, dynamic>?> getHealthDataFromWatch() async {
     try {
-      final healthData = await _healthService.fetchDataForWatch();
-      
-      // 워치에 응답 전송
-      await Wear().sendMessage(
-        '/health_data_response',
-        jsonEncode(healthData),
-      );
-      
-      debugPrint('헬스 데이터 응답 전송 완료: $healthData');
+      return await WearAPI.requestHealthData();
     } catch (e) {
-      debugPrint('헬스 데이터 요청 처리 실패: $e');
-      
-      // 에러 응답 전송
-      await Wear().sendMessage(
-        '/health_data_response',
-        jsonEncode({'error': '데이터 조회 실패: $e'}),
-      );
+      debugPrint('워치에서 헬스 데이터 가져오기 실패: $e');
+      return null;
     }
   }
 
-  // 물 섭취량 업데이트 처리
-  Future<void> _handleWaterIntakeUpdate(String? messageData) async {
-    if (messageData == null) {
-      debugPrint('물 섭취량 업데이트 실패: 메시지 데이터 없음');
-      return;
-    }
-    
+  // 워치에 물 섭취량 업데이트
+  Future<bool> updateWaterIntakeToWatch(double amount) async {
     try {
-      final data = jsonDecode(messageData);
-      final amount = data['amount'] as double;
-      final dateTime = DateTime.parse(data['dateTime']);
-      
-      final success = await _healthService.writeWaterIntake(amount, dateTime);
-      
-      // 결과 응답 전송
-      await Wear().sendMessage(
-        '/update_water_intake_result',
-        jsonEncode({'success': success}),
-      );
-      
-      debugPrint('물 섭취량 업데이트 처리 완료: $success');
+      return await WearAPI.updateWaterIntake(amount);
     } catch (e) {
-      debugPrint('물 섭취량 업데이트 처리 실패: $e');
-      
-      // 에러 응답 전송
-      await Wear().sendMessage(
-        '/update_water_intake_result',
-        jsonEncode({'success': false, 'error': '$e'}),
-      );
+      debugPrint('워치에 물 섭취량 업데이트 실패: $e');
+      return false;
     }
   }
 
-  // 카페인 섭취량 업데이트 처리
-  Future<void> _handleCaffeineIntakeUpdate(String? messageData) async {
-    if (messageData == null) {
-      debugPrint('카페인 섭취량 업데이트 실패: 메시지 데이터 없음');
-      return;
-    }
-    
+  // 워치에 카페인 섭취량 업데이트
+  Future<bool> updateCaffeineIntakeToWatch(double amount) async {
     try {
-      final data = jsonDecode(messageData);
-      final amount = data['amount'] as double;
-      final dateTime = DateTime.parse(data['dateTime']);
-      
-      final success = await _healthService.writeCaffeineIntake(amount, dateTime);
-      
-      // 결과 응답 전송
-      await Wear().sendMessage(
-        '/update_caffeine_intake_result',
-        jsonEncode({'success': success}),
-      );
-      
-      debugPrint('카페인 섭취량 업데이트 처리 완료: $success');
+      return await WearAPI.updateCaffeineIntake(amount);
     } catch (e) {
-      debugPrint('카페인 섭취량 업데이트 처리 실패: $e');
-      
-      // 에러 응답 전송
-      await Wear().sendMessage(
-        '/update_caffeine_intake_result',
-        jsonEncode({'success': false, 'error': '$e'}),
-      );
+      debugPrint('워치에 카페인 섭취량 업데이트 실패: $e');
+      return false;
     }
   }
-} 
+
+  // 연결된 워치 기기 목록 가져오기
+  Future<List<Map<String, dynamic>>> getConnectedWatches() async {
+    return await WearAPI.getConnectedNodes();
+  }
+}

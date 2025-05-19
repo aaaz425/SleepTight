@@ -303,4 +303,19 @@ class HealthService {
       // UI에 오류 메시지를 표시하도록 오류를 다시 throw하거나 상태를 관리할 수 있습니다.
     }
   }
+
+  Future<Map<String, dynamic>> fetchDataForWatch() async {
+    // TODO: 실제 데이터 반환 로직 구현
+    return {};
+  }
+
+  Future<bool> writeWaterIntake(double amount, DateTime dateTime) async {
+    // TODO: 실제 저장 로직 구현
+    return true;
+  }
+
+  Future<bool> writeCaffeineIntake(double amount, DateTime dateTime) async {
+    // TODO: 실제 저장 로직 구현
+    return true;
+  }
 }

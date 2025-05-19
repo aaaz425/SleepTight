@@ -61,7 +61,6 @@ dependencies:
   group_button: ^5.3.4
   table_calendar: ^3.1.0
   collection: ^1.19.1
-  wear: ^2.1.0 # Wear OS 통신을 위한 패키지
 
 dev_dependencies:
   flutter_test:
