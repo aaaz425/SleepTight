@@ -306,6 +306,19 @@ enum Country {
     return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
   }
 
+  // en로 ko를 찾는 함수
+  static String? findByEnglishName(String? englishName) {
+    if (englishName == null) return null;
+    for (final country in values) {
+      // 대소문자 구분 없이 비교 (API 응답이 일관되지 않을 수 있으므로)
+      if (country.englishName.toLowerCase() == englishName.toLowerCase()) {
+        return country.koreanName;
+      }
+    }
+    print('Warning: Unknown Country API value encountered: $englishName');
+    return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
+  }
+
   // ko로 en을 찾는 함수
   static String? findByKoreanName(String? koreanName) {
     if (koreanName == null) return null;
@@ -317,8 +330,16 @@ enum Country {
     }
     return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
   }
-}
 
+  // fromJson
+  factory Country.fromJson(String englishName) {
+    return Country.values.firstWhere(
+      (country) => country.englishName == englishName,
+    );
+  }
+
+  toJson() => englishName;
+}
 // --- 사용 예시 ---
 // Country myCountry = Country.southKorea;
 // print(myCountry.englishName); // "South Korea"
