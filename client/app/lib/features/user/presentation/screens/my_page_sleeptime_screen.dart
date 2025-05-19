@@ -3,10 +3,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/text_styles.dart';
+import 'package:sleep_tight/features/user/data/models/requests/update_user_min_sleep_duration_request.dart';
+import 'package:sleep_tight/features/user/data/models/requests/update_user_sleep_time_request.dart';
+import 'package:sleep_tight/features/user/data/models/requests/update_user_wake_time_request.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_tight/features/user/presentation/widgets/my_page_appbar.dart';
 import 'package:sleep_tight/shared/widgets/custom_time_picker.dart';
+import 'package:toastification/toastification.dart';
 
 class MyPageSleeptimeScreen extends ConsumerWidget {
   const MyPageSleeptimeScreen({super.key});
@@ -14,17 +18,18 @@ class MyPageSleeptimeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userModelProvider);
-    // 목표수면시간 7시간 30분
+
+    // 목표수면시간을 'X시간 Y분' 형식으로 포맷
     final minDurationInMin = user?.minSleepDurationInMinutes;
     String formattedMinSleepDuration = '';
     if (minDurationInMin != null) {
       final hours = minDurationInMin ~/ 60;
       final minutes = minDurationInMin % 60;
       if (hours > 0) {
-        formattedMinSleepDuration += '${hours}시간';
+        formattedMinSleepDuration += '$hours시간';
       }
       if (minutes > 0) {
-        formattedMinSleepDuration += ' ${minutes}분';
+        formattedMinSleepDuration += ' $minutes분';
       }
     }
 
@@ -49,18 +54,6 @@ class MyPageSleeptimeScreen extends ConsumerWidget {
       final ap = h >= 12 ? '오후' : '오전';
       final hour12 = h % 12 == 0 ? 12 : h % 12;
       formattedWakeTime = '$ap $hour12시${m > 0 ? ' $m분' : ''}';
-    }
-
-    Future<String?> _showTimePicker() async {
-      final t = await showCustomTimePicker(
-        context: context,
-        initialHour: 7,
-        initialMinute: 0,
-        showPeriodPicker: true,
-      );
-      if (t != null) {
-        // do something with the selected time
-      }
     }
 
     return SafeArea(
@@ -130,7 +123,48 @@ class MyPageSleeptimeScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final min = user?.minSleepDurationInMinutes ?? 0;
+                        final ih = min ~/ 60;
+                        final im = min % 60;
+                        final t = await showCustomTimePicker(
+                          context: context,
+                          initialHour: ih,
+                          initialMinute: im,
+                          showPeriodPicker: false,
+                          formType: CustomTimePickerForm.sleepGoal,
+                        );
+                        if (t != null) {
+                          final newMin = t.hour * 60 + t.minute;
+                          if (_isMinSleepDurationValid(
+                            user?.sleepTime,
+                            user?.wakeTime,
+                            newMin,
+                          )) {
+                            await ref
+                                .read(userModelProvider.notifier)
+                                .updateMinSleepDuration(
+                                  UpdateUserMinSleepDurationRequest(
+                                    minSleepDuration: '${t.hour}h ${t.minute}m',
+                                  ),
+                                );
+                          } else {
+                            toastification.show(
+                              context: context,
+                              type: ToastificationType.error,
+                              style: ToastificationStyle.fillColored,
+                              title: Text(
+                                '취침 시간과 기상 시간의 차이가 최소 수면 시간 이상이어야 합니다.',
+                              ),
+                              alignment: Alignment.bottomCenter,
+                              autoCloseDuration: const Duration(seconds: 4),
+                              borderRadius: BorderRadius.circular(12.0),
+                              applyBlurEffect: true,
+                              showIcon: false,
+                            );
+                          }
+                        }
+                      },
                       child: Text(
                         '수정하기',
                         style: AppTextStyles.button3Md(
@@ -173,7 +207,49 @@ class MyPageSleeptimeScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final parts = user?.sleepTime?.split(':') ?? ['0', '0'];
+                        final ih = int.tryParse(parts[0]) ?? 0;
+                        final im = int.tryParse(parts[1]) ?? 0;
+                        final t = await showCustomTimePicker(
+                          context: context,
+                          initialHour: ih,
+                          initialMinute: im,
+                          showPeriodPicker: true,
+                          formType: CustomTimePickerForm.sleepStart,
+                        );
+                        if (t != null) {
+                          final formatted =
+                              '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+                          if (_isMinSleepDurationValid(
+                            formatted,
+                            user?.wakeTime,
+                            user?.minSleepDurationInMinutes,
+                          )) {
+                            await ref
+                                .read(userModelProvider.notifier)
+                                .updateSleepTime(
+                                  UpdateUserSleepTimeRequest(
+                                    sleepTime: formatted,
+                                  ),
+                                );
+                          } else {
+                            toastification.show(
+                              context: context,
+                              type: ToastificationType.error,
+                              style: ToastificationStyle.fillColored,
+                              title: Text(
+                                '취침 시간과 기상 시간의 차이가 최소 수면 시간 이상이어야 합니다.',
+                              ),
+                              alignment: Alignment.bottomCenter,
+                              autoCloseDuration: const Duration(seconds: 4),
+                              borderRadius: BorderRadius.circular(12.0),
+                              applyBlurEffect: true,
+                              showIcon: false,
+                            );
+                          }
+                        }
+                      },
                       child: Text(
                         '수정하기',
                         style: AppTextStyles.button3Md(color: AppColors.font1),
@@ -216,9 +292,47 @@ class MyPageSleeptimeScreen extends ConsumerWidget {
                         ),
                       ),
                       onPressed: () async {
-                        final t = await _showTimePicker();
+                        final parts = user?.wakeTime?.split(':') ?? ['0', '0'];
+                        final ih = int.tryParse(parts[0]) ?? 0;
+                        final im = int.tryParse(parts[1]) ?? 0;
+                        final t = await showCustomTimePicker(
+                          context: context,
+                          initialHour: ih,
+                          initialMinute: im,
+                          showPeriodPicker: true,
+                          formType: CustomTimePickerForm.wakeUp,
+                        );
                         if (t != null) {
-                          // do something with the selected time
+                          final formatted =
+                              '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+                          if (_isMinSleepDurationValid(
+                            user?.sleepTime,
+                            formatted,
+                            user?.minSleepDurationInMinutes,
+                          )) {
+                            await ref
+                                .read(userModelProvider.notifier)
+                                .updateWakeTime(
+                                  UpdateUserWakeTimeRequest(
+                                    wakeTime: formatted,
+                                  ),
+                                );
+                          } else {
+                            // toastification
+                            toastification.show(
+                              context: context,
+                              type: ToastificationType.error,
+                              style: ToastificationStyle.fillColored,
+                              title: Text(
+                                '취침 시간과 기상 시간의 차이가 최소 수면 시간 이상이어야 합니다.',
+                              ),
+                              alignment: Alignment.bottomCenter,
+                              autoCloseDuration: const Duration(seconds: 4),
+                              borderRadius: BorderRadius.circular(12.0),
+                              applyBlurEffect: true,
+                              showIcon: false,
+                            );
+                          }
                         }
                       },
                       child: Text(
@@ -235,4 +349,23 @@ class MyPageSleeptimeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+bool _isMinSleepDurationValid(
+  String? sleepTime,
+  String? wakeTime,
+  int? minSleepDuration,
+) {
+  if (sleepTime == null || wakeTime == null || minSleepDuration == null) {
+    return false;
+  }
+
+  final s = sleepTime.split(':').map(int.parse).toList();
+  final w = wakeTime.split(':').map(int.parse).toList();
+  int start = s[0] * 60 + s[1];
+  int end = w[0] * 60 + w[1];
+  int diff = end - start;
+  if (diff < 0) diff += 24 * 60; // 자정 넘김 보정
+
+  return diff >= minSleepDuration;
 }
