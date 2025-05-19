@@ -3,10 +3,10 @@ import 'package:sleep_tight/features/auth/presentation/screens/placeholder_scree
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:sleep_tight/features/coach/presentation/screens/sleep_coach_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_birthdate_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_withdraw_confirmation_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_birthdate_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_withdraw_confirmation_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_screen.dart';
 import 'package:sleep_tight/features/user/presentation/screens/signup_screen.dart';
 import 'package:sleep_tight/shared/widgets/shell_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,18 +17,18 @@ import 'package:sleep_tight/features/sleep_mode/presentation/screens/home_screen
 import 'package:sleep_tight/features/sleep_mode/presentation/screens/sleeping_screen.dart';
 
 import 'app_config.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_name_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_gender_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_nationality_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_oauth_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_logout_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_info_withdraw_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_body_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_body_height_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_body_weight_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_sleeptime_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_push_screen.dart';
-// import 'package:sleep_tight/features/user/presentation/screens/my_page_appinfo_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_name_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_gender_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_nationality_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_oauth_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_logout_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_info_withdraw_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_body_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_body_height_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_body_weight_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_sleeptime_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_push_screen.dart';
+import 'package:sleep_tight/features/user/presentation/screens/my_page_appinfo_screen.dart';
 
 // goRouterProvider를 Provider.family로 변경하고 GlobalKey<NavigatorState>를 인자로 받도록 수정합니다.
 final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
@@ -205,9 +205,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
         // 마이페이지 기본 화면은 ShellScreen 내에 표시
         pageBuilder:
             (context, state) => const NoTransitionPage(
-              child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-
-              // child: ShellScreen(body: MyPageScreen()),
+              child: ShellScreen(body: MyPageScreen()),
             ),
         routes: <RouteBase>[
           GoRoute(
@@ -218,9 +216,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             // 여기서는 간단히 builder 사용. ShellScreen을 계속 사용하려면 MyPage 자체를 ShellRoute로 고려.
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-
-                  // child: ShellScreen(body: MyPageInfoScreen()),
+                  child: ShellScreen(body: MyPageInfoScreen()),
                 ),
             routes: <RouteBase>[
               GoRoute(
@@ -228,11 +224,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-name',
                 pageBuilder:
                     (context, state) => NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoNameScreen()),
+                      child: ShellScreen(body: MyPageInfoNameScreen()),
                     ),
               ),
               GoRoute(
@@ -240,11 +232,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-birth-date',
                 pageBuilder:
                     (context, state) => NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoBirthDateScreen()),
+                      child: ShellScreen(body: MyPageInfoBirthDateScreen()),
                     ),
               ),
               GoRoute(
@@ -252,11 +240,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-gender',
                 pageBuilder:
                     (context, state) => NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoGenderScreen()),
+                      child: ShellScreen(body: MyPageInfoGenderScreen()),
                     ),
               ),
               GoRoute(
@@ -264,11 +248,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-nationality',
                 pageBuilder:
                     (context, state) => NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoNationalityScreen()),
+                      child: ShellScreen(body: MyPageInfoNationalityScreen()),
                     ),
               ),
               GoRoute(
@@ -276,11 +256,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-oauth',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoOauthScreen()),
+                      child: ShellScreen(body: MyPageInfoOauthScreen()),
                     ),
               ),
               GoRoute(
@@ -288,11 +264,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-logout',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoLogoutScreen()),
+                      child: ShellScreen(body: MyPageInfoLogoutScreen()),
                     ),
               ),
               GoRoute(
@@ -300,11 +272,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-withdraw',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageInfoWithdrawScreen()),
+                      child: ShellScreen(body: MyPageInfoWithdrawScreen()),
                     ),
               ),
               GoRoute(
@@ -313,11 +281,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-info-withdraw-confirmation',
                 pageBuilder:
                     (context, state) => const NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: MyPageInfoWithdrawConfirmationScreen(),
+                      child: MyPageInfoWithdrawConfirmationScreen(),
                     ),
               ),
             ],
@@ -327,9 +291,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-body',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-
-                  // child: ShellScreen(body: MyPageBodyScreen()),
+                  child: ShellScreen(body: MyPageBodyScreen()),
                 ),
             routes: <RouteBase>[
               GoRoute(
@@ -337,11 +299,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-body-height',
                 pageBuilder:
                     (context, state) => NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageBodyHeightScreen()),
+                      child: ShellScreen(body: MyPageBodyHeightScreen()),
                     ),
               ),
               GoRoute(
@@ -349,11 +307,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
                 name: 'mypage-body-weight',
                 pageBuilder:
                     (context, state) => NoTransitionPage(
-                      child: ShellScreen(
-                        body: PlaceholderScreen(title: 'Sound'),
-                      ),
-
-                      // child: ShellScreen(body: MyPageBodyWeightScreen()),
+                      child: ShellScreen(body: MyPageBodyWeightScreen()),
                     ),
               ),
             ],
@@ -363,9 +317,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-sleep-time',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-
-                  // child: ShellScreen(body: MyPageSleeptimeScreen()),
+                  child: ShellScreen(body: MyPageSleeptimeScreen()),
                 ),
           ),
           GoRoute(
@@ -373,9 +325,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-push',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-
-                  // child: ShellScreen(body: MyPagePushScreen()),
+                  child: ShellScreen(body: MyPagePushScreen()),
                 ),
           ),
           GoRoute(
@@ -383,9 +333,7 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
             name: 'mypage-app-info',
             pageBuilder:
                 (context, state) => const NoTransitionPage(
-                  child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-
-                  // child: ShellScreen(body: MyPageAppInfoScreen()),
+                  child: ShellScreen(body: MyPageAppInfoScreen()),
                 ),
           ),
         ],
