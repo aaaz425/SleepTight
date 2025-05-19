@@ -37,16 +37,20 @@ class HealthViewModel(application: Application) : AndroidViewModel(application) 
     // 물 섭취량 업데이트
     fun updateWaterIntake(amount: Int) {
         viewModelScope.launch {
+            // 1. 로컬 상태 즉시 업데이트 (UI 반영) 후 모바일에 업데이트 요청
+            // 2. 모바일 응답은 비동기적으로 WearableRepository에서 처리
+            // 3. 모바일에서 받은 최신 데이터가 최종적으로 반영됨
             wearableRepository.updateWaterIntake(amount)
-            // 응답은 MessageClient.OnMessageReceivedListener를 통해 처리됨
         }
     }
     
     // 카페인 섭취량 업데이트
     fun updateCaffeineIntake(amount: Int) {
         viewModelScope.launch {
+            // 1. 로컬 상태 즉시 업데이트 (UI 반영) 후 모바일에 업데이트 요청
+            // 2. 모바일 응답은 비동기적으로 WearableRepository에서 처리
+            // 3. 모바일에서 받은 최신 데이터가 최종적으로 반영됨
             wearableRepository.updateCaffeineIntake(amount)
-            // 응답은 MessageClient.OnMessageReceivedListener를 통해 처리됨
         }
     }
     

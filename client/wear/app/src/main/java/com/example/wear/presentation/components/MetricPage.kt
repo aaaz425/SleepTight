@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +73,14 @@ fun MetricPage(
     var editableValue by remember { mutableStateOf(currentValue) }
     var displayProgress by remember { mutableStateOf(progress) }
     
+    // 현재 값이 변경될 때마다 편집 값 업데이트
+    LaunchedEffect(currentValue) {
+        // 모바일에서 받은 값이 우선이므로 현재 값으로 즉시 갱신
+        editableValue = currentValue
+        // 진행률도 함께 업데이트
+        displayProgress = (currentValue.toFloat() / targetValue).coerceIn(0f, 1f)
+    }
+    
     // 진동을 한 번만 발생시키기 위한 상태
     var hasVibrated by remember { mutableStateOf(false) }
     
@@ -80,6 +89,16 @@ fun MetricPage(
     // 버튼으로 값 수정 시 진행률 계산
     if (isEditable) {
         displayProgress = (displayValue.toFloat() / targetValue).coerceIn(0f, 1f)
+    }
+    
+    // 화면에서 나갈 때 현재 편집 값을 저장하기 위한 효과
+    DisposableEffect(Unit) {
+        onDispose {
+            // 화면을 떠날 때 변경된 값이 있으면 콜백을 통해 저장
+            if (isEditable && editableValue != currentValue) {
+                onValueChange?.invoke(editableValue)
+            }
+        }
     }
     
     // 애니메이션이 적용된 진행률
