@@ -73,6 +73,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
+  audio_waveforms:
+    dependency: "direct main"
+    description:
+      name: audio_waveforms
+      sha256: "658fef41bbab299184b65ba2fd749e8ec658c1f7d54a21f7cf97fa96b173b4ce"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -393,6 +401,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  ffmpeg_kit_flutter_android:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter_android
+      sha256: "1b033a586431e0a7aace9fe16b509bfa313ba13963134777b473ecb4c7b66c5e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
+  ffmpeg_kit_flutter_new:
+    dependency: "direct main"
+    description:
+      name: ffmpeg_kit_flutter_new
+      sha256: "241fd93abf0450ac065f5d87486e22208a9a397a28f2ac64238c7886a8cc8bb7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.0"
+  ffmpeg_kit_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter_platform_interface
+      sha256: addf046ae44e190ad0101b2fde2ad909a3cd08a2a109f6106d2f7048b7abedee
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   file:
     dependency: transitive
     description:
@@ -409,6 +441,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  fl_chart:
+    dependency: "direct main"
+    description:
+      name: fl_chart
+      sha256: "577aeac8ca414c25333334d7c4bb246775234c0e44b38b10a82b559dd4d764e7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   flutter:
     dependency: "direct main"
     description: flutter

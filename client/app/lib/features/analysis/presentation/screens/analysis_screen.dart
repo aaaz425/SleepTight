@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
+import 'package:sleep_tight/features/analysis/data/services/sleep_report_service.dart';
 import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/analysis_header.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/analysis_tab.dart';
@@ -16,11 +19,11 @@ class AnalysisScreen extends ConsumerStatefulWidget {
 }
 
 class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
+  late Future<List<SleepReport>> _reportsFuture;
+
   @override
   void initState() {
     super.initState();
-
-    // 만약 initialDate가 주어졌다면 provider를 초기화
     if (widget.initialDate != null) {
       Future.microtask(() {
         ref.read(selectedDateProvider.notifier).update(widget.initialDate!);
@@ -30,7 +33,10 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
+    final selectedDate = ref.watch(selectedDateProvider);
+    _reportsFuture = fetchSleepReports(ref, selectedDate);
+
+    return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,7 +44,24 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
           SizedBox(height: 4),
           WeekDateSelector(),
           SizedBox(height: 4),
-          Expanded(child: AnalysisTab(initialTabIndex: widget.initialTabIndex)),
+
+          Expanded(
+            child: FutureBuilder<List<SleepReport>>(
+              future: _reportsFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final reports = snapshot.data!;
+                if (reports.isEmpty) {
+                  return const Center(child: Text("리포트가 없습니다."));
+                }
+
+                return AnalysisTab(reports: reports);
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -31,6 +31,12 @@ final apiErrorStreamProvider = StreamProvider<ApiErrorEvent>((ref) {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    // 예외 발생해도 앱 종료/중단 막기
+    debugPrint('Caught Flutter error: ${details.exception}');
+  };
+
   // 세로모드로 고정
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -60,7 +66,7 @@ void main() async {
 
   // 여기서 secureStorage에 accessToken이 있는지 확인하고
   // 이 token을 통해 회원정보를 제대로 가져오는지 확인하고
-  // 잘 가져오면 /home으로 이동
+  // 잘 가져오면 /home으로 이동 
   // 잘 가져오지 않으면 로그아웃 처리.
 
   // ProviderScope로 앱을 감싸 Riverpod을 사용할 수 있도록 합니다.

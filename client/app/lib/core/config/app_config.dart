@@ -111,14 +111,14 @@ class _UserApiPaths {
 class _SleepApiPaths {
   _SleepApiPaths();
   String get startSleep =>
-      '${ApiPaths._sleepDomain}/start-sleep'; // POST api/sleep/start-sleep
+      '${ApiPaths._sleepDomain}-report/start-sleep'; // POST api/sleep-report/start-sleep
   String get endSleep =>
-      '${ApiPaths._sleepDomain}/end-sleep'; // POST api/sleep/end-sleep
-  String get sound => '${ApiPaths._sleepDomain}/sound'; // POST api/sleep/sound
+      '${ApiPaths._sleepDomain}-report/end-sleep'; // POST api/sleep/end-sleep
+  String get sound => '${ApiPaths._sleepDomain}-sound'; // POST api/sleep-sound
   String get events =>
       '${ApiPaths._sleepDomain}/events'; // GET api/sleep/events
-  String get coaching =>
-      '${ApiPaths._sleepDomain}/coaching'; // GET api/sleep/coaching
+  String coaching(String date) =>
+      '${ApiPaths._sleepDomain}-coaching/$date'; // GET api/sleep-coaching/{date}
   String get activityData =>
       '${ApiPaths._sleepDomain}/activity-data'; // POST api/sleep/activity-data
 
@@ -126,9 +126,11 @@ class _SleepApiPaths {
   String get reportBase =>
       '${ApiPaths._sleepDomain}/report'; // POST api/sleep/report
   String reportByDate(String date) =>
-      '${ApiPaths._sleepDomain}/report/$date'; // GET api/sleep/report/{date}
+      '${ApiPaths._sleepDomain}-report/$date'; // GET api/sleep/report/{date}
+  String eventsByReportId(int reportId) =>
+      '${ApiPaths._sleepDomain}-report/events/$reportId'; // => GET api/sleep/report/events/{reportId}
   String reportCalendarByMonth(String month) =>
-      '${ApiPaths._sleepDomain}/report/calendar/$month'; // GET api/sleep/report/calendar/{month}
+      '${ApiPaths._sleepDomain}-report/calendar'; // GET api/sleep/report/calendar
 
   // Sleep Diaries (under /sleep-reports/diaries/*)
   String diaryByDate(String date) =>
