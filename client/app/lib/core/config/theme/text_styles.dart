@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
+  // Title/T1_sb
+  static TextStyle titleT1Sb({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w600, // semibold
+    fontSize: 24,
+    height: 1.4, // 140%
+    letterSpacing: -0.6, // -2.5% of 24 = -0.6
+    color: color,
+  );
+
   // Title/T2_Sb
   static TextStyle titleT2Sb({required Color color}) => TextStyle(
     fontFamily: 'Pretendard',
@@ -28,6 +38,16 @@ class AppTextStyles {
     fontSize: 16,
     height: 1.4, // 140%
     letterSpacing: -0.4, // -2.5% of 16 = -0.4
+    color: color,
+  );
+
+  // Body/B1_Rg
+  static TextStyle bodyB1Rg({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w400, // regular
+    fontSize: 15,
+    height: 1.4, // 140%
+    letterSpacing: -0.375, // -2.5% of 15 = -0.375
     color: color,
   );
 
