@@ -133,8 +133,9 @@ export class SleepReportService {
       if (isValidSleep) {
         report.totalSleepTime = `${Math.floor(sleepDurationMs / 1000 / 60)} minutes`;
 
-        await this.sleepStageService.saveStages(dto.stages, report.id, manager);
-        await this.setStageDurations(report, manager);
+        // await this.sleepStageService.saveStages(dto.stages, report.id, manager);
+        // await this.setStageDurations(report, manager);
+        await this.saveStagesAndDurations(dto, report, manager);
 
         const firstStageStart =
           await this.sleepStageService.getFirstSleepStageStartTime(
@@ -153,12 +154,13 @@ export class SleepReportService {
         this.logger.debug('sleep latency:', {
           sleepLatency: report.sleepLatency,
         });
+        const sounds = await this.sleepSoundFactory.findWithEventsByReportId(
+          report.id,
+        );
 
         const { snoring, somniloquy, coughing } =
-          await this.sleepSoundService.calculateEventDurations(
-            report.id,
-            manager,
-          );
+          this.sleepSoundService.calculateTotalDurationsFromSounds(sounds);
+
         report.snoringDurationSeconds = snoring;
         report.somniloquyDurationSeconds = somniloquy;
         report.coughingDurationSeconds = coughing;
@@ -180,6 +182,14 @@ export class SleepReportService {
     });
 
     return result;
+  }
+  private async saveStagesAndDurations(
+    dto: EndSleepRequestDto,
+    report: SleepReport,
+    manager: EntityManager,
+  ): Promise<void> {
+    await this.sleepStageService.saveStages(dto.stages, report.id, manager);
+    await this.setStageDurations(report, manager);
   }
 
   // 해당 일자의 수면로그 갖고오기
