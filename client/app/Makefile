@@ -63,12 +63,12 @@ apk-install:
 apk-build-install: apk-build apk-install
 
 apk-build-install-galaxys10: apk-build
-	adb -s 192.168.137.89:36241 uninstall com.example.sleeptight
-	adb -s 192.168.137.89:36241 install "$(APK)"
+	adb -s 192.168.137.89:33879 uninstall com.example.sleeptight
+	adb -s 192.168.137.89:33879 install "$(APK)"
 
 galaxy10-simulator: icon splash
 	# flutter run -d R39M208CZ1B
-	flutter run -d 192.168.137.89:36241
+	flutter run -d 192.168.137.89:33879
 
 # ios simulator
 ios-simulator: icon splash

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/text_styles.dart';
@@ -48,7 +49,7 @@ class MyPageInfoOauthScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/images/kakao_oauth.png'),
+                    SvgPicture.asset('assets/icons/kakao_oauth.svg'),
                     const SizedBox(height: 10),
                     Text(
                       '카카오',

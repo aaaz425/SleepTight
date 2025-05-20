@@ -133,10 +133,10 @@ class _SleepApiPaths {
       '${ApiPaths._sleepDomain}-report/calendar'; // GET api/sleep/report/calendar
 
   // Sleep Diaries (under /sleep-reports/diaries/*)
-  String get diariesBase =>
-      '${ApiPaths._sleepReportsDomain}/diaries'; // POST api/sleep-reports/diaries
   String diaryByDate(String date) =>
       '${ApiPaths._sleepReportsDomain}/diaries/$date'; // GET api/sleep-reports/diaries/{date}
+  String diaryById(int reportId) =>
+      '${ApiPaths._sleepReportsDomain}/diaries/$reportId'; // GET api/sleep-reports/diaries/{reportId}
   String get updateDiary =>
       '${ApiPaths._sleepReportsDomain}/diaries'; // PATCH api/sleep-reports/diaries
 }
