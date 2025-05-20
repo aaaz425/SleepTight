@@ -20,11 +20,11 @@ RUN npm run build
 FROM node:lts-alpine
 
 # --- 타임존 설정을 위해 tzdata 설치 및 KST 적용 ---
-    RUN apk update \
-    && apk add --no-cache tzdata \
-    && cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
-    && echo "Asia/Seoul" > /etc/timezone \
-    && rm -rf /var/cache/apk/*
+RUN apk update \
+ && apk add --no-cache tzdata \
+ && cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
+ && echo "Asia/Seoul" > /etc/timezone \
+ && rm -rf /var/cache/apk/*
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -41,3 +41,7 @@ EXPOSE 3000
 
 # 컨테이너 시작 시 애플리케이션 실행
 CMD ["node", "dist/main.js"]
+
+# (선택) 헬스체크 설정 예시
+# HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+#   CMD curl -f http://localhost:3000/api/utils/status || exit 1
