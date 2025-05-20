@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SleepDiaryView extends ConsumerWidget {
-  const SleepDiaryView({super.key});
+  final int reportId;
+
+  const SleepDiaryView({super.key, required this.reportId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,6 +21,6 @@ class SleepDiaryView extends ConsumerWidget {
     //   error: (err, _) => Center(child: Text('오류: $err')),
     // );
 
-    return Text('수면 일지');
+    return Column(children: [Text('수면 일지 (reportId: $reportId)')]);
   }
 }

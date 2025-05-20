@@ -2,12 +2,12 @@ class SleepReport {
   final int sleepReportId;
   final DateTime sleepStartTime;
   final DateTime sleepEndTime;
-  final Duration sleepLatency;
-  final Duration totalAwakeTime;
-  final Duration totalRemSleepTime;
-  final Duration totalLightSleepTime;
-  final Duration totalDeepSleepTime;
-  final int awakenCount;
+  final Duration? sleepLatency;
+  final Duration? totalAwakeTime;
+  final Duration? totalRemSleepTime;
+  final Duration? totalLightSleepTime;
+  final Duration? totalDeepSleepTime;
+  final int? awakenCount;
   final List<SleepStage> sleepStages;
 
   SleepReport({
@@ -25,31 +25,20 @@ class SleepReport {
 
   factory SleepReport.fromJson(Map<String, dynamic> json) {
     return SleepReport(
-      sleepReportId: json['sleepReportId'],
+      sleepLatency: parseDuration(json['sleep_latency']),
+      totalAwakeTime: parseDuration(json['total_awake_time']),
+      totalLightSleepTime: parseDuration(json['total_light_sleep_time']),
+      totalDeepSleepTime: parseDuration(json['total_deep_sleep_time']),
+      totalRemSleepTime: parseDuration(json['total_rem_sleep_time']),
+      awakenCount: json['awaken_count'] ?? 0,
+      sleepStages:
+          (json['sleep_stage'] as List<dynamic>?)
+              ?.map((e) => SleepStage.fromJson(e))
+              .toList() ??
+          [],
       sleepStartTime: DateTime.parse(json['sleep_start_time']),
       sleepEndTime: DateTime.parse(json['sleep_end_time']),
-      sleepLatency: Duration(minutes: json['sleep_latency']['minutes']),
-      totalAwakeTime: Duration(
-        hours: json['total_awake_time']['hours'] ?? 0,
-        minutes: json['total_awake_time']['minutes'] ?? 0,
-      ),
-      totalRemSleepTime: Duration(
-        hours: json['total_rem_sleep_time']['hours'] ?? 0,
-        minutes: json['total_rem_sleep_time']['minutes'] ?? 0,
-      ),
-      totalLightSleepTime: Duration(
-        hours: json['total_light_sleep_time']['hours'] ?? 0,
-        minutes: json['total_light_sleep_time']['minutes'] ?? 0,
-      ),
-      totalDeepSleepTime: Duration(
-        hours: json['total_deep_sleep_time']['hours'] ?? 0,
-        minutes: json['total_deep_sleep_time']['minutes'] ?? 0,
-      ),
-      awakenCount: json['awaken_count'],
-      sleepStages:
-          (json['sleep_stage'] as List)
-              .map((e) => SleepStage.fromJson(e))
-              .toList(),
+      sleepReportId: json['sleepReportId'],
     );
   }
 }
@@ -75,4 +64,18 @@ class SleepStage {
       duration: int.parse(json['duration'].toString()),
     );
   }
+}
+
+Duration parseDuration(dynamic json) {
+  if (json == null || json is! Map<String, dynamic>) {
+    return Duration.zero;
+  }
+
+  final hours = json['hours'];
+  final minutes = json['minutes'];
+
+  return Duration(
+    hours: (hours is int) ? hours : 0,
+    minutes: (minutes is int) ? minutes : 0,
+  );
 }

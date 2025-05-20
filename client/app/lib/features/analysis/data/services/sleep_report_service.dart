@@ -13,5 +13,6 @@ Future<List<SleepReport>> fetchSleepReports(
   );
 
   final data = response as List;
+
   return data.map((e) => SleepReport.fromJson(e)).toList();
 }
