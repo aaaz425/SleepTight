@@ -1,3 +1,4 @@
+import { SleepSoundFactory } from './../sleep-sound/sleep-sound.factory';
 import { SleepSoundService } from './../sleep-sound/sleep-sound.service';
 import { SleepReportFactory } from './sleep-report.factory';
 import {
@@ -17,6 +18,7 @@ import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
 import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
 import { SleepStageLog } from './entities/sleep-stage-log.entity';
 import { SleepDiariesService } from './sleep-diaries.service';
+import { SleepSound } from 'src/sleep-sound/entities/sleep-sound.entity';
 
 @Injectable()
 export class SleepReportService {
@@ -35,6 +37,7 @@ export class SleepReportService {
     private readonly stageRepo: Repository<SleepStageLog>,
     @Inject(SleepDiariesService)
     private readonly sleepDiariesService: SleepDiariesService,
+    private readonly sleepSoundFactory: SleepSoundFactory,
   ) {}
 
   // 수면 시작
@@ -227,8 +230,12 @@ export class SleepReportService {
   }
 
   // 리포트 ID로 수면 이벤트 조회
-  async getSleepEventsByReportId(reportId: number) {
-    return this.sleepSoundService.getSleepEventsByReportId(reportId);
+  async getSleepEventsByReportId(reportId: number, manager?: EntityManager) {
+    const usedManager = manager ?? this.sleepSoundFactory.getManager();
+    return this.sleepSoundService.getSleepEventsByReportId(
+      reportId,
+      usedManager,
+    );
   }
 
   // 월별 수면 리포트가 존재하는 날짜 조회

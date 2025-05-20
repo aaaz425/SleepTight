@@ -48,11 +48,10 @@ export class SleepSoundFactory {
   // reportId로 sleepSound 목록 가져오기
   async findByReportId(
     reportId: number,
-    manager: EntityManager,
+    manager?: EntityManager,
   ): Promise<SleepSound[]> {
-    return manager.find(SleepSound, {
-      where: { sleepReport: reportId },
-    });
+    const usedManager = manager ?? this.sleepSoundRepo.manager;
+    return usedManager.find(SleepSound, { where: { sleepReport: reportId } });
   }
 
   // segmentId 목록으로 이벤트들 가져오기

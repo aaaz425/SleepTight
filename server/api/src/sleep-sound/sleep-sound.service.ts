@@ -159,10 +159,13 @@ export class SleepSoundService {
   // 수면 분석 결과 조회
   async getSleepEventsByReportId(
     reportId: number,
+    manager?: EntityManager,
   ): Promise<SleepSoundAnalysisResponseDto> {
+    const usedManager = manager ?? this.sleepSoundFactory.getManager();
+
     const sounds = await this.sleepSoundFactory.findByReportId(
       reportId,
-      this.sleepSoundFactory.getManager(),
+      usedManager,
     );
     this.logger.debug('📌 loaded sounds:', sounds);
 
@@ -175,7 +178,7 @@ export class SleepSoundService {
 
     const events = await this.sleepSoundFactory.findEventsBySegmentIds(
       segmentIds,
-      this.sleepSoundFactory.getManager(),
+      usedManager,
     );
     this.logger.debug('📌 loaded events:', events);
 
