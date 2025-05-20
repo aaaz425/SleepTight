@@ -121,7 +121,10 @@ export class SleepReportService {
 
       const sleepDurationMs =
         sleepEndTime.getTime() - report.sleepStartTime.getTime();
-      const isValidSleep = sleepDurationMs >= 60 * 60 * 1000; // 1시간 이상이면 유효 수면
+
+      // ⚠️ 유효수면 1시간 판단 임시 주석 처리
+      const isValidSleep = true; // 1시간 판단 시 해당 줄 삭제 후 아래 주석 해제
+      // const isValidSleep = sleepDurationMs >= 60 * 60 * 1000; // 1시간 이상이면 유효 수면
       report.isValidReport = isValidSleep;
 
       if (isValidSleep) {
