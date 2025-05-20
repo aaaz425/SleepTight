@@ -75,6 +75,8 @@ export class SleepReportService {
       sleepStartTime,
       sleepDateOnly,
     );
+    newReport.targetStartTime = user.sleep_time;
+    newReport.targetEndTime = user.wake_time;
     newReport.isValidReport = false;
 
     // 저장 후 리포트 ID 반환
