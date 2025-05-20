@@ -86,6 +86,9 @@ export class SleepSoundService {
 
   async saveSleepEvent(sleepEvent: SleepEvent) {
     this.sleepSoundFactory.saveSleepEvent(sleepEvent);
+    this.logger.log(
+      `✅ 수면 이벤트 저장 완료 - segmentId: ${sleepEvent.segmentId}, anomaly: ${sleepEvent.anomaly}, 구간: ${sleepEvent.startSec}s ~ ${sleepEvent.endSec}s`,
+    );
   }
 
   async calculateEventDurations(
