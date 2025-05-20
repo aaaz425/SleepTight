@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 import 'package:sleep_tight/features/analysis/presentation/screens/sleep_diary_view.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/page_indicator.dart';
 
 class SleepDiaryPages extends StatefulWidget {
-  final List<SleepReport> reports;
+  final List<SleepReportModel> reports;
   final void Function(int)? onPageChanged;
 
   const SleepDiaryPages({super.key, required this.reports, this.onPageChanged});

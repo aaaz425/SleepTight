@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/core/network/dio_provider.dart';
-import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 
-Future<List<SleepReport>> fetchSleepReports(
+Future<List<SleepReportModel>> fetchSleepReports(
   WidgetRef ref,
   DateTime date,
 ) async {
@@ -14,5 +14,5 @@ Future<List<SleepReport>> fetchSleepReports(
 
   final data = response as List;
 
-  return data.map((e) => SleepReport.fromJson(e)).toList();
+  return data.map((e) => SleepReportModel.fromJson(e)).toList();
 }

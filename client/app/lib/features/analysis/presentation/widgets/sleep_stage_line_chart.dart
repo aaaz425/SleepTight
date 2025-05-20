@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 
 class SleepStageLineChart extends StatelessWidget {
-  final List<SleepStage> stages;
+  final List<SleepStageModel> stages;
 
   const SleepStageLineChart({super.key, required this.stages});
 
@@ -18,7 +18,7 @@ class SleepStageLineChart extends StatelessWidget {
 }
 
 class _SleepStageChartPainter extends CustomPainter {
-  final List<SleepStage> stages;
+  final List<SleepStageModel> stages;
 
   _SleepStageChartPainter(this.stages);
 
@@ -49,7 +49,7 @@ class _SleepStageChartPainter extends CustomPainter {
     final double chartHeight = size.height - labelHeight;
     final double chartWidth = size.width;
 
-    Offset pointFor(SleepStage s) {
+    Offset pointFor(SleepStageModel s) {
       final minutes = s.startTime.difference(baseTime).inMinutes;
       final x = (minutes / totalDuration) * chartWidth;
       final yLevel = stageToY[s.stageType] ?? 0;

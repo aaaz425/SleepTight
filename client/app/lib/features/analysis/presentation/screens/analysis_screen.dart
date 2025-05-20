@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 import 'package:sleep_tight/features/analysis/data/services/sleep_report_service.dart';
 import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/analysis_header.dart';
@@ -19,7 +18,7 @@ class AnalysisScreen extends ConsumerStatefulWidget {
 }
 
 class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
-  late Future<List<SleepReport>> _reportsFuture;
+  late Future<List<SleepReportModel>> _reportsFuture;
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
           SizedBox(height: 4),
 
           Expanded(
-            child: FutureBuilder<List<SleepReport>>(
+            child: FutureBuilder<List<SleepReportModel>>(
               future: _reportsFuture,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

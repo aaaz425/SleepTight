@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
-import 'package:sleep_tight/features/analysis/presentation/screens/sleep_diary_view.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 import 'package:sleep_tight/features/analysis/presentation/screens/sleep_report_view.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_diary_pages.dart';
 
 class AnalysisTab extends StatefulWidget {
-  final List<SleepReport> reports;
+  final List<SleepReportModel> reports;
   final int initialTabIndex;
   final void Function(int index)? onTabChanged;
 
