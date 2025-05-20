@@ -142,9 +142,12 @@ class _CustomRadioGroupBody<T> extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 4),
-            Text(
-              value,
-              style: selected ? selectedTextStyle : unselectedTextStyle,
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 2.5),
+              child: Text(
+                value,
+                style: selected ? selectedTextStyle : unselectedTextStyle,
+              ),
             ),
           ],
         );
