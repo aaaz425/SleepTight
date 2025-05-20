@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgresql:
@@ -14,6 +14,8 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
@@ -27,6 +29,8 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - redis_data:/data
     networks:
       - app-network
@@ -40,9 +44,11 @@ services:
     environment:
       - RABBITMQ_MANAGEMENT_PATH_PREFIX=/rabbitmq
     ports:
-      - "0.0.0.0:5672:5672"     # AMQP
+      - "0.0.0.0:5672:5672" # AMQP
       - "127.0.0.1:15672:15672" # Management UI (로컬 바인딩)
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro # 호스트의 rabbitmq.conf 를 컨테이너 설정 파일로 마운트
     networks:
