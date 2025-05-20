@@ -9,11 +9,13 @@ import { SleepStageFactory } from './sleep-stage.factory';
 import { SleepStageLog } from './entities/sleep-stage-log.entity';
 import { User } from 'src/users/entities/user.entity';
 import { SleepReportFactory } from './sleep-report.factory';
+import { SleepDiariesModule } from './sleep-diaries.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SleepReport, User, SleepStageLog]),
     SleepSoundModule,
+    SleepDiariesModule,
   ],
   controllers: [SleepReportController],
   providers: [

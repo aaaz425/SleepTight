@@ -24,18 +24,22 @@ export class SleepDiaryResponseDto {
   @ApiProperty({ description: '깬 횟수' })
   wakeCount: number;
 
-  @ApiProperty({ description: '수면 품질 점수 (1–7)' })
-  sleepQuality: number;
+  @ApiProperty({ description: '수면 품질 점수 (1–7)', nullable: true })
+  sleepQuality: number | null;
 
-  @ApiProperty({ description: '기상 시 기분 점수 (1–7)' })
-  moodScore: number;
+  @ApiProperty({ description: '기상 시 기분 점수 (1–7)', nullable: true })
+  moodScore: number | null;
 
-  @ApiProperty({ enum: WakeAwareness })
-  wakeAwareness: WakeAwareness;
+  @ApiProperty({ enum: WakeAwareness, nullable: true })
+  wakeAwareness: WakeAwareness | null;
 
-  @ApiProperty({ enum: WakeMethod })
-  wakeMethod: WakeMethod;
+  @ApiProperty({ enum: WakeMethod, nullable: true })
+  wakeMethod: WakeMethod | null;
 
-  @ApiProperty({ description: '기타 기상 방법', required: false })
-  wakeMethodEtc?: string;
+  @ApiProperty({
+    description: '기타 기상 방법',
+    required: false,
+    nullable: true,
+  })
+  wakeMethodEtc?: string | null;
 }

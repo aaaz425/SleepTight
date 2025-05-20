@@ -6,11 +6,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { SleepDiary } from './entities/sleep-diary.entity';
+import { SleepDiary, WakeMethod } from './entities/sleep-diary.entity';
 import { SleepReport } from './entities/sleep-report.entity';
-import { CreateSleepDiaryDto } from './dto/create-sleep-diary.dto';
-import { UpdateSleepDiaryDto } from './dto/update-sleep-diary.dto';
+import { UpdateSleepDiaryDto } from './dto/update-sleep-diary.request.dto';
 import { SleepDiaryResponseDto } from './dto/sleep-diary.response.dto';
+import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
+import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
 
 @Injectable()
 export class SleepDiariesService {
@@ -34,21 +35,59 @@ export class SleepDiariesService {
   }
 
   /** 일지 생성 */
-  async create(userId: number, dto: CreateSleepDiaryDto): Promise<SleepDiary> {
-    // 1) 클라이언트가 넘겨준 reportId로 소유 여부 확인
+  async createPartialFromReport(report: SleepReport): Promise<SleepDiary> {
+    const exist = await this.diaryRepo.findOne({
+      where: { sleepReportId: report.id },
+    });
+    if (exist) {
+      return exist; // 이미 있으면 생성 안 함
+    }
+
+    const diary = this.diaryRepo.create({
+      sleepReportId: report.id,
+      sleepDate:
+        typeof report.sleepDate === 'string'
+          ? report.sleepDate
+          : report.sleepDate.toISOString().split('T')[0],
+      sleepTime: report.sleepStartTime
+        .toISOString()
+        .split('T')[1]
+        .split('.')[0], // HH:MM:SS
+      wakeTime: report.sleepEndTime?.toISOString().split('T')[1].split('.')[0], // HH:MM:SS
+      sleepLatency: report.sleepLatency,
+      wakeCount: report.awakenCount,
+    });
+
+    return this.diaryRepo.save(diary);
+  }
+
+  /** 수면 일지 수정
+   * 1. 유저 입장에서 처음 수면 일지 작성 시
+   * 2. 수면 일지 수정 시
+   */
+  async update(userId: number, dto: UpdateSleepDiaryDto): Promise<SleepDiary> {
+    // 1) report 확인
     const report = await this.reportRepo.findOne({
       where: { id: dto.sleepReportId, userId },
     });
     if (!report) {
-      throw new NotFoundException(`SleepReport ${dto.sleepReportId} not found`);
+      throwNotFoundException(ExceptionCode.REPORT_NOT_FOUND);
     }
 
-    // 2) 날짜 중복 체크
-    await this.ensureNotExists(dto.sleepReportId);
+    // 2) 일지 존재 확인
+    const diary = await this.diaryRepo.findOne({
+      where: { sleepReportId: dto.sleepReportId },
+    });
+    if (!diary) {
+      throwNotFoundException(ExceptionCode.DIARY_NOT_FOUND);
+    }
 
-    // 3) 일지 생성
-    const { sleepReportId, ...rest } = dto;
-    const diary = this.diaryRepo.create({ sleepReportId, ...rest });
+    // 3) 수정할 필드 덮어쓰기
+
+    if (dto.wakeMethod !== WakeMethod.OTHER) {
+      dto.wakeMethodEtc = null;
+    }
+    Object.assign(diary, dto);
     return this.diaryRepo.save(diary);
   }
 
@@ -74,7 +113,7 @@ export class SleepDiariesService {
   }
 
   /**
-   * 날짜별 다이어리 조회(리포트 기준준)
+   * 날짜별 다이어리 조회(리포트 기준)
    *  날짜로 보고서 목록을 먼저 조회한 뒤,
    *  각 보고서별 일지가 있으면 가져오고, 없으면 null 로 채워 반환
    *  @param userId
@@ -121,31 +160,6 @@ export class SleepDiariesService {
     });
   }
 
-  /** 일지 수정 */
-  async update(userId: number, dto: UpdateSleepDiaryDto): Promise<SleepDiary> {
-    // 1) report 확인
-    const report = await this.reportRepo.findOne({
-      where: { id: dto.sleepReportId, userId },
-    });
-    if (!report) {
-      throw new NotFoundException(`No SleepReport for id ${dto.sleepReportId}`);
-    }
-
-    // 2) 일지 존재 확인
-    const diary = await this.diaryRepo.findOne({
-      where: { sleepReportId: dto.sleepReportId },
-    });
-    if (!diary) {
-      throw new NotFoundException(
-        `Diary not found for reportId ${dto.sleepReportId}`,
-      );
-    }
-
-    // 3) 수정할 필드 덮어쓰기
-    Object.assign(diary, dto);
-    return this.diaryRepo.save(diary);
-  }
-
   /** 엔티티 → DTO 변환 헬퍼 */
   private toResponseDto(entity: SleepDiary): SleepDiaryResponseDto {
     const dto = new SleepDiaryResponseDto();
@@ -155,12 +169,15 @@ export class SleepDiariesService {
     dto.sleepTime = entity.sleepTime;
     dto.wakeTime = entity.wakeTime;
     dto.sleepLatency = entity.sleepLatency;
-    dto.wakeCount = entity.wakeCount;
-    dto.sleepQuality = entity.sleepQuality;
-    dto.moodScore = entity.moodScore;
-    dto.wakeAwareness = entity.wakeAwareness;
-    dto.wakeMethod = entity.wakeMethod;
-    dto.wakeMethodEtc = entity.wakeMethodEtc;
+
+    // nullable 필드 → null 병합 연산자 추가
+    dto.wakeCount = entity.wakeCount ?? null;
+    dto.sleepQuality = entity.sleepQuality ?? null;
+    dto.moodScore = entity.moodScore ?? null;
+    dto.wakeAwareness = entity.wakeAwareness ?? null;
+    dto.wakeMethod = entity.wakeMethod ?? null;
+    dto.wakeMethodEtc = entity.wakeMethodEtc ?? null;
+
     return dto;
   }
 }

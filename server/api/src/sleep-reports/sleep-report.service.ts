@@ -1,6 +1,6 @@
 import { SleepSoundService } from './../sleep-sound/sleep-sound.service';
 import { SleepReportFactory } from './sleep-report.factory';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, EntityManager, Between } from 'typeorm';
 import { SleepReport } from './entities/sleep-report.entity';
@@ -11,6 +11,7 @@ import { User } from 'src/users/entities/user.entity';
 import { throwNotFoundException } from 'src/common/exceptions/exception.helper';
 import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
 import { SleepStageLog } from './entities/sleep-stage-log.entity';
+import { SleepDiariesService } from './sleep-diaries.service';
 
 @Injectable()
 export class SleepReportService {
@@ -25,6 +26,8 @@ export class SleepReportService {
     private readonly sleepSoundService: SleepSoundService,
     @InjectRepository(SleepStageLog)
     private readonly stageRepo: Repository<SleepStageLog>,
+    @Inject(SleepDiariesService)
+    private readonly sleepDiariesService: SleepDiariesService,
   ) {}
 
   // 수면 시작
@@ -172,6 +175,10 @@ export class SleepReportService {
         coughing: report.coughingDurationSeconds,
       });
       await manager.save(report);
+
+      // 수면 일지 자동 생성
+      await this.sleepDiariesService.createPartialFromReport(report);
+
       return isValidSleep;
     });
 
