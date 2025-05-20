@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/core/network/dio_provider.dart';
+import 'package:sleep_tight/features/coach/data/datasources/sleep_coach_remote_data_source.dart';
+import 'package:sleep_tight/features/coach/data/repositories/sleep_coach_repository_impl.dart';
+import 'package:sleep_tight/features/coach/domain/repositories/sleep_coach_repository.dart';
 
 class SleepCoachingItem {
   final String activity;
@@ -32,3 +35,8 @@ final sleepCoachingProvider =
       final data = response.data['data'] as List;
       return data.map((e) => SleepCoachingItem.fromJson(e)).toList();
     });
+
+final sleepCoachRepositoryProvider = Provider<SleepCoachRepository>((ref) {
+  final remoteDataSource = ref.read(sleepCoachRemoteDataSourceProvider);
+  return SleepCoachRepositoryImpl(remoteDataSource);
+});
