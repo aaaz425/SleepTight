@@ -45,6 +45,31 @@ export class SleepSoundFactory {
     return this.sleepEventRepo.save(sleepEvent);
   }
 
+  // SleepSound와 SleepReport 조인을 통해 reportId에 연결된 sleepSound만 가져오도록 필터링
+  async findByReportIdWithQueryBuilder(
+    reportId: number,
+  ): Promise<SleepSound[]> {
+    return this.sleepSoundRepo
+      .createQueryBuilder('sound')
+      .leftJoin('sound.sleepReport', 'report')
+      .where('report.id = :reportId', { reportId })
+      .getMany();
+  }
+
+  async findWithEventsByReportId(reportId: number): Promise<SleepSound[]> {
+    return this.sleepSoundRepo
+      .createQueryBuilder('sound')
+      .leftJoin('sound.sleepReport', 'report')
+      .leftJoinAndMapMany(
+        'sound.events', // sound에 가상 필드로 매핑
+        SleepEvent,
+        'event',
+        'event.segmentId = sound.segmentId',
+      )
+      .where('report.id = :reportId', { reportId })
+      .getMany();
+  }
+
   // reportId로 sleepSound 목록 가져오기
   async findByReportId(
     reportId: number,

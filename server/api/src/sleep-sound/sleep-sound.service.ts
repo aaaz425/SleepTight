@@ -16,6 +16,7 @@ import { AnomalyType } from './entities/anomaly-type.enum';
 import { EntityManager } from 'typeorm';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { SleepSoundAnalysisResponseDto } from 'src/sleep-reports/dto/sleep-sound-analysis.response.dto';
+import { SleepSound } from './entities/sleep-sound.entity';
 
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -93,7 +94,6 @@ export class SleepSoundService {
 
   async calculateEventDurations(
     reportId: number,
-
     manager: EntityManager,
   ): Promise<{
     snoring: number;
@@ -101,10 +101,8 @@ export class SleepSoundService {
     coughing: number;
   }> {
     // 해당 리포트에 연결된 segmentId들 조회
-    const sounds = await this.sleepSoundFactory.findByReportId(
-      reportId,
-      manager,
-    );
+    const sounds =
+      await this.sleepSoundFactory.findByReportIdWithQueryBuilder(reportId);
     this.logger.debug(`📌 [calculateEventDurations] reportId: ${reportId}`);
 
     const segmentIds = sounds.map((sound) => sound.segmentId);
@@ -119,9 +117,9 @@ export class SleepSoundService {
     console.log('🧪 loaded events:', events);
 
     // anomaly 기준으로 누적 시간 계산
-    let snoring = 0,
-      somniloquy = 0,
-      coughing = 0;
+    let snoring = 0;
+    let somniloquy = 0;
+    let coughing = 0;
 
     for (const event of events) {
       const duration = event.endSec - event.startSec;
@@ -155,38 +153,45 @@ export class SleepSoundService {
     const url = await getSignedUrl(this.s3, command, { expiresIn: 60 }); // 60초 유효
     return url;
   }
+  calculateTotalDurationsFromSounds(sounds: SleepSound[]): {
+    snoring: number;
+    somniloquy: number;
+    coughing: number;
+  } {
+    let snoring = 0,
+      somniloquy = 0,
+      coughing = 0;
 
+    for (const sound of sounds) {
+      for (const event of sound.events ?? []) {
+        const duration = event.endSec - event.startSec;
+        if (event.anomaly === 'SNORE') snoring += duration;
+        else if (event.anomaly === 'SOMNILOQUY') somniloquy += duration;
+        else if (event.anomaly === 'COUGH') coughing += duration;
+      }
+    }
+
+    return {
+      snoring: Math.round(snoring),
+      somniloquy: Math.round(somniloquy),
+      coughing: Math.round(coughing),
+    };
+  }
   // 수면 분석 결과 조회
   async getSleepEventsByReportId(
     reportId: number,
     manager?: EntityManager,
   ): Promise<SleepSoundAnalysisResponseDto> {
-    const usedManager = manager ?? this.sleepSoundFactory.getManager();
-
-    const sounds = await this.sleepSoundFactory.findByReportId(
-      reportId,
-      usedManager,
-    );
+    const sounds =
+      await this.sleepSoundFactory.findWithEventsByReportId(reportId);
     this.logger.debug('📌 loaded sounds:', sounds);
 
     if (!sounds.length) {
       throwBadRequest(ExceptionCode.SLEEP_SOUND_NOT_FOUND);
     }
 
-    const segmentIds = sounds.map((s) => s.segmentId);
-    this.logger.debug('📌 segmentIds:', segmentIds);
-
-    const events = await this.sleepSoundFactory.findEventsBySegmentIds(
-      segmentIds,
-      usedManager,
-    );
-    this.logger.debug('📌 loaded events:', events);
-
     const result = await Promise.all(
-      sounds.map(async (sound) => {
-        const relatedEvents = events.filter(
-          (e) => e.segmentId === sound.segmentId,
-        );
+      sounds.map(async (sound: any) => {
         const soundStart = dayjs(sound.startTime);
         const soundEnd = soundStart.add(sound.duration, 'seconds');
 
@@ -199,7 +204,7 @@ export class SleepSoundService {
           soundStartTime: soundStart.utc().format('HH:mm:ss'),
           soundEndTime: soundEnd.utc().format('HH:mm:ss'),
           clipUrl: presignedUrl,
-          events: relatedEvents.map((e) => ({
+          events: (sound.events ?? []).map((e) => ({
             eventId: e.id,
             anomaly: e.anomaly,
             eventStartSec: e.startSec,

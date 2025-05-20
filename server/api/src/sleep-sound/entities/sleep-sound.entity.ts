@@ -8,6 +8,7 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { SleepEvent } from './sleep-event.entity';
 
 @Entity('sleep_sounds')
 export class SleepSound {
@@ -41,4 +42,6 @@ export class SleepSound {
   @Column({ name: 'segment_id', type: 'uuid' })
   @Index({ unique: true })
   segmentId: string;
+
+  events?: SleepEvent[]; // 조인 시 가상으로 매핑할 필드
 }
