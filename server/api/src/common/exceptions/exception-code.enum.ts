@@ -38,6 +38,11 @@ export const ExceptionCode = {
     code: 'REPORT_NOT_FOUND',
     message: '수면 리포트를 찾을 수 없습니다.',
   },
+  DIARY_NOT_FOUND: {
+    status: 404,
+    code: 'DIARY_NOT_FOUND',
+    message: '수면 리포트를 찾을 수 없습니다.',
+  },
   SLEEP_SOUND_NOT_FOUND: {
     status: 404,
     code: 'SLEEP_SOUND_NOT_FOUND',
