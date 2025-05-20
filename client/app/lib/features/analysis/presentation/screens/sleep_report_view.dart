@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/analysis/data/models/sleep_report.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
+import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/page_indicator.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_sound.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_stage_line_chart.dart';
 
 class SleepReportView extends StatefulWidget {
-  final List<SleepReport> reports;
+  final List<SleepReportModel> reports;
   final void Function(int)? onPageChanged;
 
   const SleepReportView({super.key, required this.reports, this.onPageChanged});
@@ -43,9 +44,9 @@ class _SleepReportViewState extends State<SleepReportView> {
     final h = d.inHours;
     final m = d.inMinutes.remainder(60);
     if (h == 0 && m == 0) return '-';
-    if (h == 0) return '${m}분';
-    if (m == 0) return '${h}시간';
-    return '${h}시간 ${m}분';
+    if (h == 0) return '$m분';
+    if (m == 0) return '$h시간';
+    return '$h시간 $m분';
   }
 
   String formatPercent(Duration part, Duration total) {
@@ -108,7 +109,7 @@ class _SleepReportViewState extends State<SleepReportView> {
                                 ),
                                 TextSpan(
                                   text: formatDuration(totalSleep),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppColors.sub1,
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -160,7 +161,7 @@ class _SleepReportViewState extends State<SleepReportView> {
                                   formatDuration(latency),
                                 ),
                                 const SizedBox(height: 4),
-                                _buildLabelRow('잠에서 깬 횟수', '${awakenCount}회'),
+                                _buildLabelRow('잠에서 깬 횟수', '$awakenCount회'),
                               ],
                             ),
                           ),
@@ -183,9 +184,39 @@ class _SleepReportViewState extends State<SleepReportView> {
                               ),
                               const SizedBox(height: 16),
                               isStagesEmpty
-                                  ? const Text(
-                                    '수면 단계 데이터가 없습니다.',
-                                    style: TextStyle(color: AppColors.font2),
+                                  ? SizedBox(
+                                    height: 100,
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        // 블러 적용된 이미지
+                                        ClipRect(
+                                          child: ImageFiltered(
+                                            imageFilter: ImageFilter.blur(
+                                              sigmaX: 2,
+                                              sigmaY: 2,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/images/sleep_stage_sample.png',
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                        ),
+
+                                        // 텍스트는 블러 바깥
+                                        const Center(
+                                          child: Text(
+                                            '수면 단계를 분석하려면 수면 시 웨어러블 기기를 착용하셔야 합니다',
+                                            style: TextStyle(
+                                              color: AppColors.white,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   )
                                   : SizedBox(
                                     height: 100,
@@ -195,7 +226,11 @@ class _SleepReportViewState extends State<SleepReportView> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            top: 10,
+                          ),
                           child: Column(
                             children: [
                               Row(
@@ -229,7 +264,7 @@ class _SleepReportViewState extends State<SleepReportView> {
                             ],
                           ),
                         ),
-                        const SleepSound(),
+                        SleepSound(reportId: report.sleepReportId),
                       ],
                     ),
                   );
@@ -312,47 +347,61 @@ class _SleepReportViewState extends State<SleepReportView> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          _buildStageRow(
-            '비수면',
-            AppColors.white,
-            awake,
-            totalSleep,
-            formatDuration,
-            formatPercent,
+          Row(
+            children: [
+              Expanded(
+                child: _buildStageColumn(
+                  '비수면',
+                  AppColors.white,
+                  awake,
+                  totalSleep,
+                  formatDuration,
+                  formatPercent,
+                ),
+              ),
+              Expanded(
+                child: _buildStageColumn(
+                  '렘수면',
+                  AppColors.sub2,
+                  rem,
+                  totalSleep,
+                  formatDuration,
+                  formatPercent,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
-          _buildStageRow(
-            '렘수면',
-            AppColors.sub2,
-            rem,
-            totalSleep,
-            formatDuration,
-            formatPercent,
-          ),
-          const SizedBox(height: 12),
-          _buildStageRow(
-            '얕은 수면',
-            AppColors.sub1,
-            light,
-            totalSleep,
-            formatDuration,
-            formatPercent,
-          ),
-          const SizedBox(height: 12),
-          _buildStageRow(
-            '깊은 수면',
-            AppColors.sub1Vr,
-            deep,
-            totalSleep,
-            formatDuration,
-            formatPercent,
+          Row(
+            children: [
+              Expanded(
+                child: _buildStageColumn(
+                  '얕은 수면',
+                  AppColors.sub1,
+                  light,
+                  totalSleep,
+                  formatDuration,
+                  formatPercent,
+                ),
+              ),
+              Expanded(
+                child: _buildStageColumn(
+                  '깊은 수면',
+                  AppColors.sub1Vr,
+                  deep,
+                  totalSleep,
+                  formatDuration,
+                  formatPercent,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStageRow(
+  Widget _buildStageColumn(
     String label,
     Color color,
     Duration duration,
@@ -360,40 +409,33 @@ class _SleepReportViewState extends State<SleepReportView> {
     String Function(Duration) formatDuration,
     String Function(Duration, Duration) formatPercent,
   ) {
-    return Row(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: const TextStyle(color: AppColors.font2, fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        Row(
           children: [
-            Text(
-              formatPercent(duration, total),
-              style: TextStyle(color: color, fontSize: 16),
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-            Text(
-              formatDuration(duration),
-              style: const TextStyle(color: AppColors.font2, fontSize: 14),
-            ),
+            const SizedBox(width: 2),
+            Text(label, style: AppTextStyles.bodyB4Rg(color: AppColors.font2)),
           ],
+        ),
+        const SizedBox(height: 4),
+
+        Text(
+          formatPercent(duration, total),
+          style: AppTextStyles.titleT3Sb(color: color),
+        ),
+        Text(
+          formatDuration(duration),
+          style: AppTextStyles.bodyB2Rg(color: AppColors.font2),
         ),
       ],
     );

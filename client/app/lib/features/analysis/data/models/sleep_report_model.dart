@@ -1,4 +1,4 @@
-class SleepReport {
+class SleepReportModel {
   final int sleepReportId;
   final DateTime sleepStartTime;
   final DateTime sleepEndTime;
@@ -8,9 +8,9 @@ class SleepReport {
   final Duration? totalLightSleepTime;
   final Duration? totalDeepSleepTime;
   final int? awakenCount;
-  final List<SleepStage> sleepStages;
+  final List<SleepStageModel> sleepStages;
 
-  SleepReport({
+  SleepReportModel({
     required this.sleepReportId,
     required this.sleepStartTime,
     required this.sleepEndTime,
@@ -23,8 +23,8 @@ class SleepReport {
     required this.sleepStages,
   });
 
-  factory SleepReport.fromJson(Map<String, dynamic> json) {
-    return SleepReport(
+  factory SleepReportModel.fromJson(Map<String, dynamic> json) {
+    return SleepReportModel(
       sleepLatency: parseDuration(json['sleep_latency']),
       totalAwakeTime: parseDuration(json['total_awake_time']),
       totalLightSleepTime: parseDuration(json['total_light_sleep_time']),
@@ -33,7 +33,7 @@ class SleepReport {
       awakenCount: json['awaken_count'] ?? 0,
       sleepStages:
           (json['sleep_stage'] as List<dynamic>?)
-              ?.map((e) => SleepStage.fromJson(e))
+              ?.map((e) => SleepStageModel.fromJson(e))
               .toList() ??
           [],
       sleepStartTime: DateTime.parse(json['sleep_start_time']),
@@ -43,21 +43,21 @@ class SleepReport {
   }
 }
 
-class SleepStage {
+class SleepStageModel {
   final String stageType;
   final DateTime startTime;
   final DateTime endTime;
   final int duration;
 
-  SleepStage({
+  SleepStageModel({
     required this.stageType,
     required this.startTime,
     required this.endTime,
     required this.duration,
   });
 
-  factory SleepStage.fromJson(Map<String, dynamic> json) {
-    return SleepStage(
+  factory SleepStageModel.fromJson(Map<String, dynamic> json) {
+    return SleepStageModel(
       stageType: json['stageType'],
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
