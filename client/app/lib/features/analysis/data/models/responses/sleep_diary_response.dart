@@ -8,7 +8,7 @@ class SleepDiaryResponse {
   final String sleepDate; // “YYYY-MM-DD”
   final String sleepTime; // “HH:MM:SS”
   final String wakeTime; // “HH:MM:SS”
-  final String sleepLatency; // “00:15:00” 포맷
+  final int sleepLatency; // 분 단위 정수
   final int? wakeCount;
   final int? sleepQuality;
   final int? moodScore;
@@ -54,6 +54,26 @@ class SleepDiaryResponse {
     return v?.toString() ?? '';
   }
 
+  // JSON에서 sleepLatency 객체 또는 문자열을 분 단위 정수로 변환
+  static int _parseLatency(dynamic v) {
+    if (v is int) return v;
+    if (v is String) {
+      final parts = v.split(':');
+      if (parts.length >= 2) {
+        final h = int.tryParse(parts[0]) ?? 0;
+        final m = int.tryParse(parts[1]) ?? 0;
+        return h * 60 + m;
+      }
+      return int.tryParse(v) ?? 0;
+    }
+    if (v is Map<String, dynamic>) {
+      final h = v['hours'] as int? ?? 0;
+      final m = v['minutes'] as int? ?? 0;
+      return h * 60 + m;
+    }
+    return 0;
+  }
+
   factory SleepDiaryResponse.fromJson(Map<String, dynamic> json) {
     return SleepDiaryResponse(
       id: json['id'] as int,
@@ -61,7 +81,7 @@ class SleepDiaryResponse {
       sleepDate: _parseDate(json['sleepDate']),
       sleepTime: _parseTime(json['sleepTime']),
       wakeTime: _parseTime(json['wakeTime']),
-      sleepLatency: _parseTime(json['sleepLatency']),
+      sleepLatency: _parseLatency(json['sleepLatency']),
       wakeCount: json['wakeCount'] as int?,
       sleepQuality: json['sleepQuality'] as int?,
       moodScore: json['moodScore'] as int?,
