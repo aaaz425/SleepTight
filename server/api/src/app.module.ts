@@ -32,7 +32,7 @@ import { SleepCoachingModule } from './sleep-coaching/sleep-coaching.module';
         database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true, // 개발 환경만 true
-        logging: true,
+        logging: false,
       }),
     }),
     UserModule,
