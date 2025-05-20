@@ -30,6 +30,11 @@
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="false" />
+            
+        <!-- 모바일 앱과 통신을 위한 knownhost 설정 -->
+        <meta-data
+            android:name="com.google.android.gms.wearable.knownhost"
+            android:value="com.example.sleeptight" />
 
         <!-- 스플래시 액티비티 -->
         <activity
@@ -49,6 +54,22 @@
             android:taskAffinity=""
             android:theme="@style/MainActivityTheme.Starting">
         </activity>
+        
+        <!-- 웨어러블 메시지 수신을 위한 서비스 -->
+        <service
+            android:name="com.example.wear.data.service.WearableListenerService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter android:priority="1000">
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/" />
+            </intent-filter>
+            
+            <meta-data
+                android:name="com.google.android.gms.wearable.knownhost"
+                android:value="com.example.sleeptight"/>
+        </service>
     </application>
 
 </manifest>

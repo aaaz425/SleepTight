@@ -11,12 +11,12 @@ android {
     ndkVersion = "27.0.12077973" // flutter.ndkVersion 대신 직접 명시
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     defaultConfig {
@@ -46,6 +46,17 @@ flutter {
 
 // Wear OS 통신을 위한 종속성 추가
 dependencies {
-    // Google Play Services Wearable
-    implementation("com.google.android.gms:play-services-wearable:19.0.0")
+    // Kotlin 표준 라이브러리
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.22")
+    implementation("androidx.core:core-ktx:1.10.1")
+    
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+    
+    // Google Play Services Wearable - 버전을 호환되는 값으로 수정
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
+    
+    // JSON 처리 라이브러리
+    implementation("org.json:json:20230618")
 }

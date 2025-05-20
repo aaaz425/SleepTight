@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.sleeptight">
     <!-- 인터넷 권한 -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Wear OS 통신 권한 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Health Connect Permissions -->
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"/>
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY"/>
@@ -55,8 +59,6 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <!-- 진동 권한 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
     <!-- 알림 권한 -->
@@ -73,6 +75,23 @@
         android:icon="@mipmap/ic_launcher">
 
         <service android:name="com.gdelataillade.alarm.services.NotificationOnKillService" />
+
+        <!-- Wear OS 메시지 수신을 위한 서비스 등록 -->
+        <service
+            android:name="com.example.sleeptight.WearableListenerService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter android:priority="1000">
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/" />
+            </intent-filter>
+            
+            <!-- 명시적으로 패키지 이름 설정 -->
+            <meta-data
+                android:name="com.google.android.gms.wearable.knownhost"
+                android:value="com.example.wear"/>
+        </service>
 
         <receiver
             android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"

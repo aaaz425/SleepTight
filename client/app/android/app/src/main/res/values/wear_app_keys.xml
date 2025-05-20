@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="wear_app_keys">
+        <item>com.example.wear</item>
+        <item>7c42f9be225c92c56676b015b169b145e11df075</item>
+    </string-array>
+</resources> 

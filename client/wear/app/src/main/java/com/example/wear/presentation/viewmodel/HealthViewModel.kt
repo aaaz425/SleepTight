@@ -25,9 +25,9 @@ class HealthViewModel(application: Application) : AndroidViewModel(application) 
         
         // 앱 시작 시 헬스 데이터 요청
         refreshHealthData()
+        // 데이터 갱신
     }
-    
-    // 데이터 갱신
+
     fun refreshHealthData() {
         viewModelScope.launch {
             wearableRepository.requestHealthData()
