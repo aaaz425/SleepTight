@@ -38,6 +38,6 @@ import { SleepAnalysisResultListener } from './sleep-analysis-result.listener';
   ],
   controllers: [SleepSoundController, SleepAnalysisResultListener],
   providers: [SleepSoundProducer, SleepSoundService, SleepSoundFactory],
-  exports: [SleepSoundService],
+  exports: [SleepSoundService, TypeOrmModule],
 })
 export class SleepSoundModule {}
