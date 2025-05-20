@@ -4,7 +4,7 @@ class SleepEndResponse {
   SleepEndResponse({required this.isValidReport});
 
   factory SleepEndResponse.fromJson(Map<String, dynamic> json) {
-    final isValid = json['data']?['isValidReport'] == true;
+    final isValid = json['isValidReport'] == true;
     return SleepEndResponse(isValidReport: isValid);
   }
 }

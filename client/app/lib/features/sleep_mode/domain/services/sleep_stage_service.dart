@@ -2,15 +2,15 @@ import 'package:sleep_tight/features/health/services/health_service.dart';
 import 'package:health/health.dart';
 
 Future<List<Map<String, dynamic>>> getSleepStages({
-  required String startDate,
-  required String endDate,
+  required DateTime startDate,
+  required DateTime endDate,
 }) async {
   final healthService = HealthService();
 
   try {
     List<HealthDataPoint> sleepData = await healthService.fetchSleepData(
-      DateTime.parse(startDate),
-      DateTime.parse(endDate),
+      startDate,
+      endDate,
     );
 
     if (sleepData.isEmpty) {

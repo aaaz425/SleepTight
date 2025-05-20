@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'report_id_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ReportIdNotifier extends _$ReportIdNotifier {
   @override
   int build() => 0;
