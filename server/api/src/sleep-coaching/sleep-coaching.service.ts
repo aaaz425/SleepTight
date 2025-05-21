@@ -197,7 +197,7 @@ export class SleepCoachingService {
       };
 
       const sleepDiary = await this.sleepDiaryRepository.findOne({
-        where: { sleepReportId: 1 },
+        where: { sleepReportId: sleepReport.id },
       });
       const sleepScore = {
         dataType: 'SLEEP_SCORE',
