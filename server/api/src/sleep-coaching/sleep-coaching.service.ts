@@ -84,8 +84,7 @@ export class SleepCoachingService {
         );
         
         //fcm알림
-        //TODO: 유저 등록시 FCM토큰 추가.
-        // this.fcmService.sendNotification(userId, "수면 코칭 생성 완료!", "수면 코칭 생성이 완료되었습니다!");
+        this.fcmService.sendNotification(userId, "수면 코칭 생성 완료!", "수면 코칭 생성이 완료되었습니다!");
         return;
     }
 

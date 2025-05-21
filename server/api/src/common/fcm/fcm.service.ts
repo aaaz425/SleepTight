@@ -1,48 +1,34 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/users/user.service';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class FcmService implements OnModuleInit {
     private readonly logger: Logger = new Logger(FcmService.name);
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly userService: UserService,
-    ) {}
+    constructor(private readonly userService: UserService) {}
 
     onModuleInit() {
         if (!admin.apps.length) {
-            const firebaseConfig = {
-                type: this.configService.get('FIREBASE_TYPE'),
-                projectId: this.configService.get('FIREBASE_PROJECT_ID'),
-                privateKeyId: this.configService.get('FIREBASE_PRIVATE_KEY_ID'),
-                privateKey: this.configService.get('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n'),
-                clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
-                clientId: this.configService.get('FIREBASE_CLIENT_ID'),
-                authUri: this.configService.get('FIREBASE_AUTH_URI'),
-                tokenUri: this.configService.get('FIREBASE_TOKEN_URI'),
-                authProviderX509CertUrl: this.configService.get('FIREBASE_AUTH_PROVIDER_X509_CERT_URL'),
-                clientC509CertUrl: this.configService.get('FIREBASE_CLIENT_X509_CERT_URL'),
-            };
-
+            const jsonPath = path.join(__dirname, '..', '..', '..','src', 'common', 'fcm', 'sleep-tight-d9f9d-firebase-adminsdk-fbsvc-3fe0729751.json');
+            const serviceAccount = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
             admin.initializeApp({
-                credential: admin.credential.cert(firebaseConfig as admin.ServiceAccount),
+                credential: admin.credential.cert(serviceAccount),
             });
         }
     }
 
     async sendNotification(userId: number, title: string, body: string) {
         const user = await this.userService.findById(userId);
-        const token = user.fcm_token||'';
+        const token = user.fcm_token || '';
 
         const message = {
-            notification: {
-                title,
-                body,
-            },
+            notification: { title, body },
+            data:{}, //TODO: 추후 알림 Type 추가시 여기에
             token,
         };
+
         try {
             const res = await admin.messaging().send(message);
             this.logger.log('📨 FCM 전송 성공:', res);
@@ -51,4 +37,3 @@ export class FcmService implements OnModuleInit {
         }
     }
 }
-

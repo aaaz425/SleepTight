@@ -539,3 +539,4 @@ obj/
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,visualstudiocode,androidstudio,node,flutter,kotlin,intellij
+server/api/src/common/fcm/sleep-tight-d9f9d-firebase-adminsdk-fbsvc-3fe0729751.json
