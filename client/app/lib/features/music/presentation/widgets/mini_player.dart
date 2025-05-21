@@ -70,7 +70,9 @@ class MiniPlayer extends ConsumerWidget {
                       if (audioState.isPlaying) {
                         ref.read(audioControllerProvider.notifier).pause();
                       } else {
-                        ref.read(audioControllerProvider.notifier).play(music);
+                        ref
+                            .read(audioControllerProvider.notifier)
+                            .play(music, context);
                       }
                     },
                     child: Padding(

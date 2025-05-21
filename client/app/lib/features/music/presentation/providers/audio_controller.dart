@@ -1,6 +1,7 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/features/music/domain/entity/music_model.dart';
+import 'package:flutter/material.dart';
 
 /// 현재 재생중인 트랙 정보
 class AudioState {
@@ -17,21 +18,29 @@ class AudioController extends StateNotifier<AudioState> {
     state.player.setLoopMode(LoopMode.one);
   }
 
-  Future<void> play(MusicModel music) async {
-    final url = music.streamUrl;
-    if (state.music?.streamUrl != url) {
-      await state.player.setUrl(url);
+  Future<void> play(MusicModel music, BuildContext context) async {
+    try {
+      final url = music.streamUrl;
+      if (state.music?.streamUrl != url) {
+        await state.player.setUrl(url);
+      }
+      // 상태를 먼저 즉시 갱신
+      state = AudioState(state.player, music: music, isPlaying: true);
+      // 재생 호출
+      await state.player.play();
+    } catch (e, st) {
+      // 오류 발생 시 스낵바로 알림
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('음악 재생 중 오류가 발생했습니다: $e')));
+      debugPrint('AudioController.play error: $e');
     }
-    // ➊ 상태를 먼저 즉시 갱신
-    state = AudioState(state.player, music: music, isPlaying: true);
-    // ➋ 재생 호출 (await 있든 없든 UI는 오늘 바로 반영됨)
-    await state.player.play();
   }
 
   Future<void> pause() async {
-    // ➊ 상태를 먼저 즉시 갱신
+    // 상태를 먼저 즉시 갱신
     state = AudioState(state.player, music: state.music, isPlaying: false);
-    // ➋ 일시정지 호출
+    // 일시정지 호출
     await state.player.pause();
   }
 }

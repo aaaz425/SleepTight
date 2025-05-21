@@ -63,7 +63,7 @@ class _MusicList extends ConsumerWidget {
                               debugPrint(music.title);
                               ref
                                   .read(audioControllerProvider.notifier)
-                                  .play(music);
+                                  .play(music, context);
                             },
                             splashColor: Colors.white.withValues(alpha: 0.3),
                             highlightColor: Colors.white.withValues(
