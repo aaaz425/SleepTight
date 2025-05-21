@@ -203,7 +203,7 @@ class FullscreenPlayer extends ConsumerWidget {
                         if (isPlaying) {
                           notifier.pause();
                         } else {
-                          notifier.play(music);
+                          notifier.play(music, context);
                         }
                       },
                       style: ElevatedButton.styleFrom(
