@@ -25,6 +25,7 @@ export class FcmService implements OnModuleInit {
 
         const message = {
             notification: { title, body },
+            data:{}, //TODO: 추후 알림 Type 추가시 여기에
             token,
         };
 
