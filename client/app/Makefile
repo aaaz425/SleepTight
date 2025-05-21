@@ -91,7 +91,7 @@ apk-build-install-galaxys10: apk-build
 	adb -s 192.168.137.89:46769 install "$(APK_FOR_INSTALL)"
 
 galaxy10-simulator: icon splash
-	flutter run -d 192.168.137.89:46769
+	flutter run -d 192.168.137.89:38965
 
 ios-simulator: icon splash
 	flutter run -d 8E36C206-B199-4E83-BFE2-5095FB37019B
