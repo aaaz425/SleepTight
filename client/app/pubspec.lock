@@ -1290,6 +1290,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  sleep_chart:
+    dependency: "direct main"
+    description:
+      name: sleep_chart
+      sha256: "3676add3aabb7603d4a50f3d117ee3d4cba528d68d52a4a740e15edecdb1fbb2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   sliding_up_panel:
     dependency: "direct main"
     description:
