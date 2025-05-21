@@ -15,8 +15,10 @@ export class FcmService implements OnModuleInit {
 
     onModuleInit() {
         if (!admin.apps.length) {
-            const jsonPath = this.configService.get('FIREBASE_ADMIN_SDK_URI');
-            const serviceAccount = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+            const jsonPath = this.configService.get<string>('GOOGLE_APPLICATION_CREDENTIALS');
+            const serviceAccount = JSON.parse(
+                fs.readFileSync(jsonPath, 'utf8')
+            );
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
             });

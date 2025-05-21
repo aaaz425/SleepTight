@@ -16,10 +16,10 @@ RUN npm install --production=false
 COPY . .
 RUN npm run build
 
-# 2단계: 프로덕션 이미지 준비
+# 2단계: 프로덕션 이미지
 FROM node:lts-alpine
 
-# --- 타임존 설정을 위해 tzdata 설치 및 KST 적용 ---
+# 타임존 설정
 RUN apk update \
  && apk add --no-cache tzdata \
  && cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
@@ -36,12 +36,11 @@ RUN npm install --production
 # 빌드된 결과물(dist 디렉토리) 복사
 COPY --from=builder /app/dist ./dist
 
+# Modified: FCM JSON 키 파일 포함
+COPY sleep-tight-d9f9d-firebase-adminsdk-fbsvc-3fe0729751.json .  
+
 # NestJS 기본 포트 노출
 EXPOSE 3000
 
 # 컨테이너 시작 시 애플리케이션 실행
 CMD ["node", "dist/main.js"]
-
-# (선택) 헬스체크 설정 예시
-# HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-#   CMD curl -f http://localhost:3000/api/utils/status || exit 1
