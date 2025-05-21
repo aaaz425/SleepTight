@@ -7,7 +7,7 @@ class SleepDiaryModel {
   final String sleepDate; // YYYY-MM-DD
   final String sleepTime; // HH:MM:SS
   final String wakeTime; // HH:MM:SS
-  final String sleepLatency; // HH:MM:SS 포맷
+  final int sleepLatency; // HH:MM:SS 포맷
   final int? wakeCount;
   final int? sleepQuality;
   final int? moodScore;

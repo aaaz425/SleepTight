@@ -92,9 +92,11 @@ class _CustomRadioGroupBody<T> extends StatelessWidget {
     int selectedIndex = -1;
     if (field.value != null) {
       selectedIndex = options.indexOf(field.value as T);
-    } else if (labels.isNotEmpty) {
-      selectedIndex = 0;
     }
+    // 초기값을 선택하지 않게 하기 위함.
+    // else if (labels.isNotEmpty) {
+    //   selectedIndex = 0;
+    // }
 
     final groupButtonWidget = GroupButton<String>(
       isRadio: true,
@@ -120,9 +122,19 @@ class _CustomRadioGroupBody<T> extends StatelessWidget {
                 width: 12,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: selected ? selectedColor : unselectedColor,
+                  color:
+                      !enabled && selected
+                          ? AppColors.gray05
+                          : selected
+                          ? selectedColor
+                          : unselectedColor,
                   border: Border.all(
-                    color: selected ? selectedColor : borderColor,
+                    color:
+                        !enabled && selected
+                            ? AppColors.gray05
+                            : selected
+                            ? selectedColor
+                            : borderColor,
                     width: 1.0,
                   ),
                 ),
