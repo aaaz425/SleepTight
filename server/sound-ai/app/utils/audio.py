@@ -33,6 +33,9 @@ def load_wav(wav_path: Path) -> np.ndarray:
     change_db = TARGET_AMPLITUDE_DBFS - audio.dBFS
     audio = audio.apply_gain(change_db)
 
+    if audio.dBFS != float('-inf'):
+        audio = audio.apply_gain(TARGET_AMPLITUDE_DBFS - audio.dBFS)
+
     samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
     max_val = float(1 << (audio.sample_width * 8 - 1))
     samples /= max_val

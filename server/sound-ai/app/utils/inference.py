@@ -7,11 +7,23 @@ import numpy as np
 import torch
 import torch.nn as nn
 import tensorflow_hub as hub
+import tensorflow as tf
 from torch.nn.utils.rnn import pack_padded_sequence
 from tqdm import tqdm
+import logging
 
 from utils.audio import opus_to_wav, load_wav
 from config import SR, WINDOW_LENGTH, HOP_LENGTH, THRESHOLD, MODEL_PATH
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s [%(levelname)s] %(message)s")
+
+# GPU 사용 가능 여부 로깅
+logging.info(f"Torch CUDA available: {torch.cuda.is_available()}, "
+             f"Torch CUDA device count: {torch.cuda.device_count()}")
+tf_gpus = tf.config.list_physical_devices('GPU')
+logging.info(f"TensorFlow GPU devices: {tf_gpus if tf_gpus else 'None'}")
+
 
 # --- 1. YAMNet TF 래퍼 ---
 class YamNetTFWrapper:
@@ -58,16 +70,14 @@ class YamNetLSTMClassifier(nn.Module):
         return self.classifier(h)
 
 # --- 3. 전역 모델 로드 ---
+# 라벨 순서는 config나 학습 시 사용한 순서와 일치해야 합니다.
+_CLASSES = sorted(["snore", "cough", "breathe", "somniloquy"])
 _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _tf_wrapper = YamNetTFWrapper()
-_pt_model = YamNetLSTMClassifier(num_classes=len(_tf_wrapper.layer._func.__call__(  # 임시 입력으로 클래스 수 추출
-    np.zeros((SR, ), dtype=np.float32)
-))).to(_device)
+_pt_model = YamNetLSTMClassifier(num_classes=len(_CLASSES)).to(_device)
 _pt_model.load_state_dict(torch.load(MODEL_PATH, map_location=_device))
 _pt_model.eval()
 
-# 라벨 순서는 config나 학습 시 사용한 순서와 일치해야 합니다.
-_CLASSES = ["snore", "cough", "breathe", "somniloquy"]
 
 
 def detect_events(opus_path: str, duration: float) -> list[dict]:

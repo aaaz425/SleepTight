@@ -45,9 +45,12 @@ _channel.queue_bind(
 def _on_message(ch, method, props, body):
     try:
         meta       = json.loads(body)
-        segment_id = meta["segmentId"]
-        s3_key     = meta["s3Key"]
-        duration   = float(meta["duration"])
+        logging.info(f"[data info : {meta}")
+
+        data = meta["data"]
+        segment_id = data["segmentId"]
+        s3_key     = data["s3Key"]
+        duration   = float(data["duration"])
 
         # S3에서 opus 다운로드
         local_opus = f"/tmp/{segment_id}.opus"
