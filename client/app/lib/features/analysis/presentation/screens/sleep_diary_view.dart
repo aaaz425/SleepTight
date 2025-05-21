@@ -12,7 +12,7 @@ import 'package:sleep_tight/features/analysis/domain/entity/sleep_diary_model.da
 import 'package:sleep_tight/features/analysis/presentation/providers/sleep_diary_provider.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/wake_count_modal.dart';
 import 'package:sleep_tight/features/coach/data/models/requests/create_sleep_coaching_request.dart';
-import 'package:sleep_tight/features/coach/presentation/provider/sleep_coach.dart';
+import 'package:sleep_tight/features/coach/presentation/providers/sleep_coach_provider.dart';
 import 'package:sleep_tight/shared/widgets/custom_button.dart';
 import 'package:sleep_tight/shared/widgets/custom_radio_group.dart';
 import 'package:sleep_tight/shared/widgets/custom_text_field.dart';
