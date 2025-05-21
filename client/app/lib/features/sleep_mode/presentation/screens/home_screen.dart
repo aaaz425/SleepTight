@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/network/dio_provider.dart';
+import 'package:sleep_tight/features/health/services/health_service.dart';
 import 'package:sleep_tight/features/sleep_mode/data/models/requests/sleep_start_request.dart';
 import 'package:sleep_tight/features/sleep_mode/data/models/responses/sleep_start_response.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/provider/report_id_provider.dart';
@@ -11,8 +13,32 @@ import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_star
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final _healthService = HealthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _requestPermissions();
+  }
+
+  Future<void> _requestPermissions() async {
+    try {
+      await Permission.location.request();
+      await Permission.microphone.request();
+      await _healthService.ensureConfigured();
+      await Permission.activityRecognition.request();
+    } catch (e) {
+      print("⚠️ 권한 요청 중 오류 발생: $e");
+    }
+  }
 
   Future<SleepStartResponse> startSleep(
     WidgetRef ref,
@@ -28,7 +54,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

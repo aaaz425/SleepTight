@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/analysis/data/services/sleep_report_calendar_service.dart';
 import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -15,6 +16,8 @@ class CustomCalendarDialog extends ConsumerStatefulWidget {
 class _CustomCalendarDialogState extends ConsumerState<CustomCalendarDialog> {
   late DateTime focusedDay;
   late DateTime selectedDay;
+  late Future<List<DateTime>> _sleepDatesFuture;
+  List<DateTime> _sleepDates = [];
 
   @override
   void initState() {
@@ -23,6 +26,12 @@ class _CustomCalendarDialogState extends ConsumerState<CustomCalendarDialog> {
     final initDate = ref.read(selectedDateProvider);
     focusedDay = initDate;
     selectedDay = initDate;
+    _sleepDatesFuture = fetchSleepDates(ref, initDate);
+    _sleepDatesFuture.then((dates) {
+      setState(() {
+        _sleepDates = dates;
+      });
+    });
   }
 
   @override
@@ -43,6 +52,24 @@ class _CustomCalendarDialogState extends ConsumerState<CustomCalendarDialog> {
               bottom: 8,
             ),
             child: TableCalendar(
+              calendarBuilders: CalendarBuilders(
+                markerBuilder: (context, day, events) {
+                  final hasReport = _sleepDates.any((d) => isSameDay(d, day));
+                  if (!hasReport) return null;
+
+                  return Positioned(
+                    bottom: 8,
+                    child: Container(
+                      width: 3,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: AppColors.accessibleGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  );
+                },
+              ),
               locale: 'ko_KR',
               firstDay: DateTime.utc(2000, 1, 1),
               lastDay: DateTime.utc(2100, 12, 31),

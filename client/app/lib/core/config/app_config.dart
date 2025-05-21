@@ -131,8 +131,8 @@ class _SleepApiPaths {
       '${ApiPaths._sleepDomain}-report/$date'; // GET api/sleep/report/{date}
   String eventsByReportId(int reportId) =>
       '${ApiPaths._sleepDomain}-report/events/$reportId'; // => GET api/sleep/report/events/{reportId}
-  String reportCalendarByMonth(String month) =>
-      '${ApiPaths._sleepDomain}-report/calendar'; // GET api/sleep/report/calendar
+  String get reportCalendarByMonth =>
+      '${ApiPaths._sleepDomain}-report/calendar'; // GET api/sleep-report/calendar
 
   // Sleep Diaries (under /sleep-reports/diaries/*)
   String diaryByDate(String date) =>

@@ -19,10 +19,15 @@ class AnalysisHeader extends ConsumerWidget {
       return days[(weekday - 1) % 7];
     }
 
-    final month = selectedDate.month;
-    final day = selectedDate.day;
-    final dayBefore = selectedDate.day - 1;
-    final weekday = weekdayToKorean(selectedDate.weekday);
+    String getDateRange(DateTime date) {
+      final prev = date.subtract(Duration(days: 1));
+
+      if (date.month != prev.month) {
+        return '${prev.month}/${prev.day}-${date.month}/${date.day} ${weekdayToKorean(date.weekday)}';
+      }
+
+      return '${prev.month}/${prev.day}-${date.day} ${weekdayToKorean(date.weekday)}';
+    }
 
     return SizedBox(
       height: 44,
@@ -31,7 +36,7 @@ class AnalysisHeader extends ConsumerWidget {
         children: [
           Center(
             child: Text(
-              '$month/$dayBefore-$day $weekday',
+              getDateRange(selectedDate),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

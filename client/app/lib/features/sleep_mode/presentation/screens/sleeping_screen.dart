@@ -116,7 +116,7 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
             ),
             const SizedBox(height: 45),
             Text(
-              formattedTime,
+              formattedTime.replaceFirst('AM', '오전').replaceFirst('PM', '오후'),
               style: const TextStyle(fontSize: 32, color: AppColors.primaryHv2),
             ),
             const SizedBox(height: 10),
