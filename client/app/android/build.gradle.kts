@@ -6,6 +6,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
         classpath("org.jetbrains.kotlin:kotlin-serialization:1.8.22")  // ✅ Kotlin Serialization 플러그인 추가
+        classpath("com.google.gms:google-services:4.4.2") // fcm 구글 서비스
     }
 }
 allprojects {

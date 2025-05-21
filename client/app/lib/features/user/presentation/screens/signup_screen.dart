@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -47,6 +48,11 @@ class SignupScreenBody extends ConsumerWidget {
       // height와 weight 문자열을 숫자로 변환
       final heightVal = double.tryParse(raw['height'] as String) ?? 0;
       final weightVal = double.tryParse(raw['weight'] as String) ?? 0;
+
+      // FCM 토큰 받아오기
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      print('FCM Token from signup: $fcmToken');
+
       final formattedData =
           Map<String, dynamic>.from(raw)
             ..remove('year')
@@ -61,6 +67,7 @@ class SignupScreenBody extends ConsumerWidget {
               'country': countryEn,
               'height': heightVal,
               'weight': weightVal,
+              'fcm_token': fcmToken,
             });
 
       // API로 가입 요청 전송

@@ -8,6 +8,7 @@ class UserRegisterRequest {
   final num weight; // 20kg 이상 300kg 이하
   final String lengthUnit;
   final String weightUnit;
+  final String fcmToken;
 
   UserRegisterRequest({
     required this.firstName,
@@ -19,6 +20,7 @@ class UserRegisterRequest {
     required this.weight,
     required this.lengthUnit,
     required this.weightUnit,
+    required this.fcmToken,
   });
 
   // fromJson()
@@ -33,6 +35,7 @@ class UserRegisterRequest {
       weight: json['weight'] as num,
       lengthUnit: json['length_unit'] as String,
       weightUnit: json['weight_unit'] as String,
+      fcmToken: json['fcm_token'] as String,
     );
   }
 
@@ -47,6 +50,7 @@ class UserRegisterRequest {
       'weight': weight,
       'length_unit': lengthUnit,
       'weight_unit': weightUnit,
+      'fcm_token': fcmToken,
     };
   }
 }
