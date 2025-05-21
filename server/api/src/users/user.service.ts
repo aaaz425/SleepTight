@@ -202,7 +202,7 @@ export class UserService {
 
 
     // userId로 사용자 조회
-    private async findById(id: number): Promise<User> {
+    public async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
             throwNotFoundException(ExceptionCode.USER_NOT_FOUND);

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Between, Repository } from "typeorm";
 import { ActivityData } from "./entities/activity-data.entity";
@@ -11,6 +11,7 @@ import { SleepDiary } from "src/sleep-reports/entities/sleep-diary.entity";
 import axios from "axios";
 import { SleepCoaching } from "./entities/sleep-coaching.entity";
 import { SleepCoachingResponseDto } from "./dto/sleep-coaching.response.dto";
+import { FcmService } from "src/common/fcm/fcm.service";
 
 @Injectable()
 export class SleepCoachingService {
@@ -23,6 +24,7 @@ export class SleepCoachingService {
         private readonly sleepDiaryRepository: Repository<SleepDiary>,
         @InjectRepository(SleepCoaching)
         private readonly sleepCoachingRepository: Repository<SleepCoaching>,
+        private fcmService: FcmService,
     ) {}
     async getSleepCoaching(userId: number, date: Date): Promise<SleepCoachingResponseDto[]> {
         const sleepCoachings: SleepCoaching[] = await this.sleepCoachingRepository.findBy({
@@ -80,6 +82,10 @@ export class SleepCoachingService {
         await Promise.all(
             sleepCoachingEntities.map(entity => this.sleepCoachingRepository.save(entity))
         );
+        
+        //fcm알림
+        //TODO: 유저 등록시 FCM토큰 추가.
+        // this.fcmService.sendNotification(userId, "수면 코칭 생성 완료!", "수면 코칭 생성이 완료되었습니다!");
         return;
     }
 

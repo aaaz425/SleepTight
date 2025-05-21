@@ -4,6 +4,7 @@ import { SleepCoachingService } from "./sleep-coaching.service";
 import { SleepCoachingResponseDto } from "./dto/sleep-coaching.response.dto";
 import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { createSleepCoachingDto } from "./dto/create-sleep-coaching.request.dto";
+import { TempResponseDto } from "./dto/temp.response.dto";
 
 @Controller("sleep-coaching")
 export class SleepCoachingController {
@@ -18,7 +19,8 @@ export class SleepCoachingController {
   @UseGuards(JwtAuthGuard)
   async getSleepCoaching(@Request() req, @Param('coaching_date') date :Date) {
     const userId: number = req.user.userId; // JWT에서 userId를 가져옴
-    const dtoList: SleepCoachingResponseDto[] = await this.sleepCoachingService.getSleepCoaching(userId, date) 
+    // const dtoList: SleepCoachingResponseDto[] = await this.sleepCoachingService.getSleepCoaching(userId, date)
+    const dtoList: any = new TempResponseDto().temp;
     return dtoList;
   }
 

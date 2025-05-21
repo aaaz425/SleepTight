@@ -75,6 +75,8 @@ export class User {
   @Column({ name:'weight_unit', type: 'varchar', length: 10, nullable: true })
   weight_unit: string | null; // 예: 'kg', 'lb'
 
+  @Column({ name: 'fcm_token', type:'varchar', length:255, nullable: true})
+  fcm_token: string | null;
   // SleepReport와 연결
   @OneToMany(() => SleepReport, (report) => report.user)
   sleepReports: SleepReport[];
