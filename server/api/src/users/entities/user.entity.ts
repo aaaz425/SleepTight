@@ -84,10 +84,10 @@ export class User {
 
   // 이전 버전과의 호환성을 위한 getter
   get sleep_time(): string {
-    return this.sleepPreferences?.targetSleepTime || null;
+    return this.sleepPreferences?.targetSleepTime || '23:00';
   }
 
   get wake_time(): string {
-    return this.sleepPreferences?.targetWakeTime || null;
+    return this.sleepPreferences?.targetWakeTime || '07:00';
   }
 }
