@@ -37,25 +37,20 @@ run:
 	flutter run
 
 apk-build: icon splash
-	@echo ">>> Building debug APKs (split per ABI)..." # 문구 수정
-	flutter build apk --debug --split-per-abi # --release를 --debug로 변경
-	# 수정된 echo 문구: 실제 APK 생성 경로를 반영
+	@echo ">>> Building release APKs (split per ABI)..."
+	flutter build apk --release --split-per-abi
 	@echo ">>> Flutter build complete. Original APKs are in $(FLUTTER_SPLIT_APK_OUTPUT_DIR)/"
 
-	@# 최종 저장 디렉토리 생성 (없으면)
 	@mkdir -p $(FINAL_RENAMED_APK_DIR)
 
 	@echo ">>> Renaming and moving APKs to $(FINAL_RENAMED_APK_DIR)/..."
 	@found_apks=0; \
-	# 원본 APK 파일 패턴을 app-*-debug.apk로 변경
-	for original_apk_path in $(FLUTTER_SPLIT_APK_OUTPUT_DIR)/app-*-debug.apk; do \
+	for original_apk_path in $(FLUTTER_SPLIT_APK_OUTPUT_DIR)/app-*-release.apk; do \
 		if [ -f "$$original_apk_path" ]; then \
 			found_apks=1; \
 			original_filename=$$(basename "$$original_apk_path"); \
-			# sed 명령어에서 release를 debug로 변경
-			abi_type=$$(echo "$$original_filename" | sed -n 's/app-\(.*\)-debug\.apk/\1/p'); \
-			# 새로운 파일 이름에 '-debug' 추가 (예: myapp-armeabi-v7a-debug.apk)
-			new_apk_filename="$(DESIRED_APK_BASENAME)-$$abi_type-debug.apk"; \
+			abi_type=$$(echo "$$original_filename" | sed -n 's/app-\(.*\)-release\.apk/\1/p'); \
+			new_apk_filename="$(DESIRED_APK_BASENAME)-$$abi_type-release.apk"; \
 			final_new_path="$(FINAL_RENAMED_APK_DIR)/$$new_apk_filename"; \
 			echo ">>> Moving and Renaming '$$original_filename' to '$$final_new_path'"; \
 			mv "$$original_apk_path" "$$final_new_path"; \
@@ -67,12 +62,11 @@ apk-build: icon splash
 	else \
 		echo ">>> APKs successfully renamed and moved to $(FINAL_RENAMED_APK_DIR)/"; \
 	fi
-# 위의 'fi' 다음에는 백슬래시(\)가 없어야 합니다.
 
 clean:
 	flutter clean
 	@echo ">>> Removing renamed APKs directory..."
-	@rm -rf $(FINAL_RENAMED_APK_DIR) # 선택 사항: renamed-apks 디렉토리도 삭제
+	@rm -rf $(FINAL_RENAMED_APK_DIR)
 
 pubget:
 	flutter pub get
@@ -89,16 +83,16 @@ apk-build-install: apk-build apk-install
 
 apk-build-install-galaxys10:
 	@echo ">>> Building debug APK..."
-	flutter build apk --debug
+	flutter build apk --release
 
-	@echo ">>> Uninstalling com.example.sleeptight from 192.168.137.89:38965..."
-	adb -s 192.168.137.89:38965 uninstall com.example.sleeptight || true
+	@echo ">>> Uninstalling com.example.sleeptight from R39M208CZ1B..."
+	adb -s R39M208CZ1B uninstall com.example.sleeptight || true
 
-	@echo ">>> Installing debug APK on 192.168.137.89:38965..."
-	adb -s 192.168.137.89:38965 install "build/app/outputs/flutter-apk/app-debug.apk"
+	@echo ">>> Installing debug APK on R39M208CZ1B..."
+	adb -s R39M208CZ1B install "build/app/outputs/flutter-apk/app-release.apk"
 
 galaxy10-simulator: icon splash
-	flutter run -d 192.168.137.89:38965
+	flutter run -d R39M208CZ1B
 
 ios-simulator: icon splash
 	flutter run -d 8E36C206-B199-4E83-BFE2-5095FB37019B

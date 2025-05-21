@@ -43,6 +43,12 @@ class AudioController extends StateNotifier<AudioState> {
     // 일시정지 호출
     await state.player.pause();
   }
+
+  /// 패널 닫힐 때 호출: 재생 중지 & music 필드 null 처리
+  Future<void> stop() async {
+    await state.player.pause();
+    state = AudioState(state.player, music: null, isPlaying: false);
+  }
 }
 
 final audioControllerProvider =
