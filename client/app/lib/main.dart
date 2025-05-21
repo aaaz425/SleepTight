@@ -1,7 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/theme.dart';
 import 'package:sleep_tight/core/error/api_exception.dart';
+import 'package:sleep_tight/core/service/fcm_messaging_service.dart';
 import 'package:sleep_tight/core/storage/shared_preferences_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +33,10 @@ final apiErrorStreamProvider = StreamProvider<ApiErrorEvent>((ref) {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+  await FirebaseMessaging.instance.requestPermission();
+  await FcmService.initFCM();
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
@@ -66,7 +73,7 @@ void main() async {
 
   // 여기서 secureStorage에 accessToken이 있는지 확인하고
   // 이 token을 통해 회원정보를 제대로 가져오는지 확인하고
-  // 잘 가져오면 /home으로 이동 
+  // 잘 가져오면 /home으로 이동
   // 잘 가져오지 않으면 로그아웃 처리.
 
   // ProviderScope로 앱을 감싸 Riverpod을 사용할 수 있도록 합니다.

@@ -12,7 +12,7 @@ class SleepEndRequest {
   Map<String, dynamic> toJson() {
     return {
       'reportId': reportId,
-      'sleepEndTime': sleepEndTime.toIso8601String(),
+      'sleepEndTime': sleepEndTime.toUtc().toIso8601String(),
       'stages': stages,
     };
   }

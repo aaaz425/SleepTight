@@ -82,6 +82,7 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
       if (reportId != 0) {
         final recorderService = AudioRecordingService();
         await recorderService.init(dioClient); // 최초 1회만
+        recorderService.enqueueRecord(reportId.toString());
         _sendTimer = Timer.periodic(const Duration(seconds: 10), (_) {
           recorderService.enqueueRecord(reportId.toString());
         });
@@ -206,8 +207,9 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
                         await dio.post(
                           AppConfig.api.sleep.activityData,
                           data: {
-                            'startTime': activityStart.toIso8601String(),
-                            'endTime': endTime.toIso8601String(),
+                            'startTime':
+                                activityStart.toUtc().toIso8601String(),
+                            'endTime': endTime.toUtc().toIso8601String(),
                             'records': activityData,
                           },
                         );

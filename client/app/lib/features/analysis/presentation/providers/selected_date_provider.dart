@@ -7,7 +7,7 @@ final selectedDateProvider = NotifierProvider<SelectedDateNotifier, DateTime>(
 class SelectedDateNotifier extends Notifier<DateTime> {
   @override
   DateTime build() {
-    return DateTime.now(); // 초기값 = 오늘
+    return DateTime.now().toUtc(); // 초기값 = 오늘
   }
 
   void update(DateTime newDate) {

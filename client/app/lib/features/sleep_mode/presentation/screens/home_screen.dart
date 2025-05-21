@@ -33,8 +33,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     try {
       await Permission.location.request();
       await Permission.microphone.request();
-      await _healthService.ensureConfigured();
       await Permission.activityRecognition.request();
+      await _healthService.requestHealthPermissions();
     } catch (e) {
       print("⚠️ 권한 요청 중 오류 발생: $e");
     }

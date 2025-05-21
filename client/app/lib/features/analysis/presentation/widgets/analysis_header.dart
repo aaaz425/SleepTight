@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/calendar.dart';
 
@@ -37,11 +38,7 @@ class AnalysisHeader extends ConsumerWidget {
           Center(
             child: Text(
               getDateRange(selectedDate),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.titleT2Sb(color: AppColors.white),
             ),
           ),
           Positioned(
@@ -70,8 +67,8 @@ class AnalysisHeader extends ConsumerWidget {
                                 },
                                 child: BackdropFilter(
                                   filter: ImageFilter.blur(
-                                    sigmaX: 5,
-                                    sigmaY: 5,
+                                    sigmaX: 4,
+                                    sigmaY: 4,
                                   ),
                                   child: Container(
                                     color: const Color(0xB3000000),

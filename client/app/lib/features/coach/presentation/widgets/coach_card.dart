@@ -3,7 +3,8 @@ import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/coach/data/models/sleep_coach_meta.dart';
 import 'package:sleep_tight/features/coach/data/models/sleep_coach_model.dart';
-import 'package:sleep_tight/features/coach/data/models/sleep_coach_type_enum.dart'; // ✅ enum 확장
+import 'package:sleep_tight/features/coach/data/models/sleep_coach_type_enum.dart';
+import 'package:intl/intl.dart';
 
 class CoachingCard extends StatelessWidget {
   final SleepCoachModel item;
@@ -17,8 +18,11 @@ class CoachingCard extends StatelessWidget {
     final title = item.activity.toShortLabel();
     final unit = meta['unit'] as String;
 
-    final targetValue = item.value;
-    final progress = (100 / targetValue).clamp(0.0, 1.0);
+    final value = item.value;
+    final target = item.target;
+    final progress = (value / target).clamp(0.0, 1.0);
+    final formattedValue = NumberFormat('#,##0.##').format(value);
+    final formattedTarget = NumberFormat('#,##0.##').format(target);
     final percent = (progress * 100).toInt();
 
     return Column(
@@ -59,7 +63,7 @@ class CoachingCard extends StatelessWidget {
                 bottom: 8,
                 child: Text(
                   item.description,
-                  style: AppTextStyles.bodyB4Rg(color: AppColors.white),
+                  style: AppTextStyles.bodyB5Rg(color: AppColors.white),
                 ),
               ),
             ],
@@ -95,7 +99,7 @@ class CoachingCard extends StatelessWidget {
 
         // 수치 정보
         Text(
-          '100$unit / ${targetValue.toStringAsFixed(0)}$unit',
+          '$formattedValue$unit / $formattedTarget$unit',
           style: AppTextStyles.bodyB2Rg(color: AppColors.font2),
         ),
       ],

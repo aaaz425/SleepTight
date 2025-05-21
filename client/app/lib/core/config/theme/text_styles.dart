@@ -71,6 +71,26 @@ class AppTextStyles {
     color: color,
   );
 
+  // Body/B5_Rg
+  static TextStyle bodyB5Rg({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w400, // regular
+    fontSize: 12,
+    height: 1.4, // 140%
+    letterSpacing: -0.45,
+    color: color,
+  );
+
+  // Body/B4_Sb
+  static TextStyle bodyB4Sb({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w600, // semibold
+    fontSize: 12,
+    height: 1.4, // 140%
+    letterSpacing: -0.3, // -2.5% of 12 = -0.3
+    color: color,
+  );
+
   // Body/B2_Rg
   static TextStyle bodyB2Rg({required Color color}) => TextStyle(
     fontFamily: 'Pretendard',
@@ -85,6 +105,16 @@ class AppTextStyles {
   static TextStyle bodyB2Sb({required Color color}) => TextStyle(
     fontFamily: 'Pretendard',
     fontWeight: FontWeight.w600, // semibold
+    fontSize: 14,
+    height: 1.4, // 140%
+    letterSpacing: -0.4, // -2.5% of 14 = -0.4
+    color: color,
+  );
+
+  // Body/B2_Lt
+  static TextStyle bodyB2Lt({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w300, // light
     fontSize: 14,
     height: 1.4, // 140%
     letterSpacing: -0.4, // -2.5% of 14 = -0.4
@@ -128,5 +158,14 @@ class AppTextStyles {
     height: 1.4, // 140%
     letterSpacing: -0.325, // -2.5% of 13 = -0.325
     color: color,
+  );
+
+  // Caption/C3_Rg
+  static TextStyle captionC3Rg({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w400, // regular
+    fontSize: 11,
+    height: 1.4, // 140%
+    letterSpacing: -0.45, // -2.5% of 18 = -0.45   color: color,
   );
 }

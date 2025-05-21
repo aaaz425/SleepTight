@@ -5,28 +5,16 @@ import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/coach/data/models/sleep_coach_model.dart';
 import 'package:sleep_tight/features/coach/data/services/sleep_coach_service.dart';
 import 'package:sleep_tight/features/coach/presentation/widgets/coach_card.dart';
+import 'package:sleep_tight/features/sleep_mode/domain/services/activity_data_service.dart';
 
-class SleepCoachingScreen extends ConsumerStatefulWidget {
+class SleepCoachingScreen extends ConsumerWidget {
   const SleepCoachingScreen({super.key});
 
   @override
-  ConsumerState<SleepCoachingScreen> createState() =>
-      _SleepCoachingScreenState();
-}
-
-class _SleepCoachingScreenState extends ConsumerState<SleepCoachingScreen> {
-  late final Future<List<SleepCoachModel>> _coachingFuture;
-
-  @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    _coachingFuture = fetchSleepCoach(ref, today);
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(44),
@@ -41,7 +29,7 @@ class _SleepCoachingScreenState extends ConsumerState<SleepCoachingScreen> {
         ),
       ),
       body: FutureBuilder<List<SleepCoachModel>>(
-        future: _coachingFuture,
+        future: _loadCoaching(ref, today, now),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -53,28 +41,23 @@ class _SleepCoachingScreenState extends ConsumerState<SleepCoachingScreen> {
             return Center(
               child: Text(
                 '문제가 발생했어요: ${snapshot.error}',
-                style: const TextStyle(color: AppColors.red),
+                style: AppTextStyles.bodyB1Rg(color: AppColors.accessibleRed),
               ),
             );
           }
 
           final data = snapshot.data ?? [];
           if (data.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
                 '아직 오늘의 수면 코칭 데이터가 없어요.',
-                style: TextStyle(fontSize: 16, color: AppColors.white),
+                style: AppTextStyles.bodyB1Rg(color: AppColors.white),
               ),
             );
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              top: 20,
-              left: 20,
-              right: 20,
-              bottom: 12,
-            ),
+            padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -95,5 +78,14 @@ class _SleepCoachingScreenState extends ConsumerState<SleepCoachingScreen> {
         },
       ),
     );
+  }
+
+  Future<List<SleepCoachModel>> _loadCoaching(
+    WidgetRef ref,
+    DateTime start,
+    DateTime end,
+  ) async {
+    final activityData = await getActivityData(start, end);
+    return fetchSleepCoach(ref, end, activityData);
   }
 }

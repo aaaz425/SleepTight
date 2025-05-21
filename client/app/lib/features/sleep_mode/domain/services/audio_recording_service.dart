@@ -167,7 +167,7 @@ class AudioRecordingService {
       final request = SleepSoundRequest(
         reportId: int.parse(reportId),
         segmentId: const Uuid().v4(),
-        timestamp: DateTime.now().toIso8601String(),
+        timestamp: DateTime.now().toUtc().toIso8601String(),
         duration: 10.0,
         file: file,
       );

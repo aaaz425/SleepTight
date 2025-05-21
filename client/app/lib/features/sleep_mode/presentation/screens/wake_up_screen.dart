@@ -64,7 +64,12 @@ class WakeUpScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // Todo: 일지 작성 페이지로 이동
+                        context.go(
+                          Uri(
+                            path: AppConfig.routes.sleepAnalysis,
+                            queryParameters: {'tab': 'diary'},
+                          ).toString(),
+                        );
                       },
                       child: const Text(
                         '일지 작성하기',

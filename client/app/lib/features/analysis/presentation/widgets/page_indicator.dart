@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 
 class PageIndicator extends StatelessWidget {
   final int total;
@@ -25,14 +26,13 @@ class PageIndicator extends StatelessWidget {
           return GestureDetector(
             onTap: () => onChanged(index),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
+              padding: EdgeInsets.symmetric(horizontal: 6),
               child: Text(
                 '${index + 1}',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? AppColors.white : AppColors.font2,
-                ),
+                style:
+                    isSelected
+                        ? AppTextStyles.bodyB2Sb(color: AppColors.white)
+                        : AppTextStyles.bodyB2Lt(color: AppColors.font2),
               ),
             ),
           );
