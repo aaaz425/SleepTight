@@ -200,10 +200,11 @@ class FullscreenPlayer extends ConsumerWidget {
                         );
                         final isPlaying =
                             ref.read(audioControllerProvider).isPlaying;
-                        if (isPlaying)
+                        if (isPlaying) {
                           notifier.pause();
-                        else
+                        } else {
                           notifier.play(music);
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

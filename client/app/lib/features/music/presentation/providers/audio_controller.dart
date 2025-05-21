@@ -12,7 +12,10 @@ class AudioState {
 
 class AudioController extends StateNotifier<AudioState> {
   AudioController()
-    : super(AudioState(AudioPlayer(), music: null, isPlaying: false));
+    : super(AudioState(AudioPlayer(), music: null, isPlaying: false)) {
+    // 트랙 재생 완료 시 자동 반복
+    state.player.setLoopMode(LoopMode.one);
+  }
 
   Future<void> play(MusicModel music) async {
     final url = music.streamUrl;
