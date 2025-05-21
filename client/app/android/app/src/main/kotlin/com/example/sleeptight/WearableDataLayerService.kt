@@ -70,23 +70,35 @@ class WearableDataLayerService(private val context: Context) : DataClient.OnData
         // 데이터 경로에 따라 처리
         when (path) {
             "/request_health_data" -> {
+                Log.d(TAG, "헬스 데이터 요청 감지 - 테스트 데이터 생성 시작")
                 scope.launch {
                     try {
-                        // 헬스 데이터 응답 생성 (예시)
+                        // 테스트용 헬스 데이터 응답 생성
                         val request = PutDataMapRequest.create("/health_data_response").apply {
                             dataMap.putBoolean("success", true)
                             dataMap.putString("message", "데이터 요청 수신함")
-                            dataMap.putInt("steps", 5000)
-                            dataMap.putInt("heartRate", 72)
-                            dataMap.putDouble("sleepDuration", 7.5)
+                            // 테스트 데이터 값
+                            dataMap.putInt("steps", 7500)
+                            dataMap.putInt("calories", 1800)
+                            dataMap.putDouble("water", 1200.0)
+                            dataMap.putDouble("caffeine", 180.0)
+                            dataMap.putInt("steps_goal", 10000)
+                            dataMap.putInt("calories_goal", 2200)
+                            dataMap.putInt("water_goal", 2000)
+                            dataMap.putInt("caffeine_goal", 400)
                             dataMap.putLong("timestamp", System.currentTimeMillis())
+                            
+                            Log.d(TAG, "테스트 헬스 데이터 생성 완료: steps=7500, calories=1800, water=1200ml, caffeine=180mg")
                         }
+                        
+                        Log.d(TAG, "테스트 헬스 데이터 전송 시작")
                         
                         // 응답 전송
                         withContext(Dispatchers.IO) {
                             val putDataReq = request.asPutDataRequest().setUrgent()
                             val dataItemTask = Wearable.getDataClient(context).putDataItem(putDataReq)
-                            Tasks.await(dataItemTask)
+                            val result = Tasks.await(dataItemTask)
+                            Log.d(TAG, "테스트 헬스 데이터 전송 결과: ${result.uri}")
                         }
                         
                         Log.d(TAG, "헬스 데이터 응답 전송 완료")
@@ -101,7 +113,7 @@ class WearableDataLayerService(private val context: Context) : DataClient.OnData
                     val amount = dataMap.getDouble("amount", 0.0)
                     val dateTime = dataMap.getString("dateTime", "")
                     
-                    Log.d(TAG, "물 섭취량: ${amount}ml, 시간: $dateTime")
+                    Log.d(TAG, "물 섭취량 수신: ${amount}ml, 시간: $dateTime")
                     
                     // 여기서 데이터를 처리하고 응답 전송
                     scope.launch {
@@ -134,7 +146,7 @@ class WearableDataLayerService(private val context: Context) : DataClient.OnData
                     val amount = dataMap.getDouble("amount", 0.0)
                     val dateTime = dataMap.getString("dateTime", "")
                     
-                    Log.d(TAG, "카페인 섭취량: ${amount}mg, 시간: $dateTime")
+                    Log.d(TAG, "카페인 섭취량 수신: ${amount}mg, 시간: $dateTime")
                     
                     // 여기서 데이터를 처리하고 응답 전송
                     scope.launch {
@@ -273,7 +285,39 @@ class WearableDataLayerService(private val context: Context) : DataClient.OnData
                 // 결과는 데이터 응답이 오면 처리
             } catch (e: Exception) {
                 Log.e(TAG, "데이터 전송 실패", e)
-                result.error("DATA_ERROR", "데이터 전송 실패", e.message)
+                result.error("SEND_ERROR", "데이터 전송 실패", e.message)
+            }
+        }
+    }
+    
+    /**
+     * 메시지 직접 전송 (MessageAPI 활용)
+     */
+    fun sendMessage(nodeId: String, path: String, message: String, result: MethodChannel.Result) {
+        scope.launch {
+            try {
+                Log.d(TAG, "메시지 전송 시작: 노드=$nodeId, 경로=$path")
+                
+                if (nodeId.isEmpty()) {
+                    Log.e(TAG, "유효하지 않은 노드 ID")
+                    result.error("INVALID_NODE", "유효하지 않은 노드 ID", null)
+                    return@launch
+                }
+                
+                // MessageClient를 사용하여 메시지 전송
+                val messageClient = Wearable.getMessageClient(context)
+                val sendMessageTask = messageClient.sendMessage(
+                    nodeId,
+                    path,
+                    message.toByteArray(Charsets.UTF_8)
+                )
+                
+                Tasks.await(sendMessageTask)
+                Log.d(TAG, "메시지 전송 성공")
+                result.success(true)
+            } catch (e: Exception) {
+                Log.e(TAG, "메시지 전송 실패", e)
+                result.error("MESSAGE_ERROR", "메시지 전송 실패", e.message)
             }
         }
     }
@@ -408,53 +452,11 @@ class WearableDataLayerService(private val context: Context) : DataClient.OnData
                         }
                         
                         "/update_water_intake_result" -> {
-                            Log.d(TAG, "📲 물 섭취량 업데이트 결과 수신")
-                            
-                            // DataMap을 JSONObject로 변환
-                            val jsonObject = JSONObject()
-                            for (key in dataMap.keySet()) {
-                                when {
-                                    dataMap.getString(key, "") != "" -> jsonObject.put(key, dataMap.getString(key, ""))
-                                    dataMap.getInt(key) != 0 -> jsonObject.put(key, dataMap.getInt(key))
-                                    dataMap.containsKey(key) -> jsonObject.put(key, dataMap.getDouble(key))
-                                }
-                            }
-                            
-                            val jsonString = jsonObject.toString()
-                            
-                            // Flutter로 결과 전달
-                            val callback = dataCallbacks.remove("/update_water_intake_result")
-                            if (callback != null) {
-                                Log.d(TAG, "📲 물 섭취량 업데이트 결과 콜백 호출")
-                                callback.success(jsonString)
-                            } else {
-                                Log.w(TAG, "⚠️ 물 섭취량 업데이트 결과 콜백이 없습니다")
-                            }
+                            handleUpdateResult(path, dataMap, "/update_water_intake_result")
                         }
                         
                         "/update_caffeine_intake_result" -> {
-                            Log.d(TAG, "📲 카페인 섭취량 업데이트 결과 수신")
-                            
-                            // DataMap을 JSONObject로 변환
-                            val jsonObject = JSONObject()
-                            for (key in dataMap.keySet()) {
-                                when {
-                                    dataMap.getString(key, "") != "" -> jsonObject.put(key, dataMap.getString(key, ""))
-                                    dataMap.getInt(key) != 0 -> jsonObject.put(key, dataMap.getInt(key))
-                                    dataMap.containsKey(key) -> jsonObject.put(key, dataMap.getDouble(key))
-                                }
-                            }
-                            
-                            val jsonString = jsonObject.toString()
-                            
-                            // Flutter로 결과 전달
-                            val callback = dataCallbacks.remove("/update_caffeine_intake_result")
-                            if (callback != null) {
-                                Log.d(TAG, "📲 카페인 섭취량 업데이트 결과 콜백 호출")
-                                callback.success(jsonString)
-                            } else {
-                                Log.w(TAG, "⚠️ 카페인 섭취량 업데이트 결과 콜백이 없습니다")
-                            }
+                            handleUpdateResult(path, dataMap, "/update_caffeine_intake_result")
                         }
                         
                         "/request_health_data" -> {
@@ -478,6 +480,34 @@ class WearableDataLayerService(private val context: Context) : DataClient.OnData
             Log.e(TAG, "데이터 처리 중 오류 발생", e)
         } finally {
             dataEvents.release()
+        }
+    }
+    
+    /**
+     * 업데이트 결과 처리 메소드
+     */
+    private fun handleUpdateResult(path: String, dataMap: DataMap, callbackKey: String) {
+        Log.d(TAG, "📲 ${if (path == "/update_water_intake_result") "물" else "카페인"} 업데이트 결과 수신")
+        
+        // DataMap을 JSONObject로 변환
+        val jsonObject = JSONObject()
+        for (key in dataMap.keySet()) {
+            when {
+                dataMap.getString(key, "") != "" -> jsonObject.put(key, dataMap.getString(key, ""))
+                dataMap.getInt(key) != 0 -> jsonObject.put(key, dataMap.getInt(key))
+                dataMap.containsKey(key) -> jsonObject.put(key, dataMap.getDouble(key))
+            }
+        }
+        
+        val jsonString = jsonObject.toString()
+        
+        // Flutter로 결과 전달
+        val callback = dataCallbacks.remove(callbackKey)
+        if (callback != null) {
+            Log.d(TAG, "📲 업데이트 결과 콜백 호출")
+            callback.success(jsonString)
+        } else {
+            Log.w(TAG, "⚠️ 업데이트 결과 콜백이 없습니다")
         }
     }
 } 

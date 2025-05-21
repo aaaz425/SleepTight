@@ -127,6 +127,15 @@ class MainActivity: FlutterActivity() {
                     wearableService.sendData(path, jsonData, result)
                 }
                 
+                "sendMessage" -> {
+                    val nodeId = call.argument<String>("nodeId") ?: ""
+                    val path = call.argument<String>("path") ?: ""
+                    val message = call.argument<String>("message") ?: ""
+                    
+                    Log.d(TAG, "sendMessage 메서드 호출됨: nodeId=$nodeId, path=$path")
+                    wearableService.sendMessage(nodeId, path, message, result)
+                }
+                
                 else -> {
                     Log.w(TAG, "지원하지 않는 메서드 호출: ${call.method}")
                     result.notImplemented()

@@ -78,7 +78,7 @@
 
         <!-- Wear OS 메시지 수신을 위한 서비스 등록 -->
         <service
-            android:name="com.example.sleeptight.WearableListenerService"
+            android:name=".WearableListenerService"
             android:exported="true"
             android:enabled="true">
             <intent-filter android:priority="1000">
@@ -90,7 +90,7 @@
             <!-- 명시적으로 패키지 이름 설정 -->
             <meta-data
                 android:name="com.google.android.gms.wearable.knownhost"
-                android:value="com.example.wear"/>
+                android:value="com.example.sleeptight.wear"/>
         </service>
 
         <receiver
