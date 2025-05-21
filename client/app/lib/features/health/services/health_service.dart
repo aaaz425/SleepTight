@@ -45,7 +45,7 @@ class HealthService {
   ];
 
   // Helper to ensure Health plugin is configured
-  Future<void> _ensureConfigured() async {
+  Future<void> ensureConfigured() async {
     if (!_isConfigured) {
       try {
         // Health Connect 사용 가능하면 사용하도록 설정 (Android 해당)
@@ -62,7 +62,7 @@ class HealthService {
     DateTime startDate,
     DateTime endDate,
   ) async {
-    await _ensureConfigured();
+    await ensureConfigured();
     if (!_isConfigured) {
       print("HealthService: 설정 실패, 활동 데이터를 가져올 수 없습니다.");
       return [];
@@ -105,7 +105,7 @@ class HealthService {
     DateTime startDate,
     DateTime endDate,
   ) async {
-    await _ensureConfigured();
+    await ensureConfigured();
     if (!_isConfigured) {
       print("HealthService: 설정 실패, 수면 데이터를 가져올 수 없습니다.");
       return [];
@@ -147,7 +147,7 @@ class HealthService {
 
   /// 활동 및 수면 데이터를 문자열로 포맷하여 반환합니다.
   Future<String> getHealthDataAsString() async {
-    await _ensureConfigured();
+    await ensureConfigured();
     if (!_isConfigured) {
       return "HealthService: 설정 실패, 데이터를 문자열로 변환할 수 없습니다.";
     }

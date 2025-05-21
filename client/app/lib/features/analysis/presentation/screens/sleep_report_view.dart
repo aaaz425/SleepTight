@@ -57,227 +57,222 @@ class _SleepReportViewState extends State<SleepReportView> {
 
   String formatTime(DateTime? time) {
     if (time == null) return '-';
-    return DateFormat('a hh:mm', 'ko').format(time);
+    final formatted = DateFormat('a hh:mm', 'en').format(time);
+    return formatted.replaceFirst('AM', '오전').replaceFirst('PM', '오후');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: widget.reports.length,
-                onPageChanged: (i) {
-                  setState(() => _currentIndex = i);
-                  widget.onPageChanged?.call(i);
-                },
-                itemBuilder: (context, index) {
-                  final report = widget.reports[index];
-                  final stages = report.sleepStages;
-                  final isStagesEmpty = stages.isEmpty;
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: widget.reports.length,
+            onPageChanged: (i) {
+              setState(() => _currentIndex = i);
+              widget.onPageChanged?.call(i);
+            },
+            itemBuilder: (context, index) {
+              final report = widget.reports[index];
+              final stages = report.sleepStages;
+              final isStagesEmpty = stages.isEmpty;
 
-                  final latency = report.sleepLatency ?? Duration.zero;
-                  final awake = report.totalAwakeTime ?? Duration.zero;
-                  final light = report.totalLightSleepTime ?? Duration.zero;
-                  final deep = report.totalDeepSleepTime ?? Duration.zero;
-                  final rem = report.totalRemSleepTime ?? Duration.zero;
-                  final awakenCount = report.awakenCount ?? 0;
+              final latency = report.sleepLatency ?? Duration.zero;
+              final awake = report.totalAwakeTime ?? Duration.zero;
+              final light = report.totalLightSleepTime ?? Duration.zero;
+              final deep = report.totalDeepSleepTime ?? Duration.zero;
+              final rem = report.totalRemSleepTime ?? Duration.zero;
+              final awakenCount = report.awakenCount ?? 0;
 
-                  final totalSleep = light + deep + rem;
-                  final durationInBed = report.sleepEndTime.difference(
-                    report.sleepStartTime,
-                  );
+              final totalSleep = light + deep + rem;
+              final durationInBed = report.sleepEndTime.difference(
+                report.sleepStartTime,
+              );
 
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                color: AppColors.white,
-                                fontSize: 16,
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 16,
+                          ),
+                          children: [
+                            TextSpan(
+                              text:
+                                  '${DateFormat('M월 d일', 'ko').format(report.sleepStartTime)}에는 총 ',
+                            ),
+                            TextSpan(
+                              text: formatDuration(totalSleep),
+                              style: TextStyle(
+                                color: AppColors.sub1,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            TextSpan(text: ' 동안 잤습니다.'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 20,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.gray02,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                TextSpan(
-                                  text:
-                                      '${DateFormat('M월 d일', 'ko').format(report.sleepStartTime)}에는 총 ',
+                                _buildTimeColumn(
+                                  '취침 시간',
+                                  formatTime(report.sleepStartTime),
                                 ),
-                                TextSpan(
-                                  text: formatDuration(totalSleep),
-                                  style: TextStyle(
-                                    color: AppColors.sub1,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                _buildTimeColumn(
+                                  '기상 시간',
+                                  formatTime(report.sleepEndTime),
                                 ),
-                                TextSpan(text: ' 동안 잤습니다.'),
                               ],
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 20,
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.gray02,
-                              borderRadius: BorderRadius.circular(8),
+                            const SizedBox(height: 12),
+                            _buildLabelRow(
+                              '누워 있던 시간',
+                              formatDuration(durationInBed),
                             ),
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                Row(
+                            const SizedBox(height: 4),
+                            _buildLabelRow(
+                              '실제 수면 시간',
+                              formatDuration(totalSleep),
+                            ),
+                            const SizedBox(height: 4),
+                            _buildLabelRow(
+                              '잠드는 데 걸린 시간',
+                              formatDuration(latency),
+                            ),
+                            const SizedBox(height: 4),
+                            _buildLabelRow('잠에서 깬 횟수', '$awakenCount회'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '수면 단계',
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          isStagesEmpty
+                              ? SizedBox(
+                                height: 100,
+                                child: Stack(
+                                  fit: StackFit.expand,
                                   children: [
-                                    _buildTimeColumn(
-                                      '취침 시간',
-                                      formatTime(report.sleepStartTime),
+                                    // 블러 적용된 이미지
+                                    ClipRect(
+                                      child: ImageFiltered(
+                                        imageFilter: ImageFilter.blur(
+                                          sigmaX: 2,
+                                          sigmaY: 2,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/images/sleep_stage_sample.png',
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
                                     ),
-                                    _buildTimeColumn(
-                                      '기상 시간',
-                                      formatTime(report.sleepEndTime),
+
+                                    // 텍스트는 블러 바깥
+                                    const Center(
+                                      child: Text(
+                                        '수면 단계를 분석하려면 수면 시 웨어러블 기기를 착용하셔야 합니다',
+                                        style: TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
-                                _buildLabelRow(
-                                  '누워 있던 시간',
-                                  formatDuration(durationInBed),
-                                ),
-                                const SizedBox(height: 4),
-                                _buildLabelRow(
-                                  '실제 수면 시간',
-                                  formatDuration(totalSleep),
-                                ),
-                                const SizedBox(height: 4),
-                                _buildLabelRow(
-                                  '잠드는 데 걸린 시간',
-                                  formatDuration(latency),
-                                ),
-                                const SizedBox(height: 4),
-                                _buildLabelRow('잠에서 깬 횟수', '$awakenCount회'),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 20,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                '수면 단계',
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              )
+                              : SizedBox(
+                                height: 100,
+                                child: SleepStageLineChart(stages: stages),
                               ),
-                              const SizedBox(height: 16),
-                              isStagesEmpty
-                                  ? SizedBox(
-                                    height: 100,
-                                    child: Stack(
-                                      fit: StackFit.expand,
-                                      children: [
-                                        // 블러 적용된 이미지
-                                        ClipRect(
-                                          child: ImageFiltered(
-                                            imageFilter: ImageFilter.blur(
-                                              sigmaX: 2,
-                                              sigmaY: 2,
-                                            ),
-                                            child: Image.asset(
-                                              'assets/images/sleep_stage_sample.png',
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                        ),
-
-                                        // 텍스트는 블러 바깥
-                                        const Center(
-                                          child: Text(
-                                            '수면 단계를 분석하려면 수면 시 웨어러블 기기를 착용하셔야 합니다',
-                                            style: TextStyle(
-                                              color: AppColors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                  : SizedBox(
-                                    height: 100,
-                                    child: SleepStageLineChart(stages: stages),
-                                  ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 20,
-                            right: 20,
-                            top: 10,
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/clock.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: AppColors.gray07,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Text(
-                                    '수면 단계별 시간',
-                                    style: TextStyle(
-                                      color: AppColors.font1,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              _buildStageCard(
-                                awake: awake,
-                                rem: rem,
-                                light: light,
-                                deep: deep,
-                                totalSleep: totalSleep,
-                                formatDuration: formatDuration,
-                                formatPercent: formatPercent,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SleepSound(reportId: report.sleepReportId),
-                      ],
+                        ],
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 10,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/icons/clock.svg',
+                                width: 20,
+                                height: 20,
+                                color: AppColors.gray07,
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                '수면 단계별 시간',
+                                style: TextStyle(
+                                  color: AppColors.font1,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          _buildStageCard(
+                            awake: awake,
+                            rem: rem,
+                            light: light,
+                            deep: deep,
+                            totalSleep: totalSleep,
+                            formatDuration: formatDuration,
+                            formatPercent: formatPercent,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SleepSound(reportId: report.sleepReportId),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: PageIndicator(
+        if (widget.reports.length > 1)
+          PageIndicator(
             total: widget.reports.length,
             current: _currentIndex,
             onChanged: (index) {
@@ -290,13 +285,13 @@ class _SleepReportViewState extends State<SleepReportView> {
               widget.onPageChanged?.call(index);
             },
           ),
-        ),
       ],
     );
   }
 
   Widget _buildTimeColumn(String label, String value) {
-    return Expanded(
+    return SizedBox(
+      width: 120,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -348,51 +343,46 @@ class _SleepReportViewState extends State<SleepReportView> {
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: _buildStageColumn(
-                  '비수면',
-                  AppColors.white,
-                  awake,
-                  totalSleep,
-                  formatDuration,
-                  formatPercent,
-                ),
+              _buildStageColumn(
+                '비수면',
+                AppColors.white,
+                awake,
+                totalSleep,
+                formatDuration,
+                formatPercent,
               ),
-              Expanded(
-                child: _buildStageColumn(
-                  '렘수면',
-                  AppColors.sub2,
-                  rem,
-                  totalSleep,
-                  formatDuration,
-                  formatPercent,
-                ),
+              _buildStageColumn(
+                '렘수면',
+                AppColors.sub2,
+                rem,
+                totalSleep,
+                formatDuration,
+                formatPercent,
               ),
             ],
           ),
           const SizedBox(height: 12),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
-              Expanded(
-                child: _buildStageColumn(
-                  '얕은 수면',
-                  AppColors.sub1,
-                  light,
-                  totalSleep,
-                  formatDuration,
-                  formatPercent,
-                ),
+              _buildStageColumn(
+                '얕은 수면',
+                AppColors.sub1,
+                light,
+                totalSleep,
+                formatDuration,
+                formatPercent,
               ),
-              Expanded(
-                child: _buildStageColumn(
-                  '깊은 수면',
-                  AppColors.sub1Vr,
-                  deep,
-                  totalSleep,
-                  formatDuration,
-                  formatPercent,
-                ),
+              _buildStageColumn(
+                '깊은 수면',
+                AppColors.sub1Vr,
+                deep,
+                totalSleep,
+                formatDuration,
+                formatPercent,
               ),
             ],
           ),
@@ -409,35 +399,41 @@ class _SleepReportViewState extends State<SleepReportView> {
     String Function(Duration) formatDuration,
     String Function(Duration, Duration) formatPercent,
   ) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(2),
+    return SizedBox(
+      width: 120,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            const SizedBox(width: 2),
-            Text(label, style: AppTextStyles.bodyB4Rg(color: AppColors.font2)),
-          ],
-        ),
-        const SizedBox(height: 4),
+              const SizedBox(width: 2),
+              Text(
+                label,
+                style: AppTextStyles.bodyB4Rg(color: AppColors.font2),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
 
-        Text(
-          formatPercent(duration, total),
-          style: AppTextStyles.titleT3Sb(color: color),
-        ),
-        Text(
-          formatDuration(duration),
-          style: AppTextStyles.bodyB2Rg(color: AppColors.font2),
-        ),
-      ],
+          Text(
+            formatPercent(duration, total),
+            style: AppTextStyles.titleT3Sb(color: color),
+          ),
+          Text(
+            formatDuration(duration),
+            style: AppTextStyles.bodyB2Rg(color: AppColors.font2),
+          ),
+        ],
+      ),
     );
   }
 }

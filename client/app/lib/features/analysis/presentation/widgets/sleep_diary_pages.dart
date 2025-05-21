@@ -31,31 +31,24 @@ class _SleepDiaryPagesState extends State<SleepDiaryPages> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: widget.reports.length,
-                onPageChanged: (i) {
-                  setState(() => _currentIndex = i);
-                  widget.onPageChanged?.call(i);
-                },
-                itemBuilder: (context, index) {
-                  final report = widget.reports[index];
-                  return SleepDiaryView(reportId: report.sleepReportId);
-                },
-              ),
-            ),
-          ],
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: widget.reports.length,
+            onPageChanged: (i) {
+              setState(() => _currentIndex = i);
+              widget.onPageChanged?.call(i);
+            },
+            itemBuilder: (context, index) {
+              final report = widget.reports[index];
+              return SleepDiaryView(reportId: report.sleepReportId);
+            },
+          ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: PageIndicator(
+        if (widget.reports.length > 1)
+          PageIndicator(
             total: widget.reports.length,
             current: _currentIndex,
             onChanged: (index) {
@@ -68,7 +61,6 @@ class _SleepDiaryPagesState extends State<SleepDiaryPages> {
               widget.onPageChanged?.call(index);
             },
           ),
-        ),
       ],
     );
   }

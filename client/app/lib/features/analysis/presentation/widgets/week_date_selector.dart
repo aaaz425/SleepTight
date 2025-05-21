@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/features/analysis/data/services/sleep_report_calendar_service.dart';
 import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -21,85 +22,118 @@ class WeekDateSelector extends ConsumerWidget {
     final selectedDate = ref.watch(selectedDateProvider);
     final weekDates = _getWeekDates(selectedDate);
 
-    return Container(
-      height: 80,
-      color: AppColors.gray02,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-        child: Row(
-          children:
-              weekDates.map((date) {
-                final isSelected = isSameDay(date, selectedDate);
-                final isSaturday = date.weekday == DateTime.saturday;
-                final isSunday = date.weekday == DateTime.sunday;
-                final now = DateTime.now();
-                final today = DateTime(now.year, now.month, now.day);
-                final targetDate = DateTime(date.year, date.month, date.day);
-                final isFuture = targetDate.isAfter(today);
+    final sleepDatesFuture = fetchSleepDates(ref, selectedDate);
 
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      final now = DateTime.now();
-                      final today = DateTime(now.year, now.month, now.day);
-                      final targetDate = DateTime(
-                        date.year,
-                        date.month,
-                        date.day,
-                      );
+    return FutureBuilder<List<DateTime>>(
+      future: sleepDatesFuture,
+      builder: (context, snapshot) {
+        final sleepDates = snapshot.data ?? [];
 
-                      if (!targetDate.isAfter(today)) {
-                        ref.read(selectedDateProvider.notifier).update(date);
-                      }
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected ? AppColors.gray03 : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            weekDayLabels[date.weekday - 1],
-                            style: TextStyle(
-                              fontSize: 12,
-                              color:
-                                  (isSunday
-                                      ? AppColors.accessibleRed
-                                      : isSaturday
-                                      ? AppColors.accessibleBlue
-                                      : isSelected
-                                      ? Colors.white
-                                      : AppColors.font2),
-                            ),
+        return Container(
+          height: 80,
+          color: AppColors.gray02,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+            child: Row(
+              children:
+                  weekDates.map((date) {
+                    final isSelected = isSameDay(date, selectedDate);
+                    final isSaturday = date.weekday == DateTime.saturday;
+                    final isSunday = date.weekday == DateTime.sunday;
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+                    final targetDate = DateTime(
+                      date.year,
+                      date.month,
+                      date.day,
+                    );
+                    final isFuture = targetDate.isAfter(today);
+                    final hasReport = sleepDates.any((d) => isSameDay(d, date));
+
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          final now = DateTime.now();
+                          final today = DateTime(now.year, now.month, now.day);
+                          final targetDate = DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                          );
+
+                          if (!targetDate.isAfter(today)) {
+                            ref
+                                .read(selectedDateProvider.notifier)
+                                .update(date);
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? AppColors.gray03
+                                    : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${date.day}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  isFuture
-                                      ? AppColors.font3
-                                      : isSunday
-                                      ? AppColors.accessibleRed
-                                      : isSaturday
-                                      ? AppColors.accessibleBlue
-                                      : AppColors.white,
-                            ),
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                weekDayLabels[date.weekday - 1],
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color:
+                                      (isSunday
+                                          ? AppColors.accessibleRed
+                                          : isSaturday
+                                          ? AppColors.accessibleBlue
+                                          : isSelected
+                                          ? Colors.white
+                                          : AppColors.font2),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Container(
+                                width: 28,
+                                height: 28,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  border:
+                                      (hasReport
+                                          ? Border.all(
+                                            color: AppColors.primary,
+                                            width: 1,
+                                          )
+                                          : null),
+                                ),
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        isFuture
+                                            ? AppColors.font3
+                                            : isSunday
+                                            ? AppColors.accessibleRed
+                                            : isSaturday
+                                            ? AppColors.accessibleBlue
+                                            : AppColors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
-        ),
-      ),
+                    );
+                  }).toList(),
+            ),
+          ),
+        );
+      },
     );
   }
 }

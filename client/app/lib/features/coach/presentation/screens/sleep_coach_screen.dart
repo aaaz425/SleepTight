@@ -1,34 +1,98 @@
-// SleepCoachingScreen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sleep_tight/features/coach/presentation/provider/sleep_coach.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
+import 'package:sleep_tight/features/coach/data/models/sleep_coach_model.dart';
+import 'package:sleep_tight/features/coach/data/services/sleep_coach_service.dart';
 import 'package:sleep_tight/features/coach/presentation/widgets/coach_card.dart';
-import 'package:intl/intl.dart';
 
-class SleepCoachingScreen extends ConsumerWidget {
+class SleepCoachingScreen extends ConsumerStatefulWidget {
   const SleepCoachingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SleepCoachingScreen> createState() =>
+      _SleepCoachingScreenState();
+}
+
+class _SleepCoachingScreenState extends ConsumerState<SleepCoachingScreen> {
+  late final Future<List<SleepCoachModel>> _coachingFuture;
+
+  @override
+  void initState() {
+    super.initState();
     final now = DateTime.now();
-    final formatted = DateFormat('yyyy-MM-dd').format(now); // → '2025-05-19'
+    final today = DateTime(now.year, now.month, now.day);
+    _coachingFuture = fetchSleepCoach(ref, today);
+  }
 
-    final coachingAsync = ref.watch(sleepCoachingProvider(formatted));
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: coachingAsync.when(
-        data:
-            (data) => ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final item = data[index];
-                return CoachingCard(item: item);
-              },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(44),
+        child: AppBar(
+          title: Text(
+            '수면 코칭',
+            style: AppTextStyles.headlineH3Sb(color: AppColors.white),
+          ),
+          scrolledUnderElevation: 0,
+          centerTitle: true,
+          elevation: 0,
+        ),
+      ),
+      body: FutureBuilder<List<SleepCoachModel>>(
+        future: _coachingFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.font3),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                '문제가 발생했어요: ${snapshot.error}',
+                style: const TextStyle(color: AppColors.red),
+              ),
+            );
+          }
+
+          final data = snapshot.data ?? [];
+          if (data.isEmpty) {
+            return const Center(
+              child: Text(
+                '아직 오늘의 수면 코칭 데이터가 없어요.',
+                style: TextStyle(fontSize: 16, color: AppColors.white),
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 20,
+              right: 20,
+              bottom: 12,
             ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('문제가 발생했어요: $e')),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'AI가 분석한 오늘의 수면 코칭',
+                  style: AppTextStyles.bodyB2Rg(color: AppColors.white),
+                ),
+                SizedBox(height: 8),
+                ...data.map(
+                  (item) => Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: CoachingCard(item: item),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

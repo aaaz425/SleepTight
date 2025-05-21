@@ -30,7 +30,7 @@ class AlarmTime {
     final amPm = prefs.getString('amPm') ?? '오전';
     final hour = prefs.getInt('hour') ?? 7;
     final minute = prefs.getInt('minute') ?? 0;
-    final isAlarmOn = prefs.getBool('isAlarmOn') ?? false;
+    final isAlarmOn = prefs.getBool('isAlarmOn') ?? true;
 
     return AlarmTime(
       amPm: amPm,
