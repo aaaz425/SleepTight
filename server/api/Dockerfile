@@ -19,12 +19,6 @@ RUN npm run build
 # 2단계: 프로덕션 이미지
 FROM node:lts-alpine
 
-# 타임존 설정
-RUN apk update \
- && apk add --no-cache tzdata \
- && cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
- && echo "Asia/Seoul" > /etc/timezone \
- && rm -rf /var/cache/apk/*
 
 # 작업 디렉토리 설정
 WORKDIR /app

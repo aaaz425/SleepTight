@@ -15,9 +15,6 @@ services:
     networks:
       - app-network
     restart: on-failure
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
 
   backend-green:
     image: xylitol311/sleep-tight-backend:latest
@@ -29,9 +26,6 @@ services:
     networks:
       - app-network
     restart: on-failure
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
 
   # ────────────────────────────────────────────
   # AI 서비스
@@ -47,9 +41,6 @@ services:
     networks:
       - app-network
     restart: on-failure
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
 
 networks:
   app-network:
