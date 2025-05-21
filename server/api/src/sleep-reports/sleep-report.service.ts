@@ -64,13 +64,16 @@ export class SleepReportService {
       sleepDate.setUTCDate(sleepDate.getUTCDate() - 1);
     }
 
-    const sleepDateOnly = new Date(
-      Date.UTC(
-        sleepDate.getUTCFullYear(),
-        sleepDate.getUTCMonth(),
-        sleepDate.getUTCDate(),
-      ),
-    );
+    // KST 기준으로 변환
+    function getKSTDateOnly(date: Date): Date {
+      const kstOffset = 9 * 60 * 60 * 1000;
+      const kstDate = new Date(date.getTime() + kstOffset);
+      return new Date(
+        Date.UTC(kstDate.getFullYear(), kstDate.getMonth(), kstDate.getDate()),
+      );
+    }
+
+    const sleepDateOnly = getKSTDateOnly(sleepDate);
 
     // 리포트 생성
     const newReport = this.reportFactory.createNew(
@@ -157,7 +160,19 @@ export class SleepReportService {
         const sounds = await this.sleepSoundFactory.findWithEventsByReportId(
           report.id,
         );
-
+        this.logger.debug(
+          `🧪 [DEBUG] Found ${sounds.length} sleep sounds for report ${report.id}`,
+        );
+        for (const sound of sounds) {
+          this.logger.debug(
+            `  └ segmentId: ${sound.segmentId}, events: ${sound.events?.length ?? 0}`,
+          );
+          for (const event of sound.events || []) {
+            this.logger.debug(
+              `      🔹 Event - label: ${event['label']}, duration: ${event['durationSeconds']}`,
+            );
+          }
+        }
         const { snoring, somniloquy, coughing } =
           this.sleepSoundService.calculateTotalDurationsFromSounds(sounds);
 
@@ -197,15 +212,40 @@ export class SleepReportService {
     userId: number,
     date: string,
   ): Promise<any[]> {
-    const targetDate = new Date(date);
-    if (!date || isNaN(targetDate.getTime())) {
-      throw new BadRequestException(ExceptionCode.INVALID_DATE_FORMAT);
+    // const targetDate = new Date(date);
+    // if (!date || isNaN(targetDate.getTime())) {
+    //   throw new BadRequestException(ExceptionCode.INVALID_DATE_FORMAT);
+    // }
+    // const reports = await this.reportRepo.find({
+    //   where: {
+    //     userId,
+    //     isValidReport: true,
+    //     sleepDate: targetDate,
+    //   },
+    //   order: { sleepEndTime: 'DESC' },
+    // });
+
+    // KST 기준으로 범위 구하기
+    function getKSTRange(date: Date): { start: Date; end: Date } {
+      const kstOffset = 9 * 60 * 60 * 1000;
+
+      const kstDate = new Date(date.getTime() + kstOffset);
+      const start = new Date(
+        Date.UTC(kstDate.getFullYear(), kstDate.getMonth(), kstDate.getDate()),
+      );
+      const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+
+      return { start, end };
     }
+
+    const inputDate = new Date(date);
+    const { start, end } = getKSTRange(inputDate);
+
     const reports = await this.reportRepo.find({
       where: {
         userId,
         isValidReport: true,
-        sleepDate: targetDate,
+        sleepDate: Between(start, end),
       },
       order: { sleepEndTime: 'DESC' },
     });
@@ -248,25 +288,44 @@ export class SleepReportService {
     );
   }
 
-  // 월별 수면 리포트가 존재하는 날짜 조회
+  // 월별 수면 리포트가 존재하는 날짜 조회 (KST 기준)
   async getReportDaysInMonth(
     userId: number,
     year: number,
     month: number,
   ): Promise<number[]> {
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999)); // 말일
+    function getKSTRangeForMonth(
+      year: number,
+      month: number,
+    ): { start: Date; end: Date } {
+      const KST_OFFSET = 9 * 60 * 60 * 1000;
+
+      const startUTC = new Date(Date.UTC(year, month - 1, 1));
+      const endUTC = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+
+      return {
+        start: new Date(startUTC.getTime() - KST_OFFSET),
+        end: new Date(endUTC.getTime() - KST_OFFSET),
+      };
+    }
+
+    const { start, end } = getKSTRangeForMonth(year, month);
 
     const reports = await this.reportRepo.find({
       where: {
         userId,
         isValidReport: true,
-        sleepDate: Between(startDate, endDate),
+        sleepDate: Between(start, end),
       },
       select: ['sleepDate'],
     });
 
-    const dateList = reports.map((r) => new Date(r.sleepDate).getUTCDate());
+    // KST 기준 날짜 추출
+    const dateList = reports.map((r) => {
+      const kst = new Date(r.sleepDate.getTime() + 9 * 60 * 60 * 1000);
+      return kst.getUTCDate();
+    });
+
     return [...new Set(dateList)].sort((a, b) => a - b);
   }
 }
