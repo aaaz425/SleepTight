@@ -5,9 +5,6 @@ export class SleepSoundAnalysisResponseDto {
   @ApiProperty()
   reportId: number;
 
-  @ApiProperty()
-  date: string;
-
   @ApiProperty({ type: [SleepSoundClipResponseDto] })
   sounds: SleepSoundClipResponseDto[];
 }

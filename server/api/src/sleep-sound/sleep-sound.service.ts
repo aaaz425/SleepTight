@@ -186,8 +186,9 @@ export class SleepSoundService {
       await this.sleepSoundFactory.findWithEventsByReportId(reportId);
     this.logger.debug('📌 loaded sounds:', sounds);
 
-    if (!sounds.length) {
-      throwBadRequest(ExceptionCode.SLEEP_SOUND_NOT_FOUND);
+    //수면 음성이 없는 경우 빈배열로 리턴
+    if (!sounds || sounds.length===0) {
+      return {reportId, sounds: []};
     }
 
     const result = await Promise.all(
@@ -217,7 +218,6 @@ export class SleepSoundService {
 
     return {
       reportId,
-      date: dayjs(sounds[0].startTime).utc().format('YYYY-MM-DD'),
       sounds: result,
     };
   }
