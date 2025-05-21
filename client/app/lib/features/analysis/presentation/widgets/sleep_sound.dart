@@ -6,13 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/analysis/data/models/sleep_sound_model.dart';
 import 'package:sleep_tight/features/analysis/data/services/sleep_sound_sevice.dart';
 import 'package:sleep_tight/features/analysis/data/services/sound_download_service.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:sleep_tight/features/analysis/data/services/wave_form_queue.dart';
 
 // 이상 현상 영역 표시 색상
-const Color anomalyHighlightColor = Color(0xFF3A6EFF);
+const Color anomalyHighlightColor = AppColors.primaryHv;
 
 // 전역 이퀄라이저 데이터 캐싱 (앱 실행 중 지속적으로 유지)
 final Map<int, List<double>> _globalWaveformCache = {};
@@ -31,6 +33,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
   late Future<List<SleepSoundModel>> _sleepSoundsFuture;
   final AudioPlayer _audioPlayer = AudioPlayer();
   final SoundDownloadService _downloadService = SoundDownloadService();
+  final waveformQueue = WaveformQueue();
   int _audioProgress = 0; // 재생 진행률 (0-100)
 
   // 각 음성 파일의 로컬 경로 캐싱
@@ -125,65 +128,52 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
       if (localPath != null) {
         _localFilePaths[sound.soundId] = localPath;
 
-        // 파형 데이터 추출
-        final waveform = await _extractWaveform(localPath);
-        if (waveform.isNotEmpty) {
-          _globalWaveformCache[sound.soundId] = waveform;
-        }
-      }
+        // 2. 파형 추출은 큐에 등록 → 직렬 실행
+        waveformQueue.add(() async {
+          final waveform = await _extractWaveform(localPath);
+          if (waveform.isNotEmpty) {
+            _globalWaveformCache[sound.soundId] = waveform;
 
-      _downloadingFiles.remove(sound.soundId);
-      if (mounted) setState(() {}); // UI 업데이트
+            _downloadingFiles.remove(sound.soundId);
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() {});
+            });
+          }
+        });
+      }
     }
   }
 
   // 파형 데이터 추출
   Future<List<double>> _extractWaveform(String filePath) async {
+    final playerController = PlayerController();
+
     try {
-      // 파일이 존재하는지 확인
-      final file = File(filePath);
-      if (!await file.exists()) {
+      await playerController.preparePlayer(path: filePath, noOfSamples: 100);
+
+      final waveformData = await playerController.extractWaveformData(
+        path: filePath,
+        noOfSamples: 100,
+      );
+
+      if (waveformData.isEmpty) {
         return _generateRandomWaveform();
       }
 
-      // 파형 추출 작업
-      final playerController = PlayerController();
+      double maxValue = waveformData.reduce((a, b) => a > b ? a : b);
+      maxValue = maxValue == 0 ? 1 : maxValue;
 
-      // 파일 준비
-      try {
-        await playerController.preparePlayer(path: filePath, noOfSamples: 100);
-
-        // 파형 데이터 추출
-        final waveformData = await playerController.extractWaveformData(
-          path: filePath,
-          noOfSamples: 100,
-        );
-
-        playerController.dispose();
-
-        if (waveformData.isEmpty) {
-          return _generateRandomWaveform();
-        }
-
-        // 데이터 정규화 (0.1 ~ 1.0 범위로)
-        double maxValue = 0.1;
-        for (final value in waveformData) {
-          if (value > maxValue) maxValue = value;
-        }
-
-        final normalizedData =
-            waveformData.map((value) {
-              return 0.1 + (value / maxValue) * 0.9;
-            }).toList();
-
-        return normalizedData;
-      } finally {
-        // 항상 컨트롤러 정리
-        playerController.dispose();
-      }
+      return waveformData.map((v) => 0.1 + (v / maxValue) * 0.9).toList();
     } catch (e) {
-      print('파형 추출 오류: $e');
+      print('❌ 파형 추출 실패: $e');
       return _generateRandomWaveform();
+    } finally {
+      try {
+        playerController.dispose(); // 💥 무조건 1번만 호출
+      } catch (disposeError) {
+        print('❌ dispose 중 에러: $disposeError');
+      }
     }
   }
 
@@ -317,18 +307,14 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
       future: _sleepSoundsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '감지 된 이상 현상',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.titleT3Sb(color: AppColors.white),
                 ),
                 SizedBox(height: 16),
                 Center(
@@ -347,14 +333,16 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
               children: [
                 Text(
                   '감지 된 이상 현상',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.titleT3Sb(color: AppColors.white),
                 ),
                 SizedBox(height: 16),
-                Center(child: Text('이상현상 데이터를 불러올 수 없습니다')),
+
+                Center(
+                  child: Text(
+                    '이상현상 데이터를 불러올 수 없습니다',
+                    style: AppTextStyles.titleT3Sb(color: AppColors.white),
+                  ),
+                ),
               ],
             ),
           );
@@ -362,24 +350,20 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
 
         final sounds = snapshot.data!;
         if (sounds.isEmpty) {
-          return const Padding(
+          return Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '감지 된 이상 현상',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.titleT3Sb(color: AppColors.white),
                 ),
                 SizedBox(height: 16),
                 Center(
                   child: Text(
                     '감지된 이상현상이 없습니다.',
-                    style: TextStyle(color: AppColors.font2),
+                    style: AppTextStyles.titleT3Sb(color: AppColors.white),
                   ),
                 ),
               ],
@@ -388,17 +372,13 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
         }
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 '감지 된 이상 현상',
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleT3Sb(color: AppColors.white),
               ),
               SizedBox(height: 16),
               for (final sound in sounds) _buildSoundItem(sound),
@@ -419,7 +399,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
     final clipDuration = sound.getClipDurationInSeconds();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.gray02,
         borderRadius: BorderRadius.circular(12),
@@ -428,7 +408,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
         children: [
           // 헤더 (이름 및 시간)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -436,11 +416,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
                 Expanded(
                   child: Text(
                     sound.getAnomalyText(),
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: AppTextStyles.bodyB4Rg(color: AppColors.font1),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -448,7 +424,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
                 // 시간 정보
                 Text(
                   '${sound.soundStartTime} ~ ${sound.soundEndTime}',
-                  style: const TextStyle(color: AppColors.font2, fontSize: 12),
+                  style: AppTextStyles.bodyB4Lt(color: AppColors.font2),
                 ),
               ],
             ),
@@ -458,7 +434,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
           GestureDetector(
             onTap: () => _togglePlayback(sound),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
               child: Row(
                 children: [
                   // 재생 버튼
@@ -518,13 +494,11 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
                                   color: AppColors.gray01.withOpacity(0.3),
                                   width: double.infinity,
                                   height: double.infinity,
-                                  child: const Center(
+                                  child: Center(
                                     child: Text(
                                       '다운로드 중',
-                                      style: TextStyle(
-                                        color: AppColors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                      style: AppTextStyles.bodyB4Sb(
+                                        color: AppColors.font1,
                                       ),
                                     ),
                                   ),
@@ -635,54 +609,3 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
     );
   }
 }
-
-const mockSleepSoundData = {
-  "reportId": 1,
-  "date": "2025-04-27",
-  "sounds": [
-    {
-      "soundId": 1,
-      "soundStartTime": "04:52:12",
-      "soundEndTime": "04:52:22",
-      "clipUrl": "assets/sound/alarm.mp3",
-      "events": [
-        {
-          "eventId": "ffggh1asdjsdzxc",
-          "anomaly": "snore",
-          "eventStartSec": 0,
-          "eventEndSec": 2,
-          "confidence": 0.92,
-        },
-        {
-          "eventId": "asdgh1asdj1hjk5h",
-          "anomaly": "talk",
-          "eventStartSec": 2,
-          "eventEndSec": 6,
-          "confidence": 0.98,
-        },
-      ],
-    },
-    {
-      "soundId": 2,
-      "soundStartTime": "05:52:12",
-      "soundEndTime": "05:52:22",
-      "clipUrl": "assets/sound/alarm.mp3",
-      "events": [
-        {
-          "eventId": "ffggh1asdjsdzxc",
-          "anomaly": "snore",
-          "eventStartSec": 0,
-          "eventEndSec": 2,
-          "confidence": 0.92,
-        },
-        {
-          "eventId": "asdgh1asdj1hjk5h",
-          "anomaly": "talk",
-          "eventStartSec": 2,
-          "eventEndSec": 6,
-          "confidence": 0.98,
-        },
-      ],
-    },
-  ],
-};
