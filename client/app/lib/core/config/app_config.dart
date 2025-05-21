@@ -122,7 +122,7 @@ class _SleepApiPaths {
   String get activityData =>
       '${ApiPaths._sleepDomain}/activity-data'; // POST api/sleep/activity-data
   String get coachRequest =>
-      '${ApiPaths._sleepDomain}/coaching'; // POST api/sleep-coaching
+      '${ApiPaths._sleepDomain}-coaching'; // POST api/sleep-coaching
 
   // Sleep Reports (under /sleep/report/*)
   String get reportBase =>

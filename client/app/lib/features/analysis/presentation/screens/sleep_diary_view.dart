@@ -103,7 +103,7 @@ class _SleepDiaryViewState extends ConsumerState<SleepDiaryView> {
                     ),
                   ),
                 ),
-                // 당일 수면인 경우에만 작성하기 버튼이 보여짐
+                // NOTE: 당일 수면인 경우에만 작성하기 버튼이 보여짐
                 if (!_isEditMode && DateTime.parse(diary.sleepDate).isToday)
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -150,9 +150,9 @@ class _SleepDiaryViewState extends ConsumerState<SleepDiaryView> {
           isSavable:
               _isFormValid &&
               _isFormChanged &&
-              (_isWakeMethodOtherSelected &&
-                  _formKey.currentState?.fields['wakeMethodEtc']?.value !=
-                      null),
+              (!_isWakeMethodOtherSelected ||
+                  (_formKey.currentState?.fields['wakeMethodEtc']?.value !=
+                      null)),
         );
       },
       loading:
@@ -324,7 +324,8 @@ Widget _buildDiaryForm(
                           ),
                         ),
                       ),
-                      // readOnly이고 지금 보고 있는 수면일지가 오늘의 수면일지라면 편집 버튼을 보여줌
+
+                      // NOTE: readOnly이고 지금 보고 있는 수면일지가 오늘의 수면일지라면 편집 버튼을 보여줌
                       if (readOnly && DateTime.parse(diary.sleepDate).isToday)
                         Padding(
                           padding: const EdgeInsets.only(
@@ -665,6 +666,7 @@ Widget _buildDiaryForm(
                 ),
               ),
               // 푸터 버튼. readOnly가 false일 때만 보여짐
+              // NOTE: 작성상태인 경우에만 보여야 함.
               if (!readOnly)
                 Padding(
                   padding: const EdgeInsets.symmetric(
