@@ -317,13 +317,13 @@ export class SleepReportService {
         isValidReport: true,
         sleepDate: Between(start, end),
       },
-      select: ['sleepDate'],
     });
 
     // KST 기준 날짜 추출
     const dateList = reports.map((r) => {
-      const kst = new Date(r.sleepDate.getTime() + 9 * 60 * 60 * 1000);
-      return kst.getUTCDate();
+      const sleepDate = new Date(r.sleepDate);
+      const kst = new Date(sleepDate.getTime() + 9 * 60 * 60 * 1000);
+      return kst.getDate();
     });
 
     return [...new Set(dateList)].sort((a, b) => a - b);
