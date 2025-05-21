@@ -169,7 +169,7 @@ export class SleepReportService {
           );
           for (const event of sound.events || []) {
             this.logger.debug(
-              `      🔹 Event - label: ${event['label']}, duration: ${event['durationSeconds']}`,
+              `🔹 Event - label: ${event.anomaly}, duration: ${event.endSec - event.startSec}`,
             );
           }
         }

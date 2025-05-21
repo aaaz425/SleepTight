@@ -57,7 +57,7 @@ export class SleepSoundFactory {
   }
 
   async findWithEventsByReportId(reportId: number): Promise<SleepSound[]> {
-    return this.sleepSoundRepo
+    const result = await this.sleepSoundRepo
       .createQueryBuilder('sound')
       .leftJoin('sound.sleepReport', 'report')
       .leftJoinAndMapMany(
@@ -68,6 +68,9 @@ export class SleepSoundFactory {
       )
       .where('report.id = :reportId', { reportId })
       .getMany();
+
+    console.log('📦 [DEBUG] sleepSounds with events:', result);
+    return result;
   }
 
   // reportId로 sleepSound 목록 가져오기
