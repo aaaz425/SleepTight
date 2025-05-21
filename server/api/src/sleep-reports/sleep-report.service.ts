@@ -49,31 +49,42 @@ export class SleepReportService {
       throwNotFoundException(ExceptionCode.USER_NOT_FOUND);
     }
 
-    // 목표 기상 시간 기준 sleepDate 계산 (UTC)
-    const [wakeHourStr, wakeMinuteStr] = user.wake_time.split(':');
-    const wakeDateTime = new Date(sleepStartTime);
-    wakeDateTime.setUTCHours(
+    // 사용자 시간대 설정 (기본값: Asia/Seoul)
+    const userTimezone = user.sleepPreferences?.timezone || 'Asia/Seoul';
+    
+    // 사용자 수면 설정 가져오기 (없으면 기본값 사용)
+    const targetWakeTime = user.sleepPreferences?.targetWakeTime || user.wake_time || "07:00";
+    const [wakeHourStr, wakeMinuteStr] = targetWakeTime.split(':');
+    
+    // 수면 시작 시간을 사용자 시간대로 변환
+    const options = { timeZone: userTimezone };
+    const localTime = sleepStartTime.toLocaleString('en-US', options);
+    const startDateInLocal = new Date(localTime);
+    
+    // 사용자 시간대 기준 목표 기상 시간 설정
+    const wakeTimeInLocal = new Date(startDateInLocal);
+    wakeTimeInLocal.setHours(
       parseInt(wakeHourStr, 10),
       parseInt(wakeMinuteStr, 10),
       0,
-      0,
+      0
     );
-
-    const sleepDate = new Date(sleepStartTime);
-    if (sleepStartTime < wakeDateTime) {
-      sleepDate.setUTCDate(sleepDate.getUTCDate() - 1);
+    
+    // 사용자 시간대 기준으로 수면 날짜 결정
+    const sleepDateInLocal = new Date(startDateInLocal);
+    if (startDateInLocal.getTime() < wakeTimeInLocal.getTime()) {
+      // 수면 시작이 목표 기상 시간보다 이전이면 전날로 간주
+      sleepDateInLocal.setDate(sleepDateInLocal.getDate() - 1);
     }
-
-    // KST 기준으로 변환
-    function getKSTDateOnly(date: Date): Date {
-      const kstOffset = 9 * 60 * 60 * 1000;
-      const kstDate = new Date(date.getTime() + kstOffset);
-      return new Date(
-        Date.UTC(kstDate.getFullYear(), kstDate.getMonth(), kstDate.getDate()),
-      );
-    }
-
-    const sleepDateOnly = getKSTDateOnly(sleepDate);
+    
+    // 날짜만 포함하는 UTC 기준 날짜 생성 (사용자 시간대의 날짜 기준)
+    const sleepDateOnly = new Date(
+      Date.UTC(
+        sleepDateInLocal.getFullYear(),
+        sleepDateInLocal.getMonth(),
+        sleepDateInLocal.getDate()
+      )
+    );
 
     // 리포트 생성
     const newReport = this.reportFactory.createNew(
@@ -81,8 +92,10 @@ export class SleepReportService {
       sleepStartTime,
       sleepDateOnly,
     );
-    newReport.targetStartTime = user.sleep_time;
-    newReport.targetEndTime = user.wake_time;
+    
+    // 목표 시간 설정 (getter를 통해 접근)
+    newReport.targetStartTime = user.sleep_time || "22:00";
+    newReport.targetEndTime = user.wake_time || "07:00";
     newReport.isValidReport = false;
 
     // 저장 후 리포트 ID 반환
@@ -212,34 +225,17 @@ export class SleepReportService {
     userId: number,
     date: string,
   ): Promise<any[]> {
-    // const targetDate = new Date(date);
-    // if (!date || isNaN(targetDate.getTime())) {
-    //   throw new BadRequestException(ExceptionCode.INVALID_DATE_FORMAT);
-    // }
-    // const reports = await this.reportRepo.find({
-    //   where: {
-    //     userId,
-    //     isValidReport: true,
-    //     sleepDate: targetDate,
-    //   },
-    //   order: { sleepEndTime: 'DESC' },
-    // });
-
-    // KST 기준으로 범위 구하기
-    function getKSTRange(date: Date): { start: Date; end: Date } {
-      const kstOffset = 9 * 60 * 60 * 1000;
-
-      const kstDate = new Date(date.getTime() + kstOffset);
-      const start = new Date(
-        Date.UTC(kstDate.getFullYear(), kstDate.getMonth(), kstDate.getDate()),
-      );
-      const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
-
-      return { start, end };
-    }
-
+    // 날짜 유효성 검사
     const inputDate = new Date(date);
-    const { start, end } = getKSTRange(inputDate);
+    if (!date || isNaN(inputDate.getTime())) {
+      throw new BadRequestException(ExceptionCode.INVALID_DATE_FORMAT);
+    }
+    
+    // UTC 기준으로 날짜 범위 구하기 (00:00:00 ~ 23:59:59)
+    const start = new Date(
+      Date.UTC(inputDate.getUTCFullYear(), inputDate.getUTCMonth(), inputDate.getUTCDate())
+    );
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
 
     const reports = await this.reportRepo.find({
       where: {
@@ -288,28 +284,15 @@ export class SleepReportService {
     );
   }
 
-  // 월별 수면 리포트가 존재하는 날짜 조회 (KST 기준)
+  // 월별 수면 리포트가 존재하는 날짜 조회 (UTC 기준)
   async getReportDaysInMonth(
     userId: number,
     year: number,
     month: number,
   ): Promise<number[]> {
-    function getKSTRangeForMonth(
-      year: number,
-      month: number,
-    ): { start: Date; end: Date } {
-      const KST_OFFSET = 9 * 60 * 60 * 1000;
-
-      const startUTC = new Date(Date.UTC(year, month - 1, 1));
-      const endUTC = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
-
-      return {
-        start: new Date(startUTC.getTime() - KST_OFFSET),
-        end: new Date(endUTC.getTime() - KST_OFFSET),
-      };
-    }
-
-    const { start, end } = getKSTRangeForMonth(year, month);
+    // UTC 기준으로 월 범위 구하기
+    const start = new Date(Date.UTC(year, month - 1, 1)); // 월 시작일(1일) 00:00:00
+    const end = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999)); // 월 마지막 날 23:59:59.999
 
     const reports = await this.reportRepo.find({
       where: {
@@ -319,11 +302,10 @@ export class SleepReportService {
       },
     });
 
-    // KST 기준 날짜 추출
+    // UTC 기준 날짜만 추출
     const dateList = reports.map((r) => {
       const sleepDate = new Date(r.sleepDate);
-      const kst = new Date(sleepDate.getTime() + 9 * 60 * 60 * 1000);
-      return kst.getDate();
+      return sleepDate.getUTCDate();
     });
 
     return [...new Set(dateList)].sort((a, b) => a - b);
