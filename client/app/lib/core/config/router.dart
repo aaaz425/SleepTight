@@ -2,6 +2,7 @@ import 'package:sleep_tight/features/analysis/presentation/screens/analysis_scre
 import 'package:sleep_tight/features/auth/presentation/screens/placeholder_screen.dart';
 import 'package:sleep_tight/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:sleep_tight/features/coach/presentation/screens/sleep_coach_screen.dart';
+import 'package:sleep_tight/features/music/presentation/screens/music_screen.dart';
 import 'package:sleep_tight/features/user/presentation/providers/user_provider.dart';
 import 'package:sleep_tight/features/user/presentation/screens/my_page_info_birthdate_screen.dart';
 import 'package:sleep_tight/features/user/presentation/screens/my_page_info_screen.dart';
@@ -190,9 +191,8 @@ final goRouterProvider = Provider.family<GoRouter, GlobalKey<NavigatorState>>((
       GoRoute(
         path: AppConfig.routes.sound, // 사운드
         pageBuilder:
-            (context, state) => const NoTransitionPage(
-              child: ShellScreen(body: PlaceholderScreen(title: 'Sound')),
-            ),
+            (context, state) =>
+                const NoTransitionPage(child: ShellScreen(body: MusicScreen())),
       ),
 
       // --- 마이페이지 및 하위 라우트 ---

@@ -1,6 +1,7 @@
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
 
 class ShellBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -79,8 +80,8 @@ class ShellBottomNavBar extends StatelessWidget {
               .toList(),
       currentIndex: currentIndex,
       onTap: onTap,
-      selectedItemColor: Colors.white,
-      unselectedItemColor: const Color(0xFFA6A6A6),
+      selectedItemColor: AppColors.white,
+      unselectedItemColor: AppColors.gray06,
       selectedLabelStyle: const TextStyle(
         fontWeight: FontWeight.w600,
         fontSize: 11.0,

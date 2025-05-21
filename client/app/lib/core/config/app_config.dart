@@ -149,7 +149,8 @@ class _MusicApiPaths {
   // GET api/music/{musicId}
   String musicById(String musicId) => '${ApiPaths._musicDomain}/$musicId';
   // GET api/music?category={category} (query param added by Dio) & POST api/music
-  String get base => ApiPaths._musicDomain;
+  String musicsByCategory(String category) =>
+      '${ApiPaths._musicDomain}?category=$category';
   // PATCH api/music/like & GET api/music/like
   String get like => '${ApiPaths._musicDomain}/like';
   // GET api/music/popular
