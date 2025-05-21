@@ -85,10 +85,10 @@ apk-install: apk-build # apk-build를 먼저 실행하여 APK_FOR_INSTALL 경로
 apk-build-install: apk-build apk-install
 
 apk-build-install-galaxys10: apk-build
-	@echo ">>> Uninstalling com.example.sleeptight from 192.168.137.89:46769..."
-	adb -s 192.168.137.89:46769 uninstall com.example.sleeptight
-	@echo ">>> Installing $(APK_FOR_INSTALL) on 192.168.137.89:46769..."
-	adb -s 192.168.137.89:46769 install "$(APK_FOR_INSTALL)"
+	@echo ">>> Uninstalling com.example.sleeptight from 192.168.137.89:38965..."
+	adb -s 192.168.137.89:38965 uninstall com.example.sleeptight
+	@echo ">>> Installing $(APK_FOR_INSTALL) on 192.168.137.89:38965..."
+	adb -s 192.168.137.89:38965 install "$(APK_FOR_INSTALL)"
 
 galaxy10-simulator: icon splash
 	flutter run -d 192.168.137.89:38965

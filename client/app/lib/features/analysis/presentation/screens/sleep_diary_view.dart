@@ -248,6 +248,11 @@ String _getPreviousDay(String date) {
   return '${prev.month}월 ${prev.day}일';
 }
 
+String _formatDate(String date) {
+  final dt = DateTime.parse(date);
+  return '${dt.month}월 ${dt.day}일';
+}
+
 Widget _buildDiaryForm(
   SleepDiaryModel diary, {
   required WidgetRef ref,
@@ -295,8 +300,7 @@ Widget _buildDiaryForm(
                               ),
                               children: [
                                 TextSpan(
-                                  text:
-                                      '${_getPreviousDay(diary.sleepDate)}에는 총  ',
+                                  text: '${_formatDate(diary.sleepDate)}에는 총  ',
                                 ),
                                 WidgetSpan(
                                   alignment: PlaceholderAlignment.middle,
