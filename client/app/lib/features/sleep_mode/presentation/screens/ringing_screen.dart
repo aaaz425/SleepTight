@@ -6,7 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/utils/overlay.dart';
+import 'package:sleep_tight/features/sleep_mode/domain/services/end_sleep_service.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/report_id_provider.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 
 class RingingScreen extends ConsumerStatefulWidget {
@@ -109,7 +112,21 @@ class _RingingScreenState extends ConsumerState<RingingScreen> {
                   textColor: AppColors.white,
                   onPressed: () async {
                     await _player.stop();
+
+                    final reportId = ref.read(reportIdNotifierProvider);
+                    final startTime = ref.read(sleepStartTimeProvider);
+                    final endTime = DateTime.now();
+
                     if (!context.mounted) return;
+
+                    await endSleepAndNavigate(
+                      context: context,
+                      ref: ref,
+                      reportId: reportId,
+                      startTime: startTime,
+                      endTime: endTime,
+                    );
+
                     Navigator.of(context).pop();
 
                     showOverlay(context: context, child: WakeUpScreen());

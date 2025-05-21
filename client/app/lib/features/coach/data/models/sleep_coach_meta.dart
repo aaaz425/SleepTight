@@ -7,9 +7,9 @@ final Map<ActivityDataType, Map<String, dynamic>> activityMeta = {
     'unit': 'ml',
   },
   ActivityDataType.momentum: {
-    'title': '운동 시간',
+    'title': '에너지 소비',
     'image': 'assets/images/momentum.jpg',
-    'unit': '분',
+    'unit': 'kcal',
   },
   ActivityDataType.walk: {
     'title': '걸음 수',

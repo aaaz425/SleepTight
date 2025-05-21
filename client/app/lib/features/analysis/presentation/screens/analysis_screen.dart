@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 import 'package:sleep_tight/features/analysis/data/services/sleep_report_service.dart';
 import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
@@ -54,7 +56,12 @@ class _AnalysisScreenState extends ConsumerState<AnalysisScreen> {
 
                 final reports = snapshot.data!;
                 if (reports.isEmpty) {
-                  return const Center(child: Text("리포트가 없습니다."));
+                  return Center(
+                    child: Text(
+                      "리포트가 없습니다.",
+                      style: AppTextStyles.bodyB1Rg(color: AppColors.white),
+                    ),
+                  );
                 }
 
                 return AnalysisTab(reports: reports);

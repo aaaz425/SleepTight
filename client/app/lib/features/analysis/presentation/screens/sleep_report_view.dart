@@ -1,25 +1,27 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
 import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
+import 'package:sleep_tight/features/analysis/presentation/providers/selected_date_provider.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/page_indicator.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_sound.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_stage_line_chart.dart';
 
-class SleepReportView extends StatefulWidget {
+class SleepReportView extends ConsumerStatefulWidget {
   final List<SleepReportModel> reports;
   final void Function(int)? onPageChanged;
 
   const SleepReportView({super.key, required this.reports, this.onPageChanged});
 
   @override
-  State<SleepReportView> createState() => _SleepReportViewState();
+  ConsumerState<SleepReportView> createState() => _SleepReportViewState();
 }
 
-class _SleepReportViewState extends State<SleepReportView> {
+class _SleepReportViewState extends ConsumerState<SleepReportView> {
   int _currentIndex = 0;
   late final PageController _controller;
 
@@ -63,6 +65,8 @@ class _SleepReportViewState extends State<SleepReportView> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedDate = ref.watch(selectedDateProvider);
+
     return Column(
       children: [
         Expanded(
@@ -94,24 +98,21 @@ class _SleepReportViewState extends State<SleepReportView> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: EdgeInsets.symmetric(vertical: 8),
                       child: RichText(
                         text: TextSpan(
-                          style: const TextStyle(
+                          style: AppTextStyles.titleT3Rg(
                             color: AppColors.white,
-                            fontSize: 16,
                           ),
                           children: [
                             TextSpan(
                               text:
-                                  '${DateFormat('M월 d일', 'ko').format(report.sleepStartTime)}에는 총 ',
+                                  '${DateFormat('M월 d일', 'ko').format(selectedDate)}에는 총 ',
                             ),
                             TextSpan(
                               text: formatDuration(totalSleep),
-                              style: TextStyle(
+                              style: AppTextStyles.titleT1Sb(
                                 color: AppColors.sub1,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             TextSpan(text: ' 동안 잤습니다.'),
@@ -129,7 +130,7 @@ class _SleepReportViewState extends State<SleepReportView> {
                           color: AppColors.gray02,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(20),
                         child: Column(
                           children: [
                             Row(
@@ -167,22 +168,20 @@ class _SleepReportViewState extends State<SleepReportView> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 20,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             '수면 단계',
-                            style: TextStyle(
+                            style: AppTextStyles.titleT3Sb(
                               color: AppColors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           isStagesEmpty
                               ? SizedBox(
                                 height: 100,
@@ -211,6 +210,8 @@ class _SleepReportViewState extends State<SleepReportView> {
                                           color: AppColors.white,
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
+                                          height: 1.4,
+                                          letterSpacing: -0.3,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -226,11 +227,7 @@ class _SleepReportViewState extends State<SleepReportView> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                        top: 10,
-                      ),
+                      padding: EdgeInsets.only(left: 20, right: 20, top: 10),
                       child: Column(
                         children: [
                           Row(
@@ -241,17 +238,16 @@ class _SleepReportViewState extends State<SleepReportView> {
                                 height: 20,
                                 color: AppColors.gray07,
                               ),
-                              const SizedBox(width: 4),
-                              const Text(
+                              SizedBox(width: 4),
+                              Text(
                                 '수면 단계별 시간',
-                                style: TextStyle(
-                                  color: AppColors.font1,
-                                  fontSize: 11,
+                                style: AppTextStyles.captionC3Rg(
+                                  color: AppColors.white,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           _buildStageCard(
                             awake: awake,
                             rem: rem,
@@ -295,15 +291,9 @@ class _SleepReportViewState extends State<SleepReportView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(color: AppColors.font2, fontSize: 14),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(color: AppColors.white, fontSize: 16),
-          ),
+          Text(label, style: AppTextStyles.bodyB2Rg(color: AppColors.font2)),
+          SizedBox(height: 4),
+          Text(value, style: AppTextStyles.titleT3Sb(color: AppColors.white)),
         ],
       ),
     );
@@ -313,14 +303,8 @@ class _SleepReportViewState extends State<SleepReportView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.font2, fontSize: 12),
-        ),
-        Text(
-          value,
-          style: const TextStyle(color: AppColors.sub1, fontSize: 16),
-        ),
+        Text(label, style: AppTextStyles.bodyB4Rg(color: AppColors.font2)),
+        Text(value, style: AppTextStyles.titleT3Sb(color: AppColors.sub1)),
       ],
     );
   }
@@ -339,7 +323,7 @@ class _SleepReportViewState extends State<SleepReportView> {
         color: AppColors.gray02,
         borderRadius: BorderRadius.circular(8),
       ),
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Column(
         children: [
           Row(
@@ -363,7 +347,7 @@ class _SleepReportViewState extends State<SleepReportView> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -415,14 +399,14 @@ class _SleepReportViewState extends State<SleepReportView> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(width: 2),
+              SizedBox(width: 2),
               Text(
                 label,
                 style: AppTextStyles.bodyB4Rg(color: AppColors.font2),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
 
           Text(
             formatPercent(duration, total),

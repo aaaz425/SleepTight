@@ -25,7 +25,7 @@ extension ActivityDataTypeLabel on ActivityDataType {
       case ActivityDataType.water:
         return '수분 섭취';
       case ActivityDataType.momentum:
-        return '운동 시간';
+        return '에너지 소비량';
       case ActivityDataType.walk:
         return '걸음 수';
       case ActivityDataType.caffeine:

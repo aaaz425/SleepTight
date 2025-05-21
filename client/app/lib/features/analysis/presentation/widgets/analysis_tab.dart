@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/features/analysis/data/models/sleep_report_model.dart';
 import 'package:sleep_tight/features/analysis/presentation/screens/sleep_report_view.dart';
 import 'package:sleep_tight/features/analysis/presentation/widgets/sleep_diary_pages.dart';
@@ -58,6 +59,7 @@ class _AnalysisTabState extends State<AnalysisTab>
         TabBar(
           controller: _tabController,
           labelColor: AppColors.white,
+          labelStyle: AppTextStyles.bodyB4Sb(color: AppColors.white),
           unselectedLabelColor: AppColors.font2,
           dividerColor: AppColors.gray06,
           dividerHeight: 0.2,
@@ -65,7 +67,7 @@ class _AnalysisTabState extends State<AnalysisTab>
           indicator: const UnderlineTabIndicator(
             borderSide: BorderSide(width: 1, color: AppColors.white),
           ),
-          tabs: const [Tab(text: "수면 리포트"), Tab(text: "수면 일지")],
+          tabs: [Tab(text: "수면 리포트"), Tab(text: "수면 일지")],
         ),
         Expanded(
           child: TabBarView(
