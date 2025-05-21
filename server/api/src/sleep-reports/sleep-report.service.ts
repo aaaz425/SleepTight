@@ -19,6 +19,7 @@ import { ExceptionCode } from 'src/common/exceptions/exception-code.enum';
 import { SleepStageLog } from './entities/sleep-stage-log.entity';
 import { SleepDiariesService } from './sleep-diaries.service';
 import { SleepSound } from 'src/sleep-sound/entities/sleep-sound.entity';
+import { SleepDiary } from './entities/sleep-diary.entity';
 
 @Injectable()
 export class SleepReportService {
@@ -205,7 +206,21 @@ export class SleepReportService {
       await manager.save(report);
 
       // 수면 일지 자동 생성
-      await this.sleepDiariesService.createPartialFromReport(report);
+      this.logger.debug(
+        `수면 일지 자동 생성 시작 - reportId: ${report.id}, 날짜: ${report.sleepDate}`,
+      );
+      try {
+        const diary =
+          await this.sleepDiariesService.createPartialFromReport(report);
+        this.logger.debug(
+          `수면 일지 생성 완료 - diaryId: ${diary.id}, reportId: ${report.id}`,
+        );
+      } catch (error) {
+        this.logger.error(
+          `수면 일지 생성 실패 - reportId: ${report.id}`,
+          error,
+        );
+      }
 
       return isValidSleep;
     });
@@ -242,15 +257,25 @@ export class SleepReportService {
     this.logger.debug(`getReportsByDateWithStages: 검색 날짜 범위 UTC`, {
       startUTC: start.toISOString(),
       endUTC: end.toISOString(),
+      dateString: date, // 요청된 날짜 문자열
     });
 
-    const reports = await this.reportRepo.find({
-      where: {
-        userId,
-        isValidReport: true,
-        sleepDate: Between(start, end),
-      },
-      order: { sleepEndTime: 'DESC' },
+    // 정확히 해당 날짜만 포함하는 쿼리
+    const reports = await this.reportRepo
+      .createQueryBuilder('report')
+      .where('report.user_id = :userId', { userId })
+      .andWhere('report.is_valid_report = :isValid', { isValid: true })
+      .andWhere('report.sleep_date = :date', {
+        date: start.toISOString().split('T')[0],
+      })
+      .orderBy('report.sleep_end_time', 'DESC')
+      .getMany();
+
+    const reportCount = reports.length;
+    this.logger.debug(`조회된 리포트 수: ${reportCount}`, {
+      userId,
+      date,
+      reportCount,
     });
 
     const result = await Promise.all(

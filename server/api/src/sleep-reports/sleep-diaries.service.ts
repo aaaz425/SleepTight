@@ -141,26 +141,22 @@ export class SleepDiariesService {
       throw new BadRequestException('date는 YYYY-MM-DD 형식이어야 합니다.');
     }
 
-    // 2) UTC 기준으로 날짜 범위 구하기 (00:00:00 ~ 23:59:59)
-    const inputDate = new Date(date);
-    const start = new Date(
-      Date.UTC(
-        inputDate.getFullYear(),
-        inputDate.getMonth(),
-        inputDate.getDate(),
-      ),
-    );
-    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+    const dateComponents = date.split('-').map(Number);
 
-    // 3) QueryBuilder 수정하여 날짜 범위로 조회
+    // 2) UTC 기준으로 날짜 구하기 (날짜만 정확히 일치시키기 위해)
+    const formattedDate = new Date(
+      Date.UTC(dateComponents[0], dateComponents[1] - 1, dateComponents[2]),
+    )
+      .toISOString()
+      .split('T')[0];
+
+    // 3) 정확히 해당 날짜의 리포트만 조회
     const reports = await this.reportRepo
       .createQueryBuilder('report')
       .select('report.id')
       .where('report.user_id = :userId', { userId })
       .andWhere('report.is_valid_report = :isValid', { isValid: true })
-      .andWhere('report.sleep_date = :date', {
-        date: start.toISOString().split('T')[0],
-      })
+      .andWhere('report.sleep_date = :date', { date: formattedDate })
       .orderBy('report.sleep_end_time', 'DESC')
       .getMany();
 

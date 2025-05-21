@@ -1,6 +1,11 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 
-export function throwBadRequest(ExceptionCodeKey) {
+const logger = new Logger('ExceptionHelper');
+
+export function throwBadRequest(ExceptionCodeKey): never {
+  logger.warn(
+    `BadRequest 예외 발생: [${ExceptionCodeKey.code}] ${ExceptionCodeKey.message}`,
+  );
   throw new HttpException(
     {
       status: ExceptionCodeKey.status,
@@ -11,7 +16,10 @@ export function throwBadRequest(ExceptionCodeKey) {
   );
 }
 
-export function throwUnauthorizedException(ExceptionCodeKey) {
+export function throwUnauthorizedException(ExceptionCodeKey): never {
+  logger.warn(
+    `Unauthorized 예외 발생: [${ExceptionCodeKey.code}] ${ExceptionCodeKey.message}`,
+  );
   throw new HttpException(
     {
       status: ExceptionCodeKey.status,
@@ -23,6 +31,9 @@ export function throwUnauthorizedException(ExceptionCodeKey) {
 }
 
 export function throwNotFoundException(ExceptionCodeKey): never {
+  logger.warn(
+    `NotFound 예외 발생: [${ExceptionCodeKey.code}] ${ExceptionCodeKey.message}`,
+  );
   throw new HttpException(
     {
       status: ExceptionCodeKey.status,
@@ -34,6 +45,9 @@ export function throwNotFoundException(ExceptionCodeKey): never {
 }
 
 export function throwInternalServerError(ExceptionCodeKey): never {
+  logger.error(
+    `서버 내부 오류 발생: [${ExceptionCodeKey.code ?? 'INTERNAL_SERVER_ERROR'}] ${ExceptionCodeKey.message ?? '내부 서버 오류'}`,
+  );
   throw new HttpException(
     {
       status: ExceptionCodeKey.status ?? 500,

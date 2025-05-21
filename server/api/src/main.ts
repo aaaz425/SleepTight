@@ -2,33 +2,41 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from './common/config/swagger';
 import { setupGlobalPrefix } from './common/config/prefix';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug'],
+  });
   const configService = app.get(ConfigService);
 
+  logger.log('서버 시작 중...');
+
   // const uri = `amqp://${configService.get('RABBITMQ_DEFAULT_USER')}:${configService.get('RABBITMQ_DEFAULT_PASS')}@${configService.get('RABBITMQ_HOST')}:${configService.get('RABBITMQ_PORT')}`;
-  const uri = configService.get("RMQ_REMOTE_URI");
+  const uri = configService.get('RMQ_REMOTE_URI');
   const queue = configService.get('RABBITMQ_QUEUE');
 
   // MQ 마이크로서비스 연결
+  logger.log('RabbitMQ 마이크로서비스 연결 중...');
   app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,  
+    transport: Transport.RMQ,
     options: {
       urls: [uri],
       exchange: configService.get<string>('RMQ_RECV_EXCHANGE'),
       exchangeType: 'direct',
       routingKey: configService.get<string>('RMQ_RECV_ROUTING_KEY'),
       queue: configService.get<string>('RMQ_RECV_QUEUE'),
-      queueOptions: { durable: true},
+      queueOptions: { durable: true },
       noAck: true,
     },
   });
   await app.startAllMicroservices();
+  logger.log('RabbitMQ 마이크로서비스 연결 완료');
 
   app.useGlobalPipes(new ValidationPipe());
 
@@ -36,6 +44,7 @@ async function bootstrap() {
   setupGlobalPrefix(app);
 
   // 클래스 기반 DTO 변환 + 유효성 검사를 위해 추가
+  logger.log('글로벌 파이프, 인터셉터, 필터 설정 중...');
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // ✅ class-transformer의 @Expose, @Transform 등을 활성화
@@ -46,6 +55,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  logger.log(`서버가 포트 ${port}에서 시작되었습니다`);
 }
 bootstrap();
