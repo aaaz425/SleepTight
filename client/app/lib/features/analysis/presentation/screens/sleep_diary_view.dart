@@ -103,23 +103,24 @@ class _SleepDiaryViewState extends ConsumerState<SleepDiaryView> {
                     ),
                   ),
                 ),
-                // if (!_isEditMode && DateTime.parse(diary.sleepDate).isToday)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 12,
+                // 당일 수면인 경우에만 작성하기 버튼이 보여짐
+                if (!_isEditMode && DateTime.parse(diary.sleepDate).isToday)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 12,
+                    ),
+                    child: CustomButton(
+                      onPressed: () {
+                        setState(() {
+                          _isEditMode = true;
+                        });
+                      },
+                      height: 48,
+                      text: '수면일지 작성하기',
+                      theme: 'gray',
+                    ),
                   ),
-                  child: CustomButton(
-                    onPressed: () {
-                      setState(() {
-                        _isEditMode = true;
-                      });
-                    },
-                    height: 48,
-                    text: '수면일지 작성하기',
-                    theme: 'gray',
-                  ),
-                ),
               ],
             ),
           );
