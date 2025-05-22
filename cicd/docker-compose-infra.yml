@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgresql:
@@ -40,7 +40,7 @@ services:
     environment:
       - RABBITMQ_MANAGEMENT_PATH_PREFIX=/rabbitmq
     ports:
-      - "0.0.0.0:5672:5672"     # AMQP
+      - "0.0.0.0:5672:5672" # AMQP
       - "127.0.0.1:15672:15672" # Management UI (로컬 바인딩)
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq

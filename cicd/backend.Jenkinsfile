@@ -8,6 +8,7 @@ pipeline {
 
     // 공통 Credentials
     ENV_FILE_ID       = 'env-file-credential'
+    FCM_JSON_ID       = 'FCM_JSON_CREDENTIAL'  // Modified: FCM JSON용 Credential ID
     DOCKER_HUB_CRED   = 'docker-hub-credentials'
 
     // Git 설정
@@ -28,16 +29,24 @@ pipeline {
   stages {
     stage('Checkout & Prepare') {
       steps {
-        // 소스 코드 체크아웃
+        // 1) 소스 코드 체크아웃
         git branch: "${GIT_BRANCH}",
             credentialsId: "${GIT_CRED_ID}",
             url: "${GIT_URL}"
 
-        // .env 파일 복사
+        // 2) .env 파일 복사
         withCredentials([file(credentialsId: "${ENV_FILE_ID}", variable: 'ENV_FILE')]) {
           sh '''
             set -e
             cp "$ENV_FILE" ./.env
+          '''
+        }
+
+        // Modified: 3) FCM JSON 키 파일 복사
+        withCredentials([file(credentialsId: "${FCM_JSON_ID}", variable: 'FCM_JSON')]) {
+          sh '''
+            set -e
+            cp "$FCM_JSON" server/api/sleep-tight-d9f9d-firebase-adminsdk-fbsvc-3fe0729751.json
           '''
         }
       }
@@ -54,7 +63,6 @@ pipeline {
             set -e
             docker logout || true
             echo "$DOCKERHUB_PSW" | docker login -u "$DOCKERHUB_USR" --password-stdin
-            echo ">> docker info 확인 <<"
             docker info
           '''
         }
@@ -63,7 +71,6 @@ pipeline {
 
     stage('Build & Push Backend') {
       steps {
-        // Docker 멀티스테이지로 빌드+태그+푸시
         sh '''
           set -e
           cd server/api
@@ -84,24 +91,14 @@ pipeline {
       steps {
         sshagent(credentials: [SSH_CREDENTIAL_ID]) {
           sh """
-            # 1) 배포 디렉토리 생성 (ubuntu 권한으로)
-            ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST \\
-              "mkdir -p \$REMOTE_APP_DIR"
+            ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST "mkdir -p \$REMOTE_APP_DIR"
 
-            # 2) 파일 복사 (.env, docker-compose.yml, 스크립트)
-            scp -o StrictHostKeyChecking=no ./.env \\
-                \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/.env
+            scp -o StrictHostKeyChecking=no ./.env            \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/.env
+            scp -o StrictHostKeyChecking=no \$COMPOSE_FILE_PATH \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/docker-compose.yml
+            scp -o StrictHostKeyChecking=no cicd/deploy_backend.sh \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/deploy_backend.sh
 
-            scp -o StrictHostKeyChecking=no \$COMPOSE_FILE_PATH \\
-                \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/docker-compose.yml
-
-            scp -o StrictHostKeyChecking=no cicd/deploy_backend.sh \\
-                \$DEPLOY_USER@\$DEPLOY_HOST:\$REMOTE_APP_DIR/deploy_backend.sh
-
-            # 3) 권한 부여 및 실행
-            ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST \\
-              "chmod +x \$REMOTE_APP_DIR/deploy_backend.sh && \\
-               cd \$REMOTE_APP_DIR && ./deploy_backend.sh"
+            ssh -o StrictHostKeyChecking=no \$DEPLOY_USER@\$DEPLOY_HOST \
+              "chmod +x \$REMOTE_APP_DIR/deploy_backend.sh && cd \$REMOTE_APP_DIR && ./deploy_backend.sh"
           """
         }
       }

@@ -19,10 +19,10 @@ export class SleepStageLog {
   @Column({ name: 'stage_type', type: 'enum', enum: SleepStageType })
   stageType: SleepStageType;
 
-  @Column({ name: 'stage_start_time', type: 'timestamp' })
+  @Column({ name: 'stage_start_time', type: 'timestamptz' })
   stageStartTime: Date;
 
-  @Column({ name: 'stage_end_time', type: 'timestamp' })
+  @Column({ name: 'stage_end_time', type: 'timestamptz' })
   stageEndTime: Date;
 
   @Column({ name: 'duration_minutes' })

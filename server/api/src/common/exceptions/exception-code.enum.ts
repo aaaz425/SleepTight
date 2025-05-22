@@ -12,7 +12,12 @@ export const ExceptionCode = {
   ACTIVITY_DATA_NOT_FOUND: {
     status: 400,
     code: 'ACTIVITY_DATA_NOT_FOUND',
-    message: '활동데이터를 찾을 수 없습니다.',
+    message: '활동 데이터를 찾을 수 없습니다.',
+  },
+  SlEEP_COACHING_NOT_FOUND: {
+    status: 400,
+    code: 'SlEEP_COACHING_NOT_FOUND',
+    message: '코칭데이터를 찾을 수 없습니다.',
   },
   INCOMPLETE_REGISTRATION: {
     status: 400,
@@ -24,10 +29,24 @@ export const ExceptionCode = {
     code: 'DUPLICATE_SEGMENT_ID',
     message: '이미 존재하는 세그먼트 아이디입니다.',
   },
+  INVALID_DATE_FORMAT: {
+    code: 'INVALID_DATE_FORMAT',
+    message: '잘못된 날짜 형식입니다.',
+  },
   REPORT_NOT_FOUND: {
     status: 404,
     code: 'REPORT_NOT_FOUND',
     message: '수면 리포트를 찾을 수 없습니다.',
+  },
+  DIARY_NOT_FOUND: {
+    status: 404,
+    code: 'DIARY_NOT_FOUND',
+    message: '수면 리포트를 찾을 수 없습니다.',
+  },
+  SLEEP_SOUND_NOT_FOUND: {
+    status: 404,
+    code: 'SLEEP_SOUND_NOT_FOUND',
+    message: '수면 음성 데이터를 찾을 수 없습니다.',
   },
   INVALID_TOKEN: {
     status: 401,
@@ -60,6 +79,11 @@ export const ExceptionCode = {
     message: '리프레시 토큰 검증이 실패했습니다.',
   },
   FORBIDDEN: { status: 403, code: 'FORBIDDEN', message: '권한이 없습니다.' },
+  INTERNAL_SERVER_ERROR: {
+    status: 500,
+    code: 'INTERNAL_SERVER_ERROR',
+    message: '서버 내부 오류가 발생했습니다.',
+  },
   // 추가 가능
 } as const;
 

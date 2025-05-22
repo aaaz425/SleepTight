@@ -27,8 +27,11 @@ export class ResponseUserInfoDto {
         dto.lastName = user.last_name??'';
         dto.firstName = user.first_name??'';
         dto.email = user.email;
-        dto.wakeTime = user.wake_time;
+        
+        // sleep_time과 wake_time getter는 이미 sleepPreferences에서 값을 가져옴
         dto.sleepTime = user.sleep_time;
+        dto.wakeTime = user.wake_time;
+        
         dto.minSleepDuration = user.min_sleep_duration;
         dto.weight = user.weight??0;
         dto.height = user.height??0;
@@ -38,6 +41,7 @@ export class ResponseUserInfoDto {
         dto.lengthUnit = user.length_unit??'' 
         dto.weightUnit = user.weight_unit??''
         dto.status = user.status??'';
+        
         return dto; 
     }
 }

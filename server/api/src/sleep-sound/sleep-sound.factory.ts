@@ -1,4 +1,3 @@
-// sleep-sound.factory.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
@@ -19,14 +18,16 @@ export class SleepSoundFactory {
     segmentId: string;
     fileUrl: string;
     duration: number;
+    startTime: Date;
   }): SleepSound {
-    const { reportId, segmentId, fileUrl, duration } = params;
+    const { reportId, segmentId, fileUrl, duration, startTime } = params;
 
     return this.sleepSoundRepo.create({
-      sleepReport: { id: reportId },
+      sleepReport: reportId,
       segmentId,
       voiceUrl: fileUrl,
       duration,
+      startTime,
     });
   }
 
@@ -44,14 +45,41 @@ export class SleepSoundFactory {
     return this.sleepEventRepo.save(sleepEvent);
   }
 
+  // SleepSound와 SleepReport 조인을 통해 reportId에 연결된 sleepSound만 가져오도록 필터링
+  async findByReportIdWithQueryBuilder(
+    reportId: number,
+  ): Promise<SleepSound[]> {
+    return this.sleepSoundRepo
+      .createQueryBuilder('sound')
+      .leftJoin('sound.sleepReport', 'report')
+      .where('report.id = :reportId', { reportId })
+      .getMany();
+  }
+
+  async findWithEventsByReportId(reportId: number): Promise<SleepSound[]> {
+    const result = await this.sleepSoundRepo
+      .createQueryBuilder('sound')
+      .leftJoin('sound.sleepReport', 'report')
+      .leftJoinAndMapMany(
+        'sound.events', // sound에 가상 필드로 매핑
+        SleepEvent,
+        'event',
+        'event.segmentId = sound.segmentId',
+      )
+      .where('report.id = :reportId', { reportId })
+      .getMany();
+
+    console.log('📦 [DEBUG] sleepSounds with events:', result);
+    return result;
+  }
+
   // reportId로 sleepSound 목록 가져오기
   async findByReportId(
     reportId: number,
-    manager: EntityManager,
+    manager?: EntityManager,
   ): Promise<SleepSound[]> {
-    return manager.find(SleepSound, {
-      where: { sleepReport: { id: reportId } },
-    });
+    const usedManager = manager ?? this.sleepSoundRepo.manager;
+    return usedManager.find(SleepSound, { where: { sleepReport: reportId } });
   }
 
   // segmentId 목록으로 이벤트들 가져오기
@@ -59,5 +87,9 @@ export class SleepSoundFactory {
     return manager.find(SleepEvent, {
       where: { segmentId: In(segmentIds) },
     });
+  }
+
+  getManager(): EntityManager {
+    return this.sleepSoundRepo.manager;
   }
 }

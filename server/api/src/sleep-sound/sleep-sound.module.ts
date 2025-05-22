@@ -8,8 +8,6 @@ import { SleepSoundFactory } from './sleep-sound.factory';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SleepSoundProducer } from './sleep-sound.producer';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { SleepStageService } from '../sleep-reports/sleep-stage.service';
-import { SleepStageFactory } from '../sleep-reports/sleep-stage.factory';
 import { SleepStageLog } from '../sleep-reports/entities/sleep-stage-log.entity';
 import { SleepEvent } from './entities/sleep-event.entity';
 import { SleepAnalysisResultListener } from './sleep-analysis-result.listener';
@@ -32,7 +30,7 @@ import { SleepAnalysisResultListener } from './sleep-analysis-result.listener';
             ],
             queue: config.get<string>('RMQ_SEND_QUEUE'),
             exchange: config.get<string>('RMQ_SEND_EXCHANGE'),
-            queueOptions: { durable: false },
+            queueOptions: { durable: true },
           },
         }),
       },
@@ -40,6 +38,6 @@ import { SleepAnalysisResultListener } from './sleep-analysis-result.listener';
   ],
   controllers: [SleepSoundController, SleepAnalysisResultListener],
   providers: [SleepSoundProducer, SleepSoundService, SleepSoundFactory],
-  exports: [SleepSoundService],
+  exports: [SleepSoundService, TypeOrmModule],
 })
 export class SleepSoundModule {}

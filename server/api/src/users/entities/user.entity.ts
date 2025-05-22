@@ -21,11 +21,12 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   email: string;
 
-  @Column({ type: 'time', default: '07:00', nullable: false })
-  wake_time: string;
-
-  @Column({ type: 'time', default: '23:00', nullable: false })
-  sleep_time: string;
+  @Column({ name: 'sleep_preferences', type: 'jsonb', nullable: true })
+  sleepPreferences: {
+    targetSleepTime: string; // "HH:MM" 형식
+    targetWakeTime: string; // "HH:MM" 형식
+    timezone: string; // "Asia/Seoul"로 고정
+  };
 
   @Column({ type: 'interval', default: '8 hours', nullable: false })
   min_sleep_duration: string;
@@ -36,10 +37,10 @@ export class User {
   @CreateDateColumn({ type: 'timestamp' })
   visited_at: Date;
 
-  @Column({ type: 'numeric', precision: 5, scale: 2,  nullable: true })
+  @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
   weight: number | null;
 
-  @Column({ type: 'numeric', precision: 5, scale: 2,  nullable: true })
+  @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
   height: number | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -72,10 +73,21 @@ export class User {
   @Column({ type: 'varchar', length: 10, nullable: true })
   length_unit: string | null; // 예: 'cm', 'ft'
 
-  @Column({ name:'weight_unit', type: 'varchar', length: 10, nullable: true })
+  @Column({ name: 'weight_unit', type: 'varchar', length: 10, nullable: true })
   weight_unit: string | null; // 예: 'kg', 'lb'
 
+  @Column({ name: 'fcm_token', type: 'varchar', length: 255, nullable: true })
+  fcm_token: string | null;
   // SleepReport와 연결
   @OneToMany(() => SleepReport, (report) => report.user)
   sleepReports: SleepReport[];
+
+  // 이전 버전과의 호환성을 위한 getter
+  get sleep_time(): string {
+    return this.sleepPreferences?.targetSleepTime || '23:00';
+  }
+
+  get wake_time(): string {
+    return this.sleepPreferences?.targetWakeTime || '07:00';
+  }
 }

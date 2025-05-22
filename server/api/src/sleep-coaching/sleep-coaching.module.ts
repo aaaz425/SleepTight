@@ -7,11 +7,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityData } from './entities/activity-data.entity';
 import { SleepReport } from 'src/sleep-reports/entities/sleep-report.entity';
 import { SleepDiary } from 'src/sleep-reports/entities/sleep-diary.entity';
+import { SleepCoaching } from './entities/sleep-coaching.entity';
+import { FcmModule } from 'src/common/fcm/fcm.module';
 
 @Module({
 
   imports: [
-    TypeOrmModule.forFeature([ActivityData, SleepReport, SleepDiary]),
+    TypeOrmModule.forFeature([ActivityData, SleepReport, SleepDiary, SleepCoaching],
+    ),
+    FcmModule,
   ],
   controllers: [ActivityDataController, SleepCoachingController],
   providers: [ActivityDataService, SleepCoachingService],

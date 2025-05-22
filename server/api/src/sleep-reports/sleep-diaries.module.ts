@@ -9,5 +9,6 @@ import { SleepDiariesController } from './sleep-diaries.controller';
   imports: [TypeOrmModule.forFeature([SleepDiary, SleepReport])],
   providers: [SleepDiariesService],
   controllers: [SleepDiariesController],
+  exports: [SleepDiariesService],
 })
 export class SleepDiariesModule {}

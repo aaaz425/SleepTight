@@ -42,22 +42,23 @@ export class SleepDiary {
   @Column({ name: 'wake_time', type: 'time' })
   wakeTime: string; // HH:MM:SS
 
-  @Column({ name: 'sleep_latency', type: 'interval' })
+  @Column({ name: 'sleep_latency', type: 'interval', nullable: true })
   sleepLatency: any; // PostgreSQL interval 을 다루기 위해 any로 설정
 
-  @Column({ name: 'wake_count', type: 'int' })
+  @Column({ name: 'wake_count', type: 'int', nullable: true })
   wakeCount: number;
 
-  @Column({ name: 'sleep_quality', type: 'smallint' })
+  @Column({ name: 'sleep_quality', type: 'smallint', nullable: true })
   sleepQuality: number; // 1~7 정도의 척도
 
-  @Column({ name: 'mood_score', type: 'smallint' })
+  @Column({ name: 'mood_score', type: 'smallint', nullable: true })
   moodScore: number; // 1~7 정도의 척도
 
   @Column({
     name: 'wake_awareness',
     type: 'enum',
     enum: WakeAwareness,
+    nullable: true,
   })
   wakeAwareness: WakeAwareness;
 
@@ -65,6 +66,7 @@ export class SleepDiary {
     name: 'wake_method',
     type: 'enum',
     enum: WakeMethod,
+    nullable: true,
   })
   wakeMethod: WakeMethod;
 

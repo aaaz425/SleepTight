@@ -35,6 +35,9 @@ export class SleepReport {
   @Column({ name: 'total_sleep_time', type: 'interval', nullable: true })
   totalSleepTime: string | null;
 
+  @Column({ name: 'sleep_latency', type: 'interval', nullable: true })
+  sleepLatency: string;
+
   @Column({ name: 'total_awake_time', type: 'interval', nullable: true })
   totalAwakeTime: string;
 
@@ -77,7 +80,7 @@ export class SleepReport {
   @Column({
     name: 'is_valid_report',
     type: 'boolean',
-    default: true,
+    default: false,
   })
   isValidReport: boolean;
 

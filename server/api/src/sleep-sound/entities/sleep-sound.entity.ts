@@ -4,11 +4,11 @@ import {
   Entity,
   CreateDateColumn,
   Index,
-  PrimaryColumn,
   ManyToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { SleepEvent } from './sleep-event.entity';
 
 @Entity('sleep_sounds')
 export class SleepSound {
@@ -19,7 +19,7 @@ export class SleepSound {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'sleep_report_id' })
-  sleepReport: SleepReport;
+  sleepReport: number;
 
   @Column({ name: 'voice_url', type: 'varchar', length: 255 })
   voiceUrl: string;
@@ -30,6 +30,9 @@ export class SleepSound {
   @Column({ name: 'inference_completed', type: 'boolean', default: false })
   inferenceCompleted: boolean;
 
+  @Column({ name: 'start_time', type: 'timestamptz' })
+  startTime: Date;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
@@ -39,4 +42,6 @@ export class SleepSound {
   @Column({ name: 'segment_id', type: 'uuid' })
   @Index({ unique: true })
   segmentId: string;
+
+  events?: SleepEvent[]; // 조인 시 가상으로 매핑할 필드
 }

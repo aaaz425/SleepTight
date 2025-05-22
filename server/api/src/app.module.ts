@@ -12,6 +12,7 @@ import { SleepSoundModule } from './sleep-sound/sleep-sound.module';
 import { SleepReportModule } from './sleep-reports/sleep-report.module';
 import { SleepDiariesModule } from './sleep-reports/sleep-diaries.module';
 import { SleepCoachingModule } from './sleep-coaching/sleep-coaching.module';
+import { FcmModule } from './common/fcm/fcm.module';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { SleepCoachingModule } from './sleep-coaching/sleep-coaching.module';
         database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true, // 개발 환경만 true
-        logging: true,
+        logging: false,
       }),
     }),
     UserModule,
@@ -43,6 +44,7 @@ import { SleepCoachingModule } from './sleep-coaching/sleep-coaching.module';
     MusicModule,
     HealthModule,
     SleepCoachingModule,
+    FcmModule,
   ],
   controllers: [],
   providers: [],
