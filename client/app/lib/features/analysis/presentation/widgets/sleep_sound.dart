@@ -117,7 +117,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
       }
 
       _downloadingFiles.add(sound.soundId);
-      setState(() {}); // UI 업데이트
+      if (mounted) setState(() {}); // UI 업데이트
 
       // 파일 다운로드 시도
       final localPath = await _downloadService.downloadSound(
@@ -134,7 +134,9 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
           if (waveform.isNotEmpty) {
             _globalWaveformCache[sound.soundId] = waveform;
 
-            _downloadingFiles.remove(sound.soundId);
+            if (mounted) {
+              _downloadingFiles.remove(sound.soundId);
+            }
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) setState(() {});
@@ -348,8 +350,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
           );
         }
 
-        final sounds =
-            snapshot.data!.where((sound) => sound.events.isNotEmpty).toList();
+        final sounds = snapshot.data ?? [];
         if (sounds.isEmpty) {
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),

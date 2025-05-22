@@ -248,9 +248,9 @@ String _getPreviousDay(String date) {
   return '${prev.month}월 ${prev.day}일';
 }
 
-String _formatDate(String date) {
-  final dt = DateTime.parse(date);
-  return '${dt.month}월 ${dt.day}일';
+String _formatDate(DateTime date) {
+  // final dt = DateTime.parse(date);
+  return '${date.month}월 ${date.day}일';
 }
 
 Widget _buildDiaryForm(
@@ -265,7 +265,7 @@ Widget _buildDiaryForm(
 }) {
   String _formatTime(String time) {
     final parts = time.split(':');
-    final hour = int.parse(parts[0]);
+    final hour = (int.parse(parts[0]) + 9) % 24;
     final min = int.parse(parts[1]);
     final period = hour >= 12 ? '오후' : '오전';
     final displayHour = hour % 12 == 0 ? 12 : hour % 12;
@@ -300,7 +300,7 @@ Widget _buildDiaryForm(
                               ),
                               children: [
                                 TextSpan(
-                                  text: '${_formatDate(diary.sleepDate)}에는 총  ',
+                                  text: '${_formatDate(DateTime.now())}에는 총  ',
                                 ),
                                 WidgetSpan(
                                   alignment: PlaceholderAlignment.middle,
