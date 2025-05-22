@@ -28,8 +28,7 @@ export class SleepCoachingController {
     const userId: number = req.user.userId; // JWT에서 userId를 가져옴
     this.logger.log(`수면 코칭 조회 요청 - userId: ${userId}, date: ${date}`);
     try {
-      // const dtoList: SleepCoachingResponseDto[] = await this.sleepCoachingService.getSleepCoaching(userId, date)
-      const dtoList: any = new TempResponseDto().temp;
+      const dtoList: SleepCoachingResponseDto[] = await this.sleepCoachingService.getSleepCoaching(userId, date)
       this.logger.log(`수면 코칭 조회 성공 - userId: ${userId}, date: ${date}`);
       return dtoList;
     } catch (error) {
