@@ -59,7 +59,12 @@ class _SleepReportViewState extends ConsumerState<SleepReportView> {
 
   String formatTime(DateTime? time) {
     if (time == null) return '-';
-    final formatted = DateFormat('a hh:mm', 'en').format(time);
+
+    // UTC → KST 변환
+    final kstTime = time.add(const Duration(hours: 9));
+
+    // 포맷 후 오전/오후 치환
+    final formatted = DateFormat('a hh:mm', 'en').format(kstTime);
     return formatted.replaceFirst('AM', '오전').replaceFirst('PM', '오후');
   }
 
@@ -89,7 +94,10 @@ class _SleepReportViewState extends ConsumerState<SleepReportView> {
               final rem = report.totalRemSleepTime ?? Duration.zero;
               final awakenCount = report.awakenCount ?? 0;
 
-              final totalSleep = light + deep + rem;
+              final totalSleep = report.sleepEndTime.difference(
+                report.sleepStartTime,
+              );
+
               final durationInBed = report.sleepEndTime.difference(
                 report.sleepStartTime,
               );

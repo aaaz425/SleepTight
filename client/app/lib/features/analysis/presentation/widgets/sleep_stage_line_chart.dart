@@ -31,10 +31,10 @@ class _SleepStageChartPainter extends CustomPainter {
   };
 
   static const Map<String, Color> sleepStageColor = {
-    'AWAKE': AppColors.sub1,
-    'REM': AppColors.sub1,
+    'AWAKE': AppColors.white,
+    'REM': AppColors.sub2,
     'LIGHT': AppColors.sub1,
-    'DEEP': AppColors.sub1,
+    'DEEP': AppColors.sub1Vr,
   };
 
   @override
