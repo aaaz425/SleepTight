@@ -11,7 +11,7 @@ pipeline {
     DOCKER_HUB_CRED   = 'docker-hub-credentials'
 
     // Git 설정
-    GIT_BRANCH        = 'dev/be'
+    GIT_BRANCH        = 'dev/ai'
     GIT_URL           = 'https://lab.ssafy.com/s12-final/S12P31S303.git'
 
     // EC2 SSH 설정

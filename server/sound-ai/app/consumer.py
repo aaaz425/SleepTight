@@ -30,39 +30,46 @@ _channel.exchange_declare(
 _channel.queue_declare(queue=QUEUE_NAME, durable=True)
 _channel.queue_bind(
     queue=QUEUE_NAME,
-    exchange=RESULT_EXCHANGE,   # 직접 선언한 익스체인지 사용
-    routing_key=ROUTING_KEY     # config의 ROUTING_KEY
+    exchange=RESULT_EXCHANGE,
+    routing_key=ROUTING_KEY
 )
 
 # 2) 결과큐(publish) 선언 & 바인딩
 _channel.queue_declare(queue=RESULT_QUEUE_NAME, durable=True)
 _channel.queue_bind(
     queue=RESULT_QUEUE_NAME,
-    exchange=RESULT_EXCHANGE,       # 동일한 익스체인지 사용
-    routing_key=RESULT_ROUTING_KEY  # config의 RESULT_ROUTING_KEY
+    exchange=RESULT_EXCHANGE,
+    routing_key=RESULT_ROUTING_KEY
 )
 
 def _on_message(ch, method, props, body):
     try:
         meta       = json.loads(body)
-        segment_id = meta["segmentId"]
-        s3_key     = meta["s3Key"]
-        duration   = float(meta["duration"])
+        logging.info(f"[data info : {meta}")
+
+        data = meta["data"]
+        segment_id = data["segmentId"]
+        s3_key     = data["s3Key"]
+        duration   = float(data["duration"])
 
         # S3에서 opus 다운로드
-        # local opus는 서버의 local에 저장되는 opus 경로
         local_opus = f"/tmp/{segment_id}.opus"
         download_from_s3(s3_key, local_opus)
 
         # 이벤트 검출
         events = detect_events(local_opus, duration)
 
-        # 결과 메타데이터 생성
+        # 패턴 추가 및 data로 감싸기
         result = {
-            "segmentId":  segment_id,
-            "events":     events,
-            "inferenceTs": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "pattern": RESULT_ROUTING_KEY,  # config의 RESULT_ROUTING_KEY 사용
+            "data": {
+                "segmentId":  segment_id,
+                "inferenceTs": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "events":      events
+            }
         }
+
+        # 결과 발행
         _channel.basic_publish(
             exchange=RESULT_EXCHANGE,
             routing_key=RESULT_ROUTING_KEY,
