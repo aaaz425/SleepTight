@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # ────────────────────────────────────────────
+  # 백엔드 블루/그린 서비스 분리
+  # ────────────────────────────────────────────
+
+  backend-blue:
+    image: xylitol311/sleep-tight-backend:latest
+    container_name: sleep-tight-backend-blue
+    ports:
+      - "8080:3000"              # 블루 포트
+    env_file:
+      - ./.env
+    networks:
+      - app-network
+    restart: on-failure
+
+  backend-green:
+    image: xylitol311/sleep-tight-backend:latest
+    container_name: sleep-tight-backend-green
+    ports:
+      - "8081:3000"              # 그린 포트
+    env_file:
+      - ./.env
+    networks:
+      - app-network
+    restart: on-failure
+
+  # ────────────────────────────────────────────
+  # AI 서비스
+  # ────────────────────────────────────────────
+
+  ai:
+    image: xylitol311/sleep-tight-ai:latest
+    container_name: sleep-tight-ai
+    ports:
+      - "8082:8081"              # 호스트 8082 → 컨테이너 8081
+    env_file:
+      - ./.env
+    networks:
+      - app-network
+    restart: on-failure
+    
+networks:
+  app-network:
+    external: true

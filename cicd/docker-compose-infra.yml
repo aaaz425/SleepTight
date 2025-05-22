@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgresql:
+    image: postgres:13
+    container_name: app-postgresql
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:latest
+    container_name: app-redis
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: app-rabbitmq
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - RABBITMQ_MANAGEMENT_PATH_PREFIX=/rabbitmq
+    ports:
+      - "0.0.0.0:5672:5672"     # AMQP
+      - "127.0.0.1:15672:15672" # Management UI (로컬 바인딩)
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro # 호스트의 rabbitmq.conf 를 컨테이너 설정 파일로 마운트
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
