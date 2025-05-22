@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "842645734304",
+    "project_id": "sleep-tight-d9f9d",
+    "storage_bucket": "sleep-tight-d9f9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842645734304:android:a6cfc2c6e71ef2d9b19ac5",
+        "android_client_info": {
+          "package_name": "com.example.sleeptight"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_oAv2LDE8Z3E0o1l1op_APMjBMcpbewc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
