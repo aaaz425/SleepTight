@@ -1,7 +1,11 @@
-import 'package:sleep_tight/core/config/theme/color.dart';
-import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:group_button/group_button.dart';
+import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/provider/alarm_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sleep_tight/shared/widgets/custom_button.dart';
 
 class AlarmToggleRow extends ConsumerWidget {
   const AlarmToggleRow({super.key});
@@ -49,24 +53,21 @@ class AlarmToggleRow extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               children: [
-                                const TextSpan(
+                                TextSpan(
                                   text: '알람이 울리지 않고,\n',
-                                  style: TextStyle(
-                                    fontSize: 15,
+                                  style: AppTextStyles.bodyB1Rg(
                                     color: AppColors.white,
                                   ),
                                 ),
                                 TextSpan(
                                   text: '수면만 분석',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: AppColors.primary,
+                                  style: AppTextStyles.bodyB1Rg(
+                                    color: AppColors.primaryHv,
                                   ),
                                 ),
-                                const TextSpan(
+                                TextSpan(
                                   text: '할게요!',
-                                  style: TextStyle(
-                                    fontSize: 15,
+                                  style: AppTextStyles.bodyB1Rg(
                                     color: AppColors.white,
                                   ),
                                 ),
@@ -81,18 +82,12 @@ class AlarmToggleRow extends ConsumerWidget {
                           ),
                           SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton(
+                            child: CustomButton(
+                              height: 40,
                               onPressed: () => Navigator.of(context).pop(),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                '확인',
-                                style: TextStyle(fontSize: 13),
-                              ),
+                              text: '확인',
+                              theme: 'text',
+                              textColor: AppColors.primary,
                             ),
                           ),
                         ],
@@ -107,35 +102,84 @@ class AlarmToggleRow extends ConsumerWidget {
           await ref.read(alarmTimeNotifierProvider.notifier).toggleAlarm();
         }
 
-        return InkWell(
-          onTap: showInfoDialog,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Checkbox(
-                value: isChecked,
-                onChanged: (_) => showInfoDialog(),
-                checkColor: AppColors.white,
-                fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return AppColors.primary;
-                  }
-                  return Colors.transparent;
-                }),
-                side: const BorderSide(color: AppColors.font2, width: 2),
-              ),
-              const Icon(
-                Icons.timer_off_outlined,
-                size: 16,
-                color: AppColors.font2,
-              ),
-              const SizedBox(width: 4),
-              const Text(
-                '알람 설정 안할래요',
-                style: TextStyle(fontSize: 13, color: AppColors.font2),
-              ),
-            ],
+        return GroupButton<String>(
+          isRadio: false,
+          enableDeselect: true,
+          controller: GroupButtonController(
+            selectedIndexes: isChecked ? [0] : [],
           ),
+          buttons: const ['알람 설정 안할래요'],
+          buttonBuilder: (selected, value, context) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: selected ? AppColors.primary : Colors.transparent,
+                    border: Border.all(
+                      color: selected ? AppColors.primary : AppColors.gray06,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child:
+                      selected
+                          ? Expanded(
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/icons/check.svg',
+                                width: 12,
+                                colorFilter: ColorFilter.mode(
+                                  AppColors.white,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                          )
+                          : null,
+                ),
+                const SizedBox(width: 8),
+                SvgPicture.asset(
+                  'assets/icons/no_alarm.svg',
+                  width: 16,
+                  colorFilter: ColorFilter.mode(
+                    AppColors.gray06,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Text(
+                  value,
+                  style: AppTextStyles.bodyB3Rg(color: AppColors.font2),
+                ),
+              ],
+            );
+          },
+          options: GroupButtonOptions(
+            groupingType: GroupingType.wrap,
+            mainGroupAlignment: MainGroupAlignment.center,
+            crossGroupAlignment: CrossGroupAlignment.center,
+            direction: Axis.horizontal,
+            spacing: 2,
+            runSpacing: 0,
+            selectedShadow: const [],
+            unselectedShadow: const [],
+            selectedColor: Colors.transparent,
+            unselectedColor: Colors.transparent,
+            selectedBorderColor: AppColors.primary,
+            unselectedBorderColor: AppColors.gray06,
+            elevation: 0,
+          ),
+          onSelected: (val, idx, selected) async {
+            if (selected) {
+              await showInfoDialog();
+            } else {
+              await ref.read(alarmTimeNotifierProvider.notifier).toggleAlarm();
+            }
+          },
         );
       },
     );
