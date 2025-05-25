@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sleep_tight/core/config/app_config.dart';
 import 'package:sleep_tight/core/config/theme/color.dart';
+import 'package:sleep_tight/core/config/theme/text_styles.dart';
 import 'package:sleep_tight/core/network/dio_provider.dart';
 import 'package:sleep_tight/features/health/services/health_service.dart';
 import 'package:sleep_tight/features/sleep_mode/data/models/requests/sleep_start_request.dart';
@@ -12,6 +14,7 @@ import 'package:sleep_tight/features/sleep_mode/presentation/provider/report_id_
 import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_toggle_row.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/time_slot_picker.dart';
+import 'package:sleep_tight/shared/widgets/custom_button.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -36,7 +39,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       await Permission.activityRecognition.request();
       await _healthService.requestHealthPermissions();
     } catch (e) {
-      print("⚠️ 권한 요청 중 오류 발생: $e");
+      debugPrint("⚠️ 권한 요청 중 오류 발생: $e");
     }
   }
 
@@ -61,12 +64,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
-            Icon(Icons.timer_outlined, size: 28),
+          children: [
+            SvgPicture.asset(
+              'assets/icons/alarm.svg',
+              width: 28,
+              colorFilter: ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+            ),
             SizedBox(width: 4),
             Text(
               '알람 시간을 설정해보세요',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: AppTextStyles.titleT3Sb(color: AppColors.white),
             ),
           ],
         ),
@@ -89,45 +96,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
 
-        const SizedBox(height: 60),
+        const SizedBox(height: 80),
 
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 156),
-          child: SizedBox(
-            height: 48,
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              onPressed: () async {
-                final now = DateTime.now();
-                final timestamp = now;
-                ref.read(sleepStartTimeProvider.notifier).state = timestamp;
+        CustomButton(
+          width: 156,
+          height: 48,
+          onPressed: () async {
+            final now = DateTime.now();
+            final timestamp = now;
+            ref.read(sleepStartTimeProvider.notifier).state = timestamp;
 
-                final response = await startSleep(ref, timestamp);
+            final response = await startSleep(ref, timestamp);
 
-                if (!context.mounted) return;
+            if (!context.mounted) return;
 
-                ref
-                    .read(reportIdNotifierProvider.notifier)
-                    .set(response.reportId);
-                final currentId = ref.read(reportIdNotifierProvider);
-                print('📌 현재 reportIdProvider 상태: $currentId');
+            ref.read(reportIdNotifierProvider.notifier).set(response.reportId);
+            final currentId = ref.read(reportIdNotifierProvider);
+            debugPrint('📌 현재 reportIdProvider 상태: $currentId');
 
-                context.go(AppConfig.routes.homeSleeping);
-              },
-              child: const Text(
-                '수면 시작',
-                style: TextStyle(fontSize: 16, color: AppColors.white),
-              ),
-            ),
-          ),
+            context.go(AppConfig.routes.homeSleeping);
+          },
+          text: '수면 시작',
+          textStyle: AppTextStyles.button1Sb(color: AppColors.white),
+          textColor: AppColors.white,
         ),
       ],
     );
