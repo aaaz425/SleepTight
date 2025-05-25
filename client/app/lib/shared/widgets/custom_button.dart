@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final bool disabled;
   final Widget? icon;
   final String? text;
+  final TextStyle? textStyle;
   final Color? textColor;
 
   const CustomButton({
@@ -21,6 +22,7 @@ class CustomButton extends StatelessWidget {
     this.theme = 'default',
     this.icon,
     this.textColor,
+    this.textStyle,
   });
 
   @override
@@ -80,13 +82,15 @@ class CustomButton extends StatelessWidget {
             if (text != null)
               Text(
                 text!,
-                style: TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600, // semibold
-                  fontSize: 16,
-                  height: 1.4, // 140%
-                  letterSpacing: -0.4, // -2.5% of 16 = -0.4
-                ),
+                style:
+                    textStyle ??
+                    TextStyle(
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w600, // semibold
+                      fontSize: 16,
+                      height: 1.4, // 140%
+                      letterSpacing: -0.4, // -2.5% of 16 = -0.4
+                    ),
               ),
           ],
         ),
