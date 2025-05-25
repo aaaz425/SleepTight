@@ -1,0 +1,13 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="8.00004" cy="8.00016" r="4.66667" stroke="#A6A6A6" stroke-width="1.25"/>
+<path d="M5.33333 12L4 13.3333" stroke="#A6A6A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.6667 12L12 13.3333" stroke="#A6A6A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 2.6665L13.3334 3.99984" stroke="#A6A6A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3.99996 2.6665L2.66663 3.99984" stroke="#A6A6A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8 6V8L9.33333 9.33333" stroke="#A6A6A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<mask id="path-7-inside-1_1309_16215" fill="white">
+<path d="M2.32568 1.19434L15.1764 14.045L14.045 15.1764L1.19431 2.32571L2.32568 1.19434Z"/>
+</mask>
+<path d="M2.32568 1.19434L15.1764 14.045L14.045 15.1764L1.19431 2.32571L2.32568 1.19434Z" fill="#A6A6A6"/>
+<path d="M2.32568 1.19434L1.76 1.76002L14.6107 14.6107L15.1764 14.045L15.7421 13.4793L2.89137 0.628651L2.32568 1.19434Z" fill="#1C1C1E" mask="url(#path-7-inside-1_1309_16215)"/>
+</svg>
