@@ -21,6 +21,16 @@ class AppTextStyles {
     color: color,
   );
 
+  // Title/T2_Rg
+  static TextStyle titleT2Rg({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w400, // regular
+    fontSize: 20,
+    height: 1.4, // 140%
+    letterSpacing: -0.5, // -2.5% of 20 = -0.5
+    color: color,
+  );
+
   // Title/T3_Sb
   static TextStyle titleT3Sb({required Color color}) => TextStyle(
     fontFamily: 'Pretendard',
@@ -48,6 +58,16 @@ class AppTextStyles {
     fontSize: 15,
     height: 1.4, // 140%
     letterSpacing: -0.375, // -2.5% of 15 = -0.375
+    color: color,
+  );
+
+  // Body/B3_Rg
+  static TextStyle bodyB3Rg({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w400, // regular
+    fontSize: 13,
+    height: 1.4, // 140%
+    letterSpacing: -0.325, // -2.5% of 13 = -0.325
     color: color,
   );
 
@@ -121,7 +141,7 @@ class AppTextStyles {
     color: color,
   );
 
-  // Button1/Sb
+  // Button/BUT1_Sb
   static TextStyle button1Sb({required Color color}) => TextStyle(
     fontFamily: 'Pretendard',
     fontWeight: FontWeight.w600, // semibold
@@ -131,13 +151,33 @@ class AppTextStyles {
     color: color,
   );
 
-  // Button3/Md
+  // Button/BUT2_Sb
+  static TextStyle button2Sb({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w600, // semibold
+    fontSize: 14,
+    height: 1.4, // 140%
+    letterSpacing: -0.35, // -2.5% of 14 = -0.35
+    color: color,
+  );
+
+  // Button/BUT3_Md
   static TextStyle button3Md({required Color color}) => TextStyle(
     fontFamily: 'Pretendard',
     fontWeight: FontWeight.w500, // medium
     fontSize: 13,
     height: 1.4, // 140%
     letterSpacing: 0,
+    color: color,
+  );
+
+  // Headline/H1_Rg
+  static TextStyle headlineH1Rg({required Color color}) => TextStyle(
+    fontFamily: 'Pretendard',
+    fontWeight: FontWeight.w400, // regular
+    fontSize: 28,
+    height: 1.4, // 140%
+    letterSpacing: -0.7, // -2.5% of 28 = -0.7
     color: color,
   );
 
