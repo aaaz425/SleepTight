@@ -77,11 +77,22 @@ class _MusicList extends ConsumerWidget {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
+                                    child: Image.asset(
                                       music.coverUrl,
                                       width: 120,
                                       height: 120,
                                       fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) => Image.asset(
+                                            'assets/images/album_example.png',
+                                            width: 120,
+                                            height: 120,
+                                            fit: BoxFit.cover,
+                                          ),
                                     ),
                                   ),
                                   const SizedBox(height: 4),

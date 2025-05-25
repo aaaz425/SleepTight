@@ -11,32 +11,42 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sleep_tight/features/music/presentation/providers/audio_controller.dart';
+import 'package:sleep_tight/features/music/presentation/widgets/fullscreen_player.dart';
+import 'package:sleep_tight/features/music/presentation/widgets/mini_player.dart';
 import 'package:toastification/toastification.dart';
 import 'package:sleep_tight/core/config/router.dart';
 import 'core/network/api_error_handler.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sleep_tight/features/health/services/wear_communication_service.dart';
+import 'firebase_options.dart';
 
-// GoRouter에 전달할 NavigatorKey를 앱의 상위 레벨에 정의합니다.
+// GoRouter에 전달할 NavigatorKey
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-// WearCommunicationService 인스턴스를 제공하는 Provider
+// WearCommunicationService Provider
 final wearCommunicationServiceProvider = Provider<WearCommunicationService>((
   ref,
 ) {
   return WearCommunicationService();
 });
 
-// ApiErrorHandler 인스턴스를 제공하는 Provider
+// ApiErrorHandler Provider
 final apiErrorHandlerProvider = Provider<ApiErrorHandler>((ref) {
   return ApiErrorHandler();
 });
 
-// ApiErrorHandler의 onError 스트림을 제공하는 StreamProvider
-// ApiErrorEvent 타입을 명시해주는 것이 좋습니다. (ApiErrorEvent가 정의되어 있다고 가정)
+// ApiErrorEvent StreamProvider
 final apiErrorStreamProvider = StreamProvider<ApiErrorEvent>((ref) {
   final errorHandler = ref.watch(apiErrorHandlerProvider);
   return errorHandler.onError;
+});
+
+// Miniplayer의 확장/축소 진행 상태를 공유하기 위한 ValueNotifier Provider
+final playerExpandProgressProvider = Provider<ValueNotifier<double>>((ref) {
+  final notifier = ValueNotifier<double>(0.0); // 초기값 0.0 (최소화 상태)
+  ref.onDispose(notifier.dispose);
+  return notifier;
 });
 
 void main() async {
@@ -48,17 +58,14 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
-    // 예외 발생해도 앱 종료/중단 막기
     debugPrint('Caught Flutter error: ${details.exception}');
   };
 
-  // 세로모드로 고정
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // 상태바, 네비게이션바 색상
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: AppColors.gray01,
@@ -68,23 +75,11 @@ void main() async {
     ),
   );
 
-  // TODO: 로컬라이제이션 추가
   await initializeDateFormatting('ko_KR', null);
-
   final sharedPreferences = await SharedPreferences.getInstance();
-
-  // 반드시 dotenv.load()를 먼저 호출!
   await dotenv.load(fileName: ".env");
-
-  // 그 다음에 KakaoSdk.init 등 환경변수 사용 코드 작성
   KakaoSdk.init(nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY']!);
 
-  // 여기서 secureStorage에 accessToken이 있는지 확인하고
-  // 이 token을 통해 회원정보를 제대로 가져오는지 확인하고
-  // 잘 가져오면 /home으로 이동
-  // 잘 가져오지 않으면 로그아웃 처리.
-
-  // ProviderScope로 앱을 감싸 Riverpod을 사용할 수 있도록 합니다.
   runApp(
     ProviderScope(
       overrides: [
@@ -100,24 +95,28 @@ class SleepTightApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    debugPrint("sleeptightapp started");
-    // Wear OS 통신 서비스 초기화
+    final appRouter = ref.watch(goRouterProvider(navigatorKey));
+    final audioState = ref.watch(audioControllerProvider);
+    final bool showMiniplayer = audioState.music != null;
+
+    final playerExpandProgress = ref.watch(playerExpandProgressProvider);
+
+    const double miniPlayerMinHeight = 52.0;
+    // BottomNavigationBar의 표준 높이 (Miniplayer가 이를 덮도록 배치될 것임)
+    // const double bottomNavBarHeight = kBottomNavigationBarHeight; // 이 값은 Miniplayer 위치 계산에 직접 사용되지는 않음
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWearCommunication(ref);
     });
 
-    // apiErrorStreamProvider를 listen하여 에러 발생 시 토스트 메시지 표시
     ref.listen<AsyncValue<ApiErrorEvent>>(apiErrorStreamProvider, (
-      previous, // 이전 상태(nullable)
-      next, // 현재 상태
+      previous,
+      next,
     ) {
       next.whenData((apiErrorEvent) {
-        // final currentContext = navigatorKey.currentContext;
         final overlayContext = navigatorKey.currentState?.overlay?.context;
         if (overlayContext != null) {
-          // ApiErrorEvent에서 ApiException 객체를 추출합니다.
           final apiException = apiErrorEvent.apiException;
-
           toastification.show(
             context: overlayContext,
             type: ToastificationType.error,
@@ -128,7 +127,7 @@ class SleepTightApp extends ConsumerWidget {
                 apiException.errorData,
               ),
             ),
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment.topCenter,
             autoCloseDuration: const Duration(seconds: 4),
             borderRadius: BorderRadius.circular(12.0),
             applyBlurEffect: true,
@@ -138,23 +137,101 @@ class SleepTightApp extends ConsumerWidget {
       });
     });
 
-    // goRouterProvider를 watch하여 GoRouter 인스턴스를 가져옵니다.
-    // 이때, 생성한 navigatorKey를 전달합니다.
-    final appRouter = ref.watch(goRouterProvider(navigatorKey));
-
     return ToastificationWrapper(
       child: MaterialApp.router(
         title: 'Sleep Tight',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.theme,
         routerConfig: appRouter,
+        builder: (context, routerWidget) {
+          return Stack(
+            children: [
+              if (routerWidget != null) routerWidget,
+
+              if (showMiniplayer)
+                ValueListenableBuilder<double>(
+                  valueListenable: playerExpandProgress,
+                  builder: (context, percentage, _) {
+                    final bool isMinimized = percentage < 0.05;
+                    debugPrint(
+                      'ValueListenableBuilder - percentage: $percentage, isMinimized: $isMinimized',
+                    );
+
+                    if (isMinimized) {
+                      // 최소화 상태일 때: 우리가 직접 만든 MiniPlayer 위젯
+                      return Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: kBottomNavigationBarHeight,
+                        height: miniPlayerMinHeight,
+                        child: MiniPlayer(), // 사용자의 커스텀 MiniPlayer 위젯
+                      );
+                    } // ValueListenableBuilder의 else 블록 예시 (제안하신 방식)
+                    else {
+                      // isMinimized == false, 즉 percentage >= 0.05
+                      // 여기서 FullScreenPlayer를 표시합니다.
+                      // 하지만 부드러운 높이 애니메이션과 아래로 드래그하여 닫는 기능을 직접 구현해야 합니다.
+
+                      final screenHeight = MediaQuery.of(context).size.height;
+                      // playerExpandProgress.value를 기반으로 FullScreenPlayer의 현재 높이를 계산합니다.
+                      // (0.0 = 최소 높이 근처, 1.0 = 전체 화면 높이)
+                      // 이것은 Miniplayer 패키지가 내부적으로 수행하는 애니메이션을 단순화한 버전입니다.
+
+                      if (percentage >= 0.05) {
+                        // 실제로 보여줄 조건
+                        return Positioned.fill(
+                          child: GestureDetector(
+                            // FullScreenPlayer를 아래로 드래그하여 닫는 기능 추가
+                            onVerticalDragUpdate: (details) {
+                              // playerExpandProgress.value를 감소시키는 로직 (mini_player.dart의 로직과 유사하지만 아래 방향)
+                              final playerNotifier = ref.read(
+                                playerExpandProgressProvider,
+                              );
+                              double dragDelta =
+                                  details.delta.dy; // 아래로 드래그 시 양수
+                              double changeInPercentage =
+                                  dragDelta / (screenHeight * 0.7); // 민감도 조절
+                              playerNotifier.value = (playerNotifier.value +
+                                      changeInPercentage)
+                                  .clamp(0.0, 1.0);
+                            },
+                            onVerticalDragEnd: (details) {
+                              // 드래그가 끝나면 특정 조건에 따라 닫거나 다시 확장
+                              final playerNotifier = ref.read(
+                                playerExpandProgressProvider,
+                              );
+                              if (playerNotifier.value < 0.6 &&
+                                  (details.primaryVelocity ?? 0) > 300) {
+                                // 충분히 아래로 빠르게 드래그했거나, 특정 지점 이하로 드래그
+                                playerNotifier.value = 0.0; // 닫기 (최소화 상태로)
+                              } else if (playerNotifier.value < 0.05) {
+                                // 거의 닫힌 상태면 확실히 닫기
+                                playerNotifier.value = 0.0;
+                              } else {
+                                // 애매한 위치에 놓으면 다시 완전히 확장 (또는 현재 위치 유지 - 정책에 따라)
+                                // playerNotifier.value = 1.0; // 이 부분은 사용자 경험에 맞게 조절 필요
+                              }
+                            },
+                            child: FullscreenPlayer(),
+                          ),
+                        );
+                      } else {
+                        // percentage가 0.05 미만으로 다시 내려가면 (이론적으로는 isMinimized가 true가 됨)
+                        return const SizedBox.shrink();
+                      }
+                    }
+                  },
+                ),
+            ],
+          );
+        },
       ),
     );
   }
+}
 
-  // Wear OS 통신 초기화
-  Future<void> _initializeWearCommunication(WidgetRef ref) async {
-    final wearService = ref.read(wearCommunicationServiceProvider);
-    await wearService.initialize();
-  }
+Future<void> _initializeWearCommunication(WidgetRef ref) async {
+  final wearService = ref.read(wearCommunicationServiceProvider);
+  await wearService.initialize();
+  debugPrint("Wear OS Communication Initialized");
 }

@@ -13,10 +13,10 @@ class MusicResponse {
     required this.id,
     required this.title,
     required this.category,
-    required this.coverUrl,
+    this.coverUrl = 'assets/images/album_example.png',
     required this.isLiked,
     required this.likeCount,
-    required this.streamUrl,
+    this.streamUrl = 'assets/sound/music_example.mp3',
   });
 
   factory MusicResponse.fromJson(Map<String, dynamic> json) => MusicResponse(
@@ -25,19 +25,19 @@ class MusicResponse {
     category: MusicCategory.values.firstWhere(
       (e) => e.name == json['category'],
     ),
-    coverUrl: json['coverUrl'] as String,
+    // coverUrl: json['coverUrl'] as String,
     isLiked: json['isLiked'] as bool,
     likeCount: json['likeCount'] as int,
-    streamUrl: json['streamUrl'] as String,
+    // streamUrl: json['streamUrl'] as String,
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
     'category': category.name,
-    'coverUrl': coverUrl,
+    // 'coverUrl': coverUrl,
     'isLiked': isLiked,
     'likeCount': likeCount,
-    'streamUrl': streamUrl,
+    // 'streamUrl': streamUrl,
   };
 }

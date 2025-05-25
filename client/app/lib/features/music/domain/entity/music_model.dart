@@ -11,8 +11,8 @@ class MusicModel {
     required this.id,
     required this.title,
     required this.category,
-    required this.coverUrl,
-    required this.streamUrl,
+    this.coverUrl = 'assets/images/album_example.png',
+    this.streamUrl = 'assets/sound/music_example.mp3',
   });
 
   // JSON으로부터 MusicModel 객체를 생성하는 factory 생성자
@@ -33,8 +33,7 @@ class MusicModel {
       id: id,
       title: '$displayCategory $id',
       category: rawCategory,
-      coverUrl: json['coverUrl'] as String,
-      streamUrl: json['streamUrl'] as String,
+      streamUrl: 'assets/sound/music_example.mp3',
     );
   }
 
@@ -53,5 +52,10 @@ class MusicModel {
       'coverUrl': coverUrl,
       'streamUrl': streamUrl,
     };
+  }
+
+  @override
+  String toString() {
+    return 'MusicModel(id: $id, title: $title, category: $category, coverUrl: $coverUrl, streamUrl: $streamUrl)';
   }
 }

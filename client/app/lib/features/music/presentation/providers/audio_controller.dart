@@ -139,6 +139,8 @@ class AudioController extends StateNotifier<AudioState> {
     _lastPlayCallTime = now;
     _lastPlayedMusicIdForDebounce = music.id;
 
+    debugPrint("AudioController: Play called for ${music.toString()}");
+
     debugPrint(
       "AudioController: Attempting to play - ${music.title} (URL: ${music.streamUrl})",
     );
@@ -154,7 +156,12 @@ class AudioController extends StateNotifier<AudioState> {
 
     try {
       // setUrl은 내부적으로 이전 소스를 해제하고 새 소스를 준비
-      await state.player.setUrl(music.streamUrl);
+      if (music.streamUrl.startsWith('http')) {
+        await state.player.setUrl(music.streamUrl);
+      } else {
+        await state.player.setAsset(music.streamUrl);
+      }
+      debugPrint("AudioController: Stream URL: ${music.streamUrl}");
       await state.player.play(); // 재생 시작
       debugPrint("AudioController: Play command issued for - ${music.title}");
       // isPlaying, isLoading 등의 상태는 playerStateStream 리스너가 업데이트함
