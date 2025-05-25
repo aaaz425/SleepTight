@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:health/health.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -64,7 +65,7 @@ class HealthService {
   ) async {
     await ensureConfigured();
     if (!_isConfigured) {
-      print("HealthService: 설정 실패, 활동 데이터를 가져올 수 없습니다.");
+      debugPrint("HealthService: 설정 실패, 활동 데이터를 가져올 수 없습니다.");
       return [];
     }
 
@@ -78,7 +79,7 @@ class HealthService {
     try {
       permissionsGranted = await _health.requestAuthorization(_activityTypes);
     } catch (e) {
-      print("활동 유형에 대한 권한 요청 중 오류 발생: $e");
+      debugPrint("활동 유형에 대한 권한 요청 중 오류 발생: $e");
       return []; // 권한 오류 시 빈 목록 반환
     }
 
@@ -91,10 +92,10 @@ class HealthService {
         );
         activityData = _health.removeDuplicates(activityData);
       } catch (error) {
-        print("활동 데이터 가져오기 실패: $error");
+        debugPrint("활동 데이터 가져오기 실패: $error");
       }
     } else {
-      print("활동 데이터에 대한 접근 권한이 거부되었습니다.");
+      debugPrint("활동 데이터에 대한 접근 권한이 거부되었습니다.");
     }
     return activityData;
   }
@@ -106,7 +107,7 @@ class HealthService {
   ) async {
     await ensureConfigured();
     if (!_isConfigured) {
-      print("HealthService: 설정 실패, 수면 데이터를 가져올 수 없습니다.");
+      debugPrint("HealthService: 설정 실패, 수면 데이터를 가져올 수 없습니다.");
       return [];
     }
 
@@ -121,7 +122,7 @@ class HealthService {
       // 데이터를 읽기 전에 데이터 유형에 대한 액세스 요청
       permissionsGranted = await _health.requestAuthorization(_sleepDataTypes);
     } catch (e) {
-      print("수면 유형에 대한 권한 요청 중 오류 발생: $e");
+      debugPrint("수면 유형에 대한 권한 요청 중 오류 발생: $e");
       return []; // 권한 오류 시 빈 목록 반환
     }
 
@@ -132,14 +133,14 @@ class HealthService {
           startTime: startDate,
           endTime: endDate,
         );
-        print("SLEEP_DATA: $sleepData");
+        debugPrint("SLEEP_DATA: $sleepData");
         sleepData = _health.removeDuplicates(sleepData);
-        print("SLEEP_DATA: $sleepData");
+        debugPrint("SLEEP_DATA: $sleepData");
       } catch (error) {
-        print("수면 데이터 가져오기 실패: $error");
+        debugPrint("수면 데이터 가져오기 실패: $error");
       }
     } else {
-      print("수면 데이터에 대한 접근 권한이 거부되었습니다.");
+      debugPrint("수면 데이터에 대한 접근 권한이 거부되었습니다.");
     }
     return sleepData;
   }
@@ -264,16 +265,16 @@ class HealthService {
 
   // 데이터를 콘솔에 출력 (이제 getHealthDataAsString 사용)
   Future<void> printData() async {
-    print("HealthService: 데이터 가져오기 및 콘솔 출력 시도...");
+    debugPrint("HealthService: 데이터 가져오기 및 콘솔 출력 시도...");
     String dataString = await getHealthDataAsString();
-    print(dataString);
-    print("HealthService: 데이터 콘솔 출력 완료.");
+    debugPrint(dataString);
+    debugPrint("HealthService: 데이터 콘솔 출력 완료.");
   }
 
   /// Fetches health data, saves it to a temporary .txt file, and shares it.
   Future<void> exportHealthDataAsTxt() async {
     try {
-      print("HealthService: 데이터 TXT 파일로 내보내기 시작...");
+      debugPrint("HealthService: 데이터 TXT 파일로 내보내기 시작...");
       String dataString = await getHealthDataAsString();
 
       // 1. Get temporary directory
@@ -288,7 +289,7 @@ class HealthService {
       // 2. Create and write to the file
       final file = File(filePath);
       await file.writeAsString(dataString);
-      print("HealthService: 데이터 파일 저장 완료 - $filePath");
+      debugPrint("HealthService: 데이터 파일 저장 완료 - $filePath");
 
       // 3. Share the file
       final shareParams = ShareParams(
@@ -296,9 +297,9 @@ class HealthService {
         files: [XFile(filePath)],
       );
       await SharePlus.instance.share(shareParams);
-      print("HealthService: 파일 공유 완료.");
+      debugPrint("HealthService: 파일 공유 완료.");
     } catch (e) {
-      print("HealthService: TXT 파일 내보내기 중 오류 발생: $e");
+      debugPrint("HealthService: TXT 파일 내보내기 중 오류 발생: $e");
       // UI에 오류 메시지를 표시하도록 오류를 다시 throw하거나 상태를 관리할 수 있습니다.
     }
   }
@@ -310,7 +311,7 @@ class HealthService {
         await _health.configure();
         _isConfigured = true;
       } catch (e) {
-        print('Health Connect 초기화 실패: $e');
+        debugPrint('Health Connect 초기화 실패: $e');
         return;
       }
     }
@@ -326,12 +327,12 @@ class HealthService {
         ..._sleepDataTypes,
       ]);
       if (granted) {
-        print("Health Connect 권한 획득 완료");
+        debugPrint("Health Connect 권한 획득 완료");
       } else {
-        print("Health Connect 권한 거부됨");
+        debugPrint("Health Connect 권한 거부됨");
       }
     } catch (e) {
-      print("Health Connect 권한 요청 중 오류: $e");
+      debugPrint("Health Connect 권한 요청 중 오류: $e");
     }
   }
 

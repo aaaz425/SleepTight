@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum Gender {
   male(en: 'Male', ko: '남성'),
   female(en: 'Female', ko: '여성');
@@ -22,7 +24,7 @@ enum Gender {
       }
     }
     // 알려지지 않은 값에 대한 처리 (예: 기본값 반환 또는 null 반환)
-    print('Warning: Unknown Gender string value encountered: $value');
+    debugPrint('Warning: Unknown Gender string value encountered: $value');
     return null;
   }
 }

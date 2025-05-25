@@ -10,9 +10,9 @@ void handleNotification(RemoteMessage message) {
   final title = message.notification?.title ?? '알림';
   final body = message.notification?.body ?? '';
 
-  print('🧩 알림 데이터: $data');
-  print('🧩 제목: $title');
-  print('🧩 내용: $body');
+  debugPrint('🧩 알림 데이터: $data');
+  debugPrint('🧩 제목: $title');
+  debugPrint('🧩 내용: $body');
 }
 
 class FcmService {
@@ -24,7 +24,7 @@ class FcmService {
 
     // FCM 토큰 확인
     final token = await _messaging.getToken();
-    print('✅ FCM Token: $token');
+    debugPrint('✅ FCM Token: $token');
 
     // 수신 리스너 등록
     _setupListeners();
@@ -32,7 +32,7 @@ class FcmService {
 
   static void _setupListeners() {
     FirebaseMessaging.onMessage.listen((message) {
-      print("📥 포그라운드 알림 수신");
+      debugPrint("📥 포그라운드 알림 수신");
       handleNotification(message);
 
       final overlayContext = navigatorKey.currentState?.overlay?.context;
@@ -51,7 +51,7 @@ class FcmService {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print("📥 백그라운드 알림 클릭");
+      debugPrint("📥 백그라운드 알림 클릭");
       handleNotification(message);
       final context = navigatorKey.currentState?.context;
       if (context != null) {
@@ -61,7 +61,7 @@ class FcmService {
 
     _messaging.getInitialMessage().then((message) {
       if (message != null) {
-        print("📥 종료 상태에서 알림 클릭");
+        debugPrint("📥 종료 상태에서 알림 클릭");
         handleNotification(message);
       }
 

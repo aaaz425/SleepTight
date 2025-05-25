@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum Country {
   // enum 멤버 이름은 lowerCamelCase로 작성합니다.
   // (영어 국가명, 한국어 국가명) 순서로 생성자에 전달합니다.
@@ -302,7 +304,7 @@ enum Country {
         return country;
       }
     }
-    print('Warning: Unknown Country API value encountered: $countryCode');
+    debugPrint('Warning: Unknown Country API value encountered: $countryCode');
     return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
   }
 
@@ -315,7 +317,7 @@ enum Country {
         return country.koreanName;
       }
     }
-    print('Warning: Unknown Country API value encountered: $englishName');
+    debugPrint('Warning: Unknown Country API value encountered: $englishName');
     return null; // 일치하는 국가가 없으면 null 반환 또는 예외 처리
   }
 
@@ -342,13 +344,13 @@ enum Country {
 }
 // --- 사용 예시 ---
 // Country myCountry = Country.southKorea;
-// print(myCountry.englishName); // "South Korea"
-// print(myCountry.koreanName);  // "대한민국"
-// print(myCountry.apiValue);    // "South Korea" (API 전송용)
-// print(myCountry.getDisplayName('ko')); // "대한민국" (UI 표시용 - 한국어)
-// print(myCountry.getDisplayName('en')); // "South Korea" (UI 표시용 - 영어)
+// debugPrint(myCountry.englishName); // "South Korea"
+// debugPrint(myCountry.koreanName);  // "대한민국"
+// debugPrint(myCountry.apiValue);    // "South Korea" (API 전송용)
+// debugPrint(myCountry.getDisplayName('ko')); // "대한민국" (UI 표시용 - 한국어)
+// debugPrint(myCountry.getDisplayName('en')); // "South Korea" (UI 표시용 - 영어)
 
 // Country? foundCountry = Country.findByCountryCode("US");
 // if (foundCountry != null) {
-//   print(foundCountry.getDisplayName('ko')); // "미국"
+//   debugPrint(foundCountry.getDisplayName('ko')); // "미국"
 // }

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class WaveformQueue {
   bool _isRunning = false;
   final List<Future<void> Function()> _queue = [];
@@ -18,7 +20,7 @@ class WaveformQueue {
         // 🔐 MediaCodec 안정화 시간 약간 확보
         await Future.delayed(Duration(milliseconds: 300));
       } catch (e) {
-        print('❌ 큐 작업 중 오류: $e');
+        debugPrint('❌ 큐 작업 중 오류: $e');
       }
     }
 

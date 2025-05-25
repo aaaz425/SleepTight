@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,7 +46,7 @@ class SoundDownloadService {
       // 파일이 이미 존재하는지 확인
       final file = File(filePath);
       if (await file.exists()) {
-        print('파일이 이미 존재합니다: $filePath');
+        debugPrint('파일이 이미 존재합니다: $filePath');
         return filePath;
       }
 
@@ -56,15 +57,15 @@ class SoundDownloadService {
         onReceiveProgress: (received, total) {
           if (total != -1) {
             final progress = (received / total * 100).toStringAsFixed(0);
-            print('다운로드 진행률: $progress%');
+            debugPrint('다운로드 진행률: $progress%');
           }
         },
       );
 
-      print('다운로드 완료: $filePath');
+      debugPrint('다운로드 완료: $filePath');
       return filePath;
     } catch (e) {
-      print('다운로드 오류: $e');
+      debugPrint('다운로드 오류: $e');
       return null;
     }
   }
@@ -82,10 +83,10 @@ class SoundDownloadService {
 
       for (final file in soundFiles) {
         await (file as File).delete();
-        print('파일 삭제됨: ${file.path}');
+        debugPrint('파일 삭제됨: ${file.path}');
       }
     } catch (e) {
-      print('캐시 정리 오류: $e');
+      debugPrint('캐시 정리 오류: $e');
     }
   }
 }

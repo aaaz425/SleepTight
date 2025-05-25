@@ -51,7 +51,7 @@ class SignupScreenBody extends ConsumerWidget {
 
       // FCM 토큰 받아오기
       final fcmToken = await FirebaseMessaging.instance.getToken();
-      print('FCM Token from signup: $fcmToken');
+      debugPrint('FCM Token from signup: $fcmToken');
 
       final formattedData =
           Map<String, dynamic>.from(raw)

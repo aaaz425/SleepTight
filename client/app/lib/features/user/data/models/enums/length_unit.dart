@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum LengthUnit {
   cm,
   ftIn; // Represents "ft/in"
@@ -14,7 +16,7 @@ enum LengthUnit {
         return unit;
       }
     }
-    print('Warning: Unknown LengthUnit string value encountered: $val');
+    debugPrint('Warning: Unknown LengthUnit string value encountered: $val');
     return null; // 또는 기본값 혹은 예외 처리
   }
 }

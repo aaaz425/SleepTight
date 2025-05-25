@@ -20,6 +20,7 @@ import 'package:sleep_tight/features/sleep_mode/presentation/provider/report_id_
 import 'package:sleep_tight/features/sleep_mode/presentation/provider/sleep_start_time_provider.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/screens/wake_up_screen.dart';
 import 'package:sleep_tight/features/sleep_mode/presentation/widgets/alarm_time_display.dart';
+import 'package:sleep_tight/features/sleep_mode/presentation/widgets/custom_audio_wave.dart';
 import 'package:sleep_tight/main.dart'; // navigatorKey 사용 시 필요
 import 'package:sleep_tight/shared/widgets/alarm_trigger_watcher.dart';
 import 'package:sleep_tight/shared/widgets/custom_button.dart';
@@ -207,7 +208,7 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
               ), // 기존 여백 유지
               // padding: const EdgeInsets.symmetric(horizontal: 20), // 패딩은 수정된 AudioWaveforms 내부에서 처리 가능
               height: 120, // 기존 높이 유지 또는 텍스트 표시에 맞게 조절
-              child: AudioWaveforms(
+              child: CustomAudioWave(
                 // 수정된 AudioWaveforms 위젯 사용
                 size: const Size(double.infinity, 120), // 위젯의 전체 크기
                 pcmDataStream:

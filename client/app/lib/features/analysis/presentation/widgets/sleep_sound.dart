@@ -96,7 +96,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
           _audioProgress = 0;
         });
 
-        print('재생 완료 - soundID: $completedId');
+        debugPrint('재생 완료 - soundID: $completedId');
       }
     });
   }
@@ -168,13 +168,13 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
 
       return waveformData.map((v) => 0.1 + (v / maxValue) * 0.9).toList();
     } catch (e) {
-      print('❌ 파형 추출 실패: $e');
+      debugPrint('❌ 파형 추출 실패: $e');
       return _generateRandomWaveform();
     } finally {
       try {
         playerController.dispose(); // 💥 무조건 1번만 호출
       } catch (disposeError) {
-        print('❌ dispose 중 에러: $disposeError');
+        debugPrint('❌ dispose 중 에러: $disposeError');
       }
     }
   }
@@ -294,7 +294,7 @@ class _SleepSoundState extends ConsumerState<SleepSound> {
         _isPlaying = true;
       });
     } catch (e) {
-      print('🎧 재생 오류: $e');
+      debugPrint('🎧 재생 오류: $e');
       setState(() {
         _currentlyPlayingId = null;
         _audioProgress = 0;

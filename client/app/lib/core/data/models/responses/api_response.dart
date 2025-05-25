@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show immutable, kDebugMode;
+import 'package:flutter/foundation.dart' show immutable, kDebugMode, debugPrint;
 
 /// API 응답의 데이터 페이로드를 위한 제네릭 클래스입니다.
 ///
@@ -38,7 +38,7 @@ class ApiResponse<T> {
           } catch (e) {
             // T가 non-nullable인데 jsonData가 null인 경우 캐스트 오류 발생
             if (kDebugMode) {
-              print(
+              debugPrint(
                 'ApiResponse.fromJson: json[\'data\'] is null, but type $T is not nullable. Error: $e',
               );
             }
@@ -51,7 +51,7 @@ class ApiResponse<T> {
           } catch (e) {
             // 직접 캐스트 실패 (주로 T가 복합 객체이고 jsonData를 특정 방식으로 파싱해야 할 때)
             if (kDebugMode) {
-              print(
+              debugPrint(
                 'ApiResponse.fromJson: Failed to cast json[\'data\'] to type $T directly. Consider providing a fromJsonData function for complex types. Error: $e',
               );
             }

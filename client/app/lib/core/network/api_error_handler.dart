@@ -33,7 +33,7 @@ class ApiErrorHandler {
   void reportError(ApiException apiException) {
     _errorController.add(ApiErrorEvent(apiException));
     // 디버깅 또는 로깅 목적으로 콘솔에 출력할 수 있습니다.
-    // print('ApiErrorHandler: Error reported - ${apiException.message}');
+    // debugPrint('ApiErrorHandler: Error reported - ${apiException.message}');
   }
 
   /// StreamController를 닫습니다.
