@@ -7,6 +7,8 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { collectDefaultMetrics, Registry } from 'prom-client';
+import * as express from 'express';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -16,6 +18,19 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   logger.log('서버 시작 중...');
+
+  // Prometheus 메트릭 설정
+  logger.log('Prometheus 메트릭 설정 중...');
+  const register = new Registry();
+  collectDefaultMetrics({ register });
+
+  // Express용 /metrics 엔드포인트 추가
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.get('/metrics', async (_req, res) => {
+    res.set('Content-Type', register.contentType);
+    res.send(await register.metrics());
+  });
+  logger.log('Prometheus 메트릭 엔드포인트 (/metrics) 설정 완료');
 
   // const uri = `amqp://${configService.get('RABBITMQ_DEFAULT_USER')}:${configService.get('RABBITMQ_DEFAULT_PASS')}@${configService.get('RABBITMQ_HOST')}:${configService.get('RABBITMQ_PORT')}`;
   const uri = configService.get('RMQ_REMOTE_URI');
