@@ -1,0 +1,13 @@
+# monitoring/alertmanager.yml
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: mattermost
+
+receivers:
+  - name: mattermost
+    webhook_configs:
+      - url: "https://meeting.ssafy.com/hooks/4dn1cdxqd7br9c1wenttayas4h"
+        channel: "#sleep-tight-alerts"
+        send_resolved: true

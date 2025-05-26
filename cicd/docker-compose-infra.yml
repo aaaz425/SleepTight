@@ -45,14 +45,77 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro # 호스트의 rabbitmq.conf 를 컨테이너 설정 파일로 마운트
+
     networks:
       - app-network
 
-networks:
-  app-network:
-    external: true
+  # ──────────────────────────────────────────────
+  # ▶ Monitoring Stack
+  # ──────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: monitor-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alarm.rules.yml:/etc/prometheus/alarm.rules.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  alertmanager:
+    image: prom/alertmanager:v0.25.0
+    container_name: monitor-alertmanager
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "9093:9093"
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: monitor-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=gngnqnfauswmds303
+    ports:
+      - "3001:3000"
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.13.0
+    container_name: monitor-nginx-exporter
+    command:
+      - -nginx.scrape-uri
+      - http://nginx:9113/nginx_status
+    ports:
+      - "9114:9114"
+    networks:
+      - app-network
+
+  cadvisor:
+    image: google/cadvisor:latest
+    container_name: monitor-cadvisor
+    ports:
+      - "8085:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
+
+networks:
+  app-network:
+    external: true
+      - app-network

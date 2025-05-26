@@ -1,0 +1,21 @@
+# monitoring/alarm.rules.yml
+groups:
+  - name: infra_alerts
+    rules:
+      - alert: HighAppCPU
+        expr: rate(process_cpu_seconds_total{job="app"}[2m]) > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "앱 컨테이너 CPU 80% 초과"
+          description: "앱의 CPU 사용률이 80%를 넘었습니다."
+
+      - alert: NginxDown
+        expr: up{job="nginx"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nginx 응답 없음"
+          description: "nginx-exporter가 응답하지 않습니다."
