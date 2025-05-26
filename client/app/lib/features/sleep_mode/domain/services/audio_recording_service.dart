@@ -125,15 +125,15 @@ class AudioRecordingService {
         (Uint8List pcmDataChunk) {
           // 콜백 파라미터 타입을 Uint8List (non-nullable)로 변경
           // pcmDataChunk가 null일 수 없으므로 null 체크 제거 (단, empty 체크는 유효)
-          debugPrint(
-            'AudioRecordingService: pcmDataStream 리스너 호출됨. 데이터 크기: ${pcmDataChunk.length}',
-          );
+          // debugPrint(
+          //   'AudioRecordingService: pcmDataStream 리스너 호출됨. 데이터 크기: ${pcmDataChunk.length}',
+          // );
           if (pcmDataChunk.isNotEmpty) {
             if (!_rawPcmUiStreamController.isClosed) {
               _rawPcmUiStreamController.add(pcmDataChunk);
-              debugPrint(
-                'AudioRecordingService: _rawPcmUiStreamController에 데이터 추가됨. 크기: ${pcmDataChunk.length}',
-              );
+              // debugPrint(
+              //   'AudioRecordingService: _rawPcmUiStreamController에 데이터 추가됨. 크기: ${pcmDataChunk.length}',
+              // );
             }
 
             List<double> amplitudes = _convertPcmToAmplitudes(pcmDataChunk);

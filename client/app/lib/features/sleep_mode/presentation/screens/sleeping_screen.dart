@@ -220,10 +220,24 @@ class _SleepingScreenState extends ConsumerState<SleepingScreen> {
                 // waveStyle: const WaveStyle(...), // 제거됨
 
                 // 수정된 AudioWaveforms 위젯에 여전히 유효한 속성들 (필요에 따라 설정)
-                backgroundColor: Colors.black87, // 텍스트 표시 영역 배경색 예시
                 padding: const EdgeInsets.all(8.0), // 텍스트 주변 패딩 예시
                 // margin: ..., // 이미 외부 Container에 margin이 있으므로 중복 주의
-                // decoration: ...,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1C1C1E), // #1C1C1E
+                      Color(0xFF000000), // #000000
+                      Color(0xFF1C1C1E), // #1C1C1E
+                    ],
+                    stops: [
+                      0.0, // 0% 지점
+                      0.5, // 50% 지점
+                      1.0, // 100% 지점
+                    ],
+                    begin: Alignment.centerLeft, // 그라데이션 시작 방향 (예: 위에서 아래로)
+                    end: Alignment.centerRight, // 그라데이션 끝 방향
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 34),
