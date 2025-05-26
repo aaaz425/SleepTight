@@ -87,7 +87,7 @@ services:
       - prometheus
 
   nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:0.13.0
+    image: nginx/nginx-prometheus-exporter:1.4.2
     container_name: monitor-nginx-exporter
     command:
       - -nginx.scrape-uri
